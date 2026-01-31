@@ -20,6 +20,11 @@ logs
 # Optional npm cache directory
 .npm
 
+# IDEs
+.idea/
+*.iml
+.vscode/
+
 # Optional eslint cache
 .eslintcache
 

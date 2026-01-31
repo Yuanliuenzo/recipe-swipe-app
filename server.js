@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     console.log("GET / called");
-    res.send("Server is running");
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.post('/api/generateRecipe', async (req, res) => {
