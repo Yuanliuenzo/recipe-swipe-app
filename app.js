@@ -1,78 +1,6 @@
 // ---------------------------
-// Vibe Data for Swiping
+// Web-Specific Swipe Implementation
 // ---------------------------
-
-const vibes = [
-    { 
-        name: "Cozy Night In", 
-        emoji: "🛋️",
-        description: "Comfort food, warm blankets, Netflix marathon",
-        prompt: "comforting, hearty, perfect for staying in on a cold night",
-        color: "#8B7355",
-        image: "images/cozy_night.jpg"
-    },
-    { 
-        name: "Healthy & Fresh", 
-        emoji: "🥗",
-        description: "Light, nutritious, energizing",
-        prompt: "healthy, fresh, light but satisfying, packed with vegetables",
-        color: "#7CB342",
-        image: "images/healthy_fresh.jpg"
-    },
-    { 
-        name: "Spicy Adventure", 
-        emoji: "🌶️",
-        description: "Bold flavors, exotic ingredients, heat",
-        prompt: "spicy, adventurous, bold flavors, exciting and intense",
-        color: "#D32F2F",
-        image: "images/spicy_adventure.jpg"
-    },
-    { 
-        name: "Quick & Easy", 
-        emoji: "⚡",
-        description: "Minimal effort, maximum flavor, under 30 mins",
-        prompt: "quick, easy, minimal cleanup, perfect for busy weeknights",
-        color: "#1976D2",
-        image: "images/quick_easy.jpg"
-    },
-    { 
-        name: "Romantic Dinner", 
-        emoji: "🕯️",
-        description: "Elegant, impressive, date night worthy",
-        prompt: "romantic, elegant, impressive but not too complicated",
-        color: "#E91E63",
-        image: "images/romantic_dinner.jpg"
-    },
-    { 
-        name: "Hangover Cure", 
-        emoji: "🤕",
-        description: "Soothing, greasy, restorative",
-        prompt: "comforting, greasy, perfect for curing a hangover",
-        color: "#FF6F00",
-        image: "images/hangover_cure.jpg"
-    },
-    { 
-        name: "Summer Vibes", 
-        emoji: "☀️",
-        description: "Grilling, fresh, light, outdoor friendly",
-        prompt: "fresh, summery, perfect for grilling or outdoor dining",
-        color: "#FFB300",
-        image: "images/summer_vibes.jpg"
-    },
-    { 
-        name: "Comfort Food Classic", 
-        emoji: "🍲",
-        description: "Nostalgic, hearty, like mom used to make",
-        prompt: "classic comfort food, nostalgic, hearty and satisfying",
-        color: "#6D4C41",
-        image: "images/comfort_food.jpg"
-    }
-];
-
-let vibeProfile = [];
-const maxVibeRounds = 5;
-let currentVibeRound = 0;
-let ingredientsAtHome = ''; // Only initialize once here
 
 const container = document.getElementById("card-container");
 const resultEl = document.getElementById("result");
@@ -115,15 +43,7 @@ function createCard(vibe) {
 }
 
 // ---------------------------
-// Shuffle helper
-// ---------------------------
-
-function shuffle(array) {
-    return array.sort(() => 0.5 - Math.random());
-}
-
-// ---------------------------
-// Drag & Swipe
+// Drag & Swipe (Mouse-based for Web)
 // ---------------------------
 
 function initSwipe(card, vibe) {
@@ -131,6 +51,7 @@ function initSwipe(card, vibe) {
     let startX = 0;
     let currentX = 0;
 
+    // Mouse events
     card.addEventListener("mousedown", e => {
         isDragging = true;
         startX = e.clientX;
@@ -140,15 +61,7 @@ function initSwipe(card, vibe) {
     document.addEventListener("mousemove", e => {
         if (!isDragging) return;
         currentX = e.clientX - startX;
-        card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
-
-        // Progressive glow based on swipe distance
-        const maxDistance = 200;
-        const likeIntensity = Math.max(0, Math.min(1, currentX / maxDistance));
-        const nopeIntensity = Math.max(0, Math.min(1, -currentX / maxDistance));
-
-        likeGlow.style.opacity = likeIntensity * 0.6; // max 60% opacity
-        nopeGlow.style.opacity = nopeIntensity * 0.6; // max 60% opacity
+        updateCardPosition(card, currentX);
     });
 
     document.addEventListener("mouseup", () => {
@@ -172,6 +85,18 @@ function initSwipe(card, vibe) {
         nopeGlow.style.opacity = 0;
         currentX = 0;
     });
+}
+
+function updateCardPosition(card, currentX) {
+    card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+
+    // Progressive glow based on swipe distance
+    const maxDistance = 200;
+    const likeIntensity = Math.max(0, Math.min(1, currentX / maxDistance));
+    const nopeIntensity = Math.max(0, Math.min(1, -currentX / maxDistance));
+
+    likeGlow.style.opacity = likeIntensity * 0.6;
+    nopeGlow.style.opacity = nopeIntensity * 0.6;
 }
 
 function animateOff(card, distance) {
@@ -200,93 +125,16 @@ function showNextCard() {
 }
 
 // ---------------------------
-// Generate Personalized Prompt Based on Vibe Profile
+// Final Result with Flip Card & Sparkles
 // ---------------------------
 
-function generatePersonalizedPrompt() {
-    console.log("generatePersonalizedPrompt called. ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
-    if (vibeProfile.length === 0) {
-        return "Write me a delicious recipe that would be perfect for any occasion.";
-    }
-
-    // Combine all the vibe prompts into a cohesive description
-    const vibeDescriptions = vibeProfile.map(vibe => vibe.prompt);
-    const combinedVibes = vibeDescriptions.join(", ");
-    
-    let prompt = `Can you make a recipe for someone that has this vibe:
-
-${combinedVibes}
-
-Please write me a clear, well-formatted recipe that matches these preferences. `;
-    
-    if (ingredientsAtHome) {
-        prompt += `Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
-    }
-    
-    prompt += `Structure it exactly like this (follow the formatting rules strictly):
-
-Recipe Name
-===
-
-Ingredients:
-• [ingredient 1]
-• [ingredient 2]
-• [ingredient 3]
-
-Instructions:
-1. [step 1]
-2. [step 2]
-3. [step 3]
-
-Formatting rules:
-- Use the exact header text "Ingredients:" on its own line.
-- Use the exact header text "Instructions:" on its own line.
-- Put each ingredient on its own line (prefer starting with "• ").
-- Put each instruction on its own line starting with "1.", "2.", etc.
-- Do not merge ingredients and instructions into the same paragraph.
-- Do not omit the Instructions header.
-
-Keep it concise but complete.`;
-
-    return prompt;
-}
-
-async function fetchLocalRecipe(prompt) {
-    console.log("fetchLocalRecipe called with:", prompt);
-    
-    try {
-        const res = await fetch('/api/generateRecipe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-        });
-        
-        console.log("Response status:", res.status);
-        
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        
-        const data = await res.json();
-        console.log("Response data:", data);
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        return data.recipe;
-    } catch (error) {
-        console.error("Error in fetchLocalRecipe:", error);
-        throw error;
-    }
-}
 async function showResult() {
     // Hide swipe deck & title
     container.style.display = "none";
     document.querySelector("h1").style.display = "none";
 
     // Clear and show result container
-    resultEl.innerHTML = ""; // clear static content
+    resultEl.innerHTML = "";
     resultEl.style.display = "flex";
     resultEl.style.flexDirection = "column";
     resultEl.style.justifyContent = "center";
@@ -327,18 +175,20 @@ async function showResult() {
     
     front.innerHTML = vibeSummary;
 
-    // Back (ingredients at home input)
+    // Back (ingredients input with elegant Japandi styling)
     const back = document.createElement("div");
     back.classList.add("card-face", "back");
     back.innerHTML = `
-        <h2>What do you have at home?</h2>
-        <p class="ingredients-subtitle">Optional: List ingredients you'd like to use (e.g., chicken, rice, tomatoes)</p>
-        <textarea class="ingredients-input" placeholder="e.g., chicken breast, rice, garlic, spinach..." rows="3"></textarea>
-        <div class="ingredients-buttons">
-            <button class="add-ingredients-btn">➕ Add Ingredients</button>
-            <button class="generate-btn">🍳 Generate My Recipe</button>
+        <div class="ingredients-container">
+            <h2>🏡 What do you have at home?</h2>
+            <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
+            <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
+            <div class="ingredients-actions">
+                <button class="japandi-btn japandi-btn-subtle add-ingredients-btn">+ Add Ingredients</button>
+            </div>
+            <div class="ingredients-confirmation"></div>
+            <button class="japandi-btn japandi-btn-primary generate-btn">🍳 Generate My Recipe</button>
         </div>
-        <div class="ingredients-confirmation"></div>
     `;
 
     // Add event listeners
@@ -347,11 +197,22 @@ async function showResult() {
     const ingredientsInput = back.querySelector('.ingredients-input');
     const confirmation = back.querySelector('.ingredients-confirmation');
 
+    console.log("Event listeners setup - addBtn:", addBtn);
+    console.log("Event listeners setup - generateBtn:", generateBtn);
+    console.log("Event listeners setup - ingredientsInput:", ingredientsInput);
+
+    if (!addBtn) {
+        console.error("Add button not found!");
+        return;
+    }
+
     addBtn.addEventListener('click', (e) => {
+        console.log("ADD BUTTON CLICKED!"); // This should definitely show up
         e.stopPropagation();
         const rawValue = ingredientsInput.value.trim();
         console.log("Add clicked. rawValue:", JSON.stringify(rawValue));
-        console.log("Current ingredientsAtHome before:", JSON.stringify(ingredientsAtHome));
+        console.log("Current ingredientsAtHome before:", JSON.stringify(window.ingredientsAtHome));
+        
         if (rawValue) {
             // Split new ingredients by commas, clean each, and filter empty
             const newItems = rawValue.split(',')
@@ -359,8 +220,8 @@ async function showResult() {
                 .filter(item => item.length > 0);
             
             // Split existing ingredients (if any) and dedupe
-            const existingItems = ingredientsAtHome
-                ? ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
+            const existingItems = window.ingredientsAtHome
+                ? window.ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
                 : [];
             
             // Combine and dedupe
@@ -368,28 +229,47 @@ async function showResult() {
             const uniqueItems = [...new Set(combined)];
             
             // Update ingredientsAtHome with cleaned, unique list
-            ingredientsAtHome = uniqueItems.join(', ');
+            window.ingredientsAtHome = uniqueItems.join(', ');
             
             // Clear the textarea for next entry
             ingredientsInput.value = '';
             
             // Show confirmation
             confirmation.textContent = `✅ Added: ${newItems.join(', ')}`;
-            confirmation.style.color = '#6a4e42';
+            confirmation.style.color = '#4CAF50';
+            confirmation.classList.add('show');
+            
+            setTimeout(() => {
+                confirmation.classList.remove('show');
+            }, 3000);
+            
             console.log("newItems:", newItems);
             console.log("existingItems:", existingItems);
             console.log("uniqueItems:", uniqueItems);
-            console.log("Ingredients saved after:", JSON.stringify(ingredientsAtHome));
+            console.log("Ingredients saved after:", JSON.stringify(window.ingredientsAtHome));
+            
         } else {
             confirmation.textContent = '⚠️ Please enter ingredients first';
             confirmation.style.color = '#c9a66b';
+            confirmation.classList.add('show');
+            
+            setTimeout(() => {
+                confirmation.classList.remove('show');
+            }, 3000);
         }
     });
 
     generateBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent card flip
-        console.log("Generating with ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
-        generatePersonalizedRecipe(personalizedPrompt, ingredientsAtHome);
+        console.log("Generating with ingredientsAtHome:", JSON.stringify(window.ingredientsAtHome));
+        console.log("window.ingredientsAtHome type:", typeof window.ingredientsAtHome);
+        console.log("window.ingredientsAtHome length:", window.ingredientsAtHome ? window.ingredientsAtHome.length : 'null');
+        
+        // Regenerate the prompt with current ingredients
+        const currentPrompt = generatePersonalizedPrompt();
+        console.log("Regenerated prompt with ingredients:", currentPrompt);
+        
+        generatePersonalizedRecipe(currentPrompt);
     });
 
     // Prevent flip when clicking/focusing the textarea
@@ -439,126 +319,30 @@ async function showResult() {
     }, 100);
 }
 
-// Function to format recipe text with better HTML structure
-function formatRecipeText(recipeText) {
-    const applyInlineFormatting = (text) => {
-        if (typeof text !== 'string') return text;
-        return text
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    };
-
-    const introLines = [];
-    const ingredientLines = [];
-    const instructionLines = [];
-
-    let mode = 'intro';
-    const lines = String(recipeText || '').split('\n');
-    for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
-
-        if (line.toLowerCase() === 'ingredients:' || line.toLowerCase().startsWith('ingredients:')) {
-            mode = 'ingredients';
-            continue;
-        }
-        if (line.toLowerCase() === 'instructions:' || line.toLowerCase().startsWith('instructions:')) {
-            mode = 'instructions';
-            continue;
-        }
-
-        if (line === '===') continue;
-
-        if (mode === 'ingredients' && /^\d+(\.|\))\s+/.test(line)) {
-            mode = 'instructions';
-        }
-
-        if (mode === 'ingredients') {
-            ingredientLines.push(line);
-        } else if (mode === 'instructions') {
-            instructionLines.push(line);
-        } else {
-            introLines.push(line);
-        }
-    }
-
-    const hasIngredients = ingredientLines.length > 0;
-    const hasInstructions = instructionLines.length > 0;
-
-    let html = '';
-
-    if (introLines.length) {
-        html += `<div class="recipe-intro">${applyInlineFormatting(introLines.join('\n'))}</div>`;
-    }
-
-    if (hasIngredients) {
-        html += `
-            <div class="recipe-section recipe-section-ingredients" data-recipe-section="ingredients">
-                <h3>🥘 Ingredients</h3>
-                <ul class="ingredients-list">
-                    ${ingredientLines
-                        .map(item => item.replace(/^[-•]\s*/, ''))
-                        .map(item => `<li>${applyInlineFormatting(item)}</li>`)
-                        .join('')}
-                </ul>
-            </div>
-        `;
-    }
-
-    if (hasInstructions) {
-        html += `
-            <div class="recipe-section recipe-section-instructions" data-recipe-section="instructions">
-                <h3>👨‍🍳 Instructions</h3>
-                <ol class="instructions-list">
-                    ${instructionLines
-                        .map(item => item.replace(/^\d+\.|^\d+\)|^[-•]\s*/g, '').trim())
-                        .map(item => `<li>${applyInlineFormatting(item)}</li>`)
-                        .join('')}
-                </ol>
-            </div>
-        `;
-    }
-
-    if (!html) {
-        return {
-            html: `<p>${applyInlineFormatting(String(recipeText || ''))}</p>`,
-            hasIngredients: false,
-            hasInstructions: false
-        };
-    }
-
-    return { html, hasIngredients, hasInstructions };
-}
-
 // Global function to generate personalized recipe
-async function generatePersonalizedRecipe(basePrompt, ingredients) {
-    console.log("generatePersonalizedRecipe called with basePrompt:", basePrompt);
-    console.log("generatePersonalizedRecipe called with ingredients:", JSON.stringify(ingredients));
+async function generatePersonalizedRecipe(prompt) {
+    console.log("generatePersonalizedRecipe called with prompt:", prompt);
+    console.log("generatePersonalizedRecipe - window.ingredientsAtHome:", JSON.stringify(window.ingredientsAtHome));
     
     const back = document.querySelector('.card-face.back');
-    const button = back.querySelector('.generate-btn');
+    const container = back.querySelector('.ingredients-container');
+    const button = container.querySelector('.generate-btn');
     
     if (!back || !button) {
         console.error("Could not find back or button");
         return;
     }
     
-    // Build the final prompt including ingredients if provided
-    let finalPrompt = basePrompt;
-    if (ingredients && ingredients.trim()) {
-        finalPrompt = basePrompt.replace(
-            "Please write me a clear, well-formatted recipe that matches these preferences. ",
-            `Please write me a clear, well-formatted recipe that matches these preferences. Try to incorporate these ingredients they already have: ${ingredients.trim()}. `
-        );
-    }
-    
-    console.log("Final prompt to Ollama:", finalPrompt);
+    // Store ingredients before replacing content
+    const storedIngredients = window.ingredientsAtHome;
+    console.log("Stored ingredients before content replacement:", storedIngredients);
     
     // Show loading state with spinner
     button.innerHTML = '<span class="loading-spinner"></span> Generating... (this may take 30+ seconds)';
     button.disabled = true;
     
     try {
-        console.log("Sending final prompt:", finalPrompt);
+        console.log("Sending personalized prompt:", prompt);
         
         // Add timeout to handle slow Ollama responses
         const timeoutPromise = new Promise((_, reject) => 
@@ -566,7 +350,7 @@ async function generatePersonalizedRecipe(basePrompt, ingredients) {
         );
         
         const recipeText = await Promise.race([
-            fetchLocalRecipe(finalPrompt),
+            fetchLocalRecipe(prompt),
             timeoutPromise
         ]);
         
@@ -580,9 +364,9 @@ async function generatePersonalizedRecipe(basePrompt, ingredients) {
 
         const showToggle = hasIngredients && hasInstructions;
 
-        // Update the back content with generated recipe
-        back.innerHTML = `
-            <h2>Your Personalized Recipe</h2>
+        // Update the container content with generated recipe, maintaining structure
+        container.innerHTML = `
+            <h2>🍳 Your Personalized Recipe</h2>
             ${showToggle ? `
                 <div class="recipe-toggle" role="tablist" aria-label="Recipe sections">
                     <button type="button" class="recipe-toggle-btn active" data-target="ingredients">Ingredients</button>
@@ -590,12 +374,18 @@ async function generatePersonalizedRecipe(basePrompt, ingredients) {
                 </div>
             ` : ``}
             <div class="recipe-content">${recipeHtml}</div>
-            <button class="reset-btn" onclick="location.reload()">🔄 Start Over</button>
+            <button class="japandi-btn japandi-btn-primary reset-btn">🔄 Start Over</button>
         `;
 
+        // Restore ingredients after content replacement (in case they got reset)
+        if (storedIngredients && !window.ingredientsAtHome) {
+            window.ingredientsAtHome = storedIngredients;
+            console.log("Restored ingredients after content replacement:", window.ingredientsAtHome);
+        }
+
         if (showToggle) {
-            const contentEl = back.querySelector('.recipe-content');
-            const toggleBtns = back.querySelectorAll('.recipe-toggle-btn');
+            const contentEl = container.querySelector('.recipe-content');
+            const toggleBtns = container.querySelectorAll('.recipe-toggle-btn');
 
             const setActive = (target) => {
                 contentEl.querySelectorAll('[data-recipe-section]').forEach((el) => {
@@ -617,10 +407,12 @@ async function generatePersonalizedRecipe(basePrompt, ingredients) {
             setActive('ingredients');
         }
 
-        // Add animation for content
-        back.querySelector('h2').style.opacity = 1;
-        back.querySelector('div').style.opacity = 1;
-        back.querySelector('button').style.opacity = 1;
+        // Add event listener to reset button
+        const resetBtn = container.querySelector('.reset-btn');
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            location.reload();
+        });
         
     } catch (error) {
         console.error("Failed to fetch personalized recipe:", error);
@@ -629,9 +421,8 @@ async function generatePersonalizedRecipe(basePrompt, ingredients) {
     }
 }
 
-
 // ---------------------------
-// Start
+// Start Web App
 // ---------------------------
 
 showNextCard();

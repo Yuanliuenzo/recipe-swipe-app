@@ -38,14 +38,12 @@
     font-weight: bold;
     color: #ffffff;
     margin-bottom: 10px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
 .vibe-description {
     font-size: 14px;
     color: #ffffff;
     line-height: 1.4;
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
     max-width: 260px;
 }
 
@@ -344,7 +342,6 @@ h1 {
     max-height: 280px;
     padding-right: 10px;
     color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .recipe-toggle {
@@ -546,11 +543,15 @@ h1 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----------------- Glow for winner card ----------------- */
-
 #winner-card {
     box-shadow: 0 0 30px 10px gold, 0 0 50px 20px rgba(255,215,0,0.5);
     animation: glowPulse 2s infinite alternate, scaleIn 0.6s ease-out;
+}
+
+#result .back h2,
+#result .recipe-content,
+#result .recipe-content * {
+    text-shadow: none !important;
 }
 
 @keyframes glowPulse {
@@ -661,4 +662,325 @@ h1 {
     background-color: rgba(255, 59, 48, 0.95); /* red for nope */
     color: white;
     border-color: rgba(255, 59, 48, 0.3);
+}
+
+/* ----------------- Japandi Ingredients Styling ----------------- */
+
+.ingredients-container {
+    padding: 24px;
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.ingredients-container h2 {
+    text-align: center;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.japandi-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.japandi-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.japandi-btn:hover::before {
+    left: 100%;
+}
+
+.japandi-btn-primary {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    margin-top: 16px;
+}
+
+.japandi-btn-primary:hover {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    transform: translateY(-2px);
+}
+
+.japandi-btn-subtle {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: #ecf0f1;
+}
+
+.japandi-btn-subtle:hover {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+    transform: translateY(-1px);
+}
+
+.ingredients-subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 20px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.ingredients-input {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #faf8f3;
+    color: #2c3e50;
+    resize: vertical;
+    min-height: 80px;
+    max-height: 120px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+.ingredients-input:focus {
+    outline: none;
+    border-color: #8b7355;
+    background: #ffffff;
+}
+
+.ingredients-input::placeholder {
+    color: #bdc3c7;
+    font-style: italic;
+}
+
+.ingredients-actions {
+    margin-bottom: 12px;
+}
+
+.ingredients-confirmation {
+    min-height: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 16px;
+    opacity: 0;
+}
+
+.ingredients-confirmation.show {
+    opacity: 1;
+}
+
+/* Remove old styles */
+.ingredients-input-wrapper {
+    display: none;
+}
+
+/* Mobile responsiveness for ingredients */
+@media (max-width: 480px) {
+    .ingredients-container {
+        padding: 16px;
+    }
+    
+    .ingredients-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding-right: 70px;
+    }
+    
+    .add-ingredients-btn {
+        right: 6px;
+        bottom: 6px;
+        padding: 6px 12px;
+        min-width: 50px;
+    }
+    
+    .btn-text {
+        display: none;
+    }
+}
+
+/* ----------------- Recipe Toggle & Loading Styling ----------------- */
+
+.recipe-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: rgba(236, 240, 241, 0.5);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.recipe-toggle-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #7f8c8d;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recipe-toggle-btn.active {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+}
+
+.recipe-toggle-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.3);
+    color: #2c3e50;
+}
+
+.recipe-content {
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.recipe-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.recipe-content::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 3px;
+}
+
+.recipe-content::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.recipe-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Recipe section styling */
+.recipe-section {
+    margin-bottom: 20px;
+}
+
+.recipe-section h3 {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ingredients-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ingredients-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(236, 240, 241, 0.5);
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #34495e;
+}
+
+.ingredients-list li:before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    color: #8b7355;
+    font-weight: bold;
+}
+
+.instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step-counter;
+}
+
+.instructions-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(236, 240, 241, 0.5);
+    position: relative;
+    padding-left: 36px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #34495e;
+    counter-increment: step-counter;
+}
+
+.instructions-list li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    background: linear-gradient(135deg, #8b7355, #a0826d);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.recipe-intro {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #34495e;
 }

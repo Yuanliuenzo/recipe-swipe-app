@@ -15,9 +15,22 @@ app.use((req, res, next) => {
     next();
 });
 
+// Detect mobile user agents
+function isMobile(req) {
+    const userAgent = req.headers['user-agent'] || '';
+    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+}
+
 app.get("/", (req, res) => {
-    console.log("GET / called");
-    res.sendFile(path.join(__dirname, 'index.html'));
+    console.log("GET / called from:", req.headers['user-agent']);
+    
+    if (isMobile(req)) {
+        console.log("Serving mobile version");
+        res.sendFile(path.join(__dirname, 'mobile.html'));
+    } else {
+        console.log("Serving desktop version");
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }
 });
 
 app.post('/api/generateRecipe', async (req, res) => {
@@ -54,6 +67,7 @@ app.use((req, res) => {
     res.status(404).json({ error: "Not found", url: req.url });
 });
 
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+app.listen(3000, '0.0.0.0', () => {
+    console.log("Server running on http://0.0.0.0:3000");
+    console.log("Access from your network: http://YOUR_LOCAL_IP:3000");
 });

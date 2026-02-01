@@ -1,0 +1,402 @@
+/* ----------------- Mobile-First Recipe Swipe ----------------- */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* ----------------- Mobile Container ----------------- */
+
+.mobile-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+.mobile-header {
+    text-align: center;
+    padding: 20px 20px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.mobile-header h1 {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.round-indicator {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.current-round {
+    color: #ffd700;
+    font-weight: 700;
+}
+
+/* ----------------- Mobile App Area ----------------- */
+
+.mobile-app {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+.mobile-card-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    height: 500px;
+}
+
+/* ----------------- Mobile Vibe Cards ----------------- */
+
+.mobile-vibe-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    cursor: grab;
+    transition: transform 0.2s ease-out;
+    overflow: hidden;
+}
+
+.mobile-vibe-card.dragging {
+    cursor: grabbing;
+    transition: none;
+}
+
+.mobile-vibe-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.mobile-vibe-emoji {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.mobile-vibe-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.mobile-vibe-description {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+}
+
+/* ----------------- Swipe Indicators ----------------- */
+
+.mobile-swipe-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+}
+
+.mobile-swipe-indicator.like {
+    right: 20px;
+    color: #4CAF50;
+}
+
+.mobile-swipe-indicator.nope {
+    left: 20px;
+    color: #f44336;
+}
+
+.mobile-swipe-indicator.show {
+    opacity: 0.8;
+}
+
+/* ----------------- Instructions ----------------- */
+
+.mobile-instructions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.instruction-left, .instruction-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.instruction-icon {
+    font-size: 24px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.instruction-left .instruction-icon {
+    color: #f44336;
+}
+
+.instruction-right .instruction-icon {
+    color: #4CAF50;
+}
+
+/* ----------------- Mobile Result ----------------- */
+
+.mobile-result {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: none;
+    z-index: 1000;
+}
+
+.mobile-result.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.mobile-result-content {
+    width: 100%;
+    max-width: 400px;
+}
+
+.mobile-recipe-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.mobile-vibe-summary {
+    margin-bottom: 25px;
+}
+
+.mobile-vibe-summary h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.mobile-selected-vibes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.mobile-vibe-tag {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.mobile-generate-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.mobile-generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+}
+
+.mobile-generate-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.mobile-loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ----------------- Recipe Display ----------------- */
+
+.mobile-recipe-content {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.mobile-recipe-section {
+    margin-bottom: 25px;
+}
+
+.mobile-recipe-section h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-ingredients-list {
+    list-style: none;
+    padding: 0;
+}
+
+.mobile-ingredients-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 25px;
+}
+
+.mobile-ingredients-list li:before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.mobile-instructions-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: step-counter;
+}
+
+.mobile-instructions-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 40px;
+    counter-increment: step-counter;
+}
+
+.mobile-instructions-list li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mobile-reset-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.mobile-reset-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ----------------- Responsive Adjustments ----------------- */
+
+@media (max-height: 700px) {
+    .mobile-card-container {
+        height: 400px;
+    }
+    
+    .mobile-vibe-emoji {
+        font-size: 50px;
+    }
+    
+    .mobile-vibe-name {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 380px) {
+    .mobile-header h1 {
+        font-size: 20px;
+    }
+    
+    .mobile-card-container {
+        max-width: 300px;
+        height: 450px;
+    }
+}
