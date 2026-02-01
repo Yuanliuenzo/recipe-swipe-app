@@ -73,13 +73,27 @@ const vibes = [
 let vibeProfile = [];
 const maxVibeRounds = 5;
 let currentVibeRound = 0;
+let shuffledVibes = [];
 
 // Make ingredientsAtHome truly global
 window.ingredientsAtHome = '';
 
+// Initialize shuffled vibes once (no repeats)
+function initializeShuffledVibes() {
+    shuffledVibes = shuffle([...vibes]);
+}
+
 // Shuffle helper
 function shuffle(array) {
     return array.sort(() => 0.5 - Math.random());
+}
+
+// Get next unique vibe (reshuffle if we run out)
+function getNextVibe() {
+    if (shuffledVibes.length === 0) {
+        initializeShuffledVibes();
+    }
+    return shuffledVibes.shift();
 }
 
 // Generate personalized prompt based on vibe profile
@@ -173,6 +187,7 @@ function formatRecipeText(recipeText) {
     const introLines = [];
     const ingredientLines = [];
     const instructionLines = [];
+    let recipeTitle = '';
 
     let mode = 'intro';
     const lines = String(recipeText || '').split('\n');
@@ -195,12 +210,23 @@ function formatRecipeText(recipeText) {
             mode = 'instructions';
         }
 
-        if (mode === 'ingredients') {
+        if (mode === 'intro') {
+            // Capture the first line as the recipe title
+            if (!recipeTitle) {
+                // Remove common prefixes like "Recipe Name:" or "Recipe:"
+                let cleanLine = line.replace(/^(Recipe Name:|Recipe:)\s*/i, '').trim();
+                if (cleanLine && !cleanLine.toLowerCase().includes('ingredients') && !cleanLine.toLowerCase().includes('instructions')) {
+                    recipeTitle = cleanLine;
+                } else {
+                    introLines.push(line);
+                }
+            } else {
+                introLines.push(line);
+            }
+        } else if (mode === 'ingredients') {
             ingredientLines.push(line);
         } else if (mode === 'instructions') {
             instructionLines.push(line);
-        } else {
-            introLines.push(line);
         }
     }
 
@@ -208,6 +234,10 @@ function formatRecipeText(recipeText) {
     const hasInstructions = instructionLines.length > 0;
 
     let html = '';
+
+    if (recipeTitle) {
+        html += `<h2 class="recipe-title">${applyInlineFormatting(recipeTitle)}</h2>`;
+    }
 
     if (introLines.length) {
         html += `<div class="recipe-intro">${applyInlineFormatting(introLines.join('\n'))}</div>`;

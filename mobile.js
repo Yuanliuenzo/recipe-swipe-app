@@ -58,25 +58,50 @@ function initMobileSwipe(card, vibe) {
     let currentX = 0;
     let currentY = 0;
     let isDragging = false;
+    let gestureLocked = false;
+    let isHorizontalGesture = true;
     let startTime = 0;
 
     // Touch start
     card.addEventListener("touchstart", (e) => {
         isDragging = true;
+        gestureLocked = false;
+        isHorizontalGesture = true;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         startTime = Date.now();
         card.classList.add("dragging");
         card.style.transition = "none";
-    }, { passive: true });
+    }, { passive: false });
 
     // Touch move
     card.addEventListener("touchmove", (e) => {
         if (!isDragging) return;
-        
+
+        if (!gestureLocked) {
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+                gestureLocked = true;
+                isHorizontalGesture = Math.abs(dx) >= Math.abs(dy);
+            }
+        }
+
+        if (!isHorizontalGesture) {
+            isDragging = false;
+            card.classList.remove("dragging");
+            card.style.transition = "transform 0.2s ease-out";
+            card.style.transform = "translateX(0) translateY(0) rotate(0) scale(1)";
+            likeIndicator.classList.remove("show");
+            nopeIndicator.classList.remove("show");
+            return;
+        }
+
+        e.preventDefault();
+
         currentX = e.touches[0].clientX - startX;
         currentY = e.touches[0].clientY - startY;
-        
+
         // Apply transform with rotation based on swipe direction
         const rotation = currentX * 0.1;
         const scale = Math.max(0.95, 1 - Math.abs(currentX) / 1000);
@@ -94,24 +119,24 @@ function initMobileSwipe(card, vibe) {
             likeIndicator.classList.remove("show");
             nopeIndicator.classList.remove("show");
         }
-    }, { passive: true });
+    }, { passive: false });
 
     // Touch end
     card.addEventListener("touchend", (e) => {
         if (!isDragging) return;
-        
+
         isDragging = false;
         card.classList.remove("dragging");
         card.style.transition = "transform 0.3s ease-out";
-        
+
         const endTime = Date.now();
         const timeDiff = endTime - startTime;
         const velocity = Math.abs(currentX / timeDiff);
-        
+
         // Determine swipe action based on distance and velocity
         const swipeThreshold = 100;
         const velocityThreshold = 0.5;
-        
+
         if (currentX > swipeThreshold || (currentX > 50 && velocity > velocityThreshold)) {
             // Like - swipe right
             vibeProfile.push(vibe);
@@ -123,11 +148,11 @@ function initMobileSwipe(card, vibe) {
             // Return to center
             card.style.transform = "translateX(0) translateY(0) rotate(0) scale(1)";
         }
-        
+
         // Reset indicators
         likeIndicator.classList.remove("show");
         nopeIndicator.classList.remove("show");
-        
+
         // Reset variables
         currentX = 0;
         currentY = 0;
@@ -137,7 +162,7 @@ function initMobileSwipe(card, vibe) {
 function animateMobileCardOff(card, distance, isLike) {
     card.style.transform = `translateX(${distance}px) translateY(-50px) rotate(${distance * 0.1}deg) scale(0.8)`;
     card.style.opacity = "0";
-    
+
     setTimeout(() => {
         card.remove();
         showNextMobileCard();
@@ -157,7 +182,7 @@ function showNextMobileCard() {
     currentVibeRound++;
     currentRoundEl.textContent = currentVibeRound;
     
-    const vibe = shuffle(vibes)[0];
+    const vibe = getNextVibe();
     const card = createMobileCard(vibe);
     container.appendChild(card);
     
@@ -186,7 +211,6 @@ function showMobileResult() {
     resultEl.classList.add("show");
     
     const recipeCard = document.getElementById("mobile-recipe-card");
-    const personalizedPrompt = generatePersonalizedPrompt();
     
     // Create vibe summary
     const vibeSummary = vibeProfile.length > 0 
@@ -204,15 +228,55 @@ function showMobileResult() {
     
     recipeCard.innerHTML = `
         ${vibeSummary}
-        <button class="mobile-generate-btn" data-prompt="${encodeURIComponent(personalizedPrompt)}">
-            🍳 Generate My Recipe
-        </button>
+        <div class="ingredients-container">
+            <h2>🏡 What do you have at home?</h2>
+            <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
+            <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
+            <div class="ingredients-actions">
+                <button class="japandi-btn japandi-btn-subtle add-ingredients-btn" type="button">+ Add Ingredients</button>
+            </div>
+            <div class="ingredients-confirmation"></div>
+        </div>
+        <button class="japandi-btn japandi-btn-primary mobile-generate-btn" type="button">🍳 Generate My Recipe</button>
     `;
     
-    // Add event listener to generate button
+    const addBtn = recipeCard.querySelector('.add-ingredients-btn');
+    const ingredientsInput = recipeCard.querySelector('.ingredients-input');
+    const confirmation = recipeCard.querySelector('.ingredients-confirmation');
     const generateBtn = recipeCard.querySelector('.mobile-generate-btn');
-    generateBtn.addEventListener('click', (e) => {
-        const prompt = decodeURIComponent(e.target.dataset.prompt);
+
+    addBtn.addEventListener('click', () => {
+        const rawValue = ingredientsInput.value.trim();
+        if (rawValue) {
+            const newItems = rawValue
+                .split(',')
+                .map(item => item.trim().toLowerCase())
+                .filter(item => item.length > 0);
+
+            const existingItems = window.ingredientsAtHome
+                ? window.ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
+                : [];
+
+            const combined = [...existingItems, ...newItems];
+            const uniqueItems = [...new Set(combined)];
+            window.ingredientsAtHome = uniqueItems.join(', ');
+
+            ingredientsInput.value = '';
+
+            confirmation.textContent = `✅ Added: ${newItems.join(', ')}`;
+            confirmation.style.color = '#4CAF50';
+            confirmation.classList.add('show');
+            setTimeout(() => confirmation.classList.remove('show'), 3000);
+        } else {
+            confirmation.textContent = '⚠️ Please enter ingredients first';
+            confirmation.style.color = '#c9a66b';
+            confirmation.classList.add('show');
+            setTimeout(() => confirmation.classList.remove('show'), 3000);
+        }
+    });
+
+    generateBtn.addEventListener('click', () => {
+        const prompt = generatePersonalizedPrompt();
         generateMobileRecipe(prompt, recipeCard);
     });
 }
@@ -235,18 +299,56 @@ async function generateMobileRecipe(prompt, recipeCard) {
             timeoutPromise
         ]);
         
-        // Format the recipe
+        // Format the recipe using shared formatter
         const formattedRecipe = formatRecipeText(recipeText);
         const recipeHtml = typeof formattedRecipe === 'string' ? formattedRecipe : formattedRecipe.html;
+        const hasIngredients = typeof formattedRecipe === 'string' ? false : formattedRecipe.hasIngredients;
+        const hasInstructions = typeof formattedRecipe === 'string' ? false : formattedRecipe.hasInstructions;
         
-        // Update card with recipe
+        const showToggle = hasIngredients && hasInstructions;
+        
+        // Update card with recipe, using mobile-friendly structure
         recipeCard.innerHTML = `
-            <div class="mobile-recipe-content">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🍳 Your Personalized Recipe</h2>
-                <div class="mobile-recipe-content">${recipeHtml}</div>
-                <button class="mobile-reset-btn" onclick="location.reload()">🔄 Start Over</button>
-            </div>
+            ${showToggle ? `
+                <div class="recipe-toggle" role="tablist" aria-label="Recipe sections">
+                    <button type="button" class="recipe-toggle-btn active" data-target="ingredients">Ingredients</button>
+                    <button type="button" class="recipe-toggle-btn" data-target="instructions">Instructions</button>
+                </div>
+            ` : ``}
+            <div class="mobile-recipe-content">${recipeHtml}</div>
+            <button class="japandi-btn japandi-btn-primary mobile-reset-btn" type="button">🔄 Start Over</button>
         `;
+        
+        // Set up toggle functionality if both sections exist
+        if (showToggle) {
+            const contentEl = recipeCard.querySelector('.mobile-recipe-content');
+            const toggleBtns = recipeCard.querySelectorAll('.recipe-toggle-btn');
+            
+            const setActive = (target) => {
+                contentEl.querySelectorAll('[data-recipe-section]').forEach((el) => {
+                    el.style.display = el.dataset.recipeSection === target ? '' : 'none';
+                });
+                
+                toggleBtns.forEach((btn) => {
+                    btn.classList.toggle('active', btn.dataset.target === target);
+                });
+            };
+            
+            toggleBtns.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setActive(btn.dataset.target);
+                });
+            });
+            
+            setActive('ingredients');
+        }
+        
+        // Add event listener to reset button
+        const resetBtn = recipeCard.querySelector('.mobile-reset-btn');
+        resetBtn.addEventListener('click', () => {
+            location.reload();
+        });
         
     } catch (error) {
         console.error("Failed to fetch recipe:", error);
@@ -259,4 +361,5 @@ async function generateMobileRecipe(prompt, recipeCard) {
 // Start Mobile App
 // ---------------------------
 
+initializeShuffledVibes();
 showNextMobileCard();

@@ -984,3 +984,13 @@ h1 {
     line-height: 1.5;
     color: #34495e;
 }
+
+.recipe-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #6a4e42;
+    text-align: center;
+    margin: 0 0 20px 0;
+    line-height: 1.2;
+}

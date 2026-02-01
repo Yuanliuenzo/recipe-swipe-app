@@ -6,12 +6,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from current directory
-app.use(express.static(path.join(__dirname)));
-
 // Add logging middleware
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
+    const userAgent = req.headers['user-agent'] || '';
+    const forwardedFor = req.headers['x-forwarded-for'] || '';
+    console.log(`${req.method} ${req.url} | ip=${req.ip} xff=${forwardedFor} | ua=${userAgent}`);
     next();
 });
 
@@ -20,6 +19,13 @@ function isMobile(req) {
     const userAgent = req.headers['user-agent'] || '';
     return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 }
+
+app.get('/debug/ua', (req, res) => {
+    res.json({
+        userAgent: req.headers['user-agent'] || '',
+        isMobile: isMobile(req)
+    });
+});
 
 app.get("/", (req, res) => {
     console.log("GET / called from:", req.headers['user-agent']);
@@ -32,6 +38,9 @@ app.get("/", (req, res) => {
         res.sendFile(path.join(__dirname, 'index.html'));
     }
 });
+
+// Serve static files from current directory (must be after / routing)
+app.use(express.static(path.join(__dirname)));
 
 app.post('/api/generateRecipe', async (req, res) => {
     console.log("POST /api/generateRecipe called with body:", req.body);

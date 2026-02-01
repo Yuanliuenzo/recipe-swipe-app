@@ -118,7 +118,7 @@ function showNextCard() {
     }
 
     currentVibeRound++;
-    const vibe = shuffle(vibes)[0];
+    const vibe = getNextVibe();
     const card = createCard(vibe);
     container.appendChild(card);
     initSwipe(card, vibe);
@@ -425,4 +425,5 @@ async function generatePersonalizedRecipe(prompt) {
 // Start Web App
 // ---------------------------
 
+initializeShuffledVibes();
 showNextCard();
