@@ -72,6 +72,7 @@ const vibes = [
 let vibeProfile = [];
 const maxVibeRounds = 5;
 let currentVibeRound = 0;
+let ingredientsAtHome = ''; // Only initialize once here
 
 const container = document.getElementById("card-container");
 const resultEl = document.getElementById("result");
@@ -199,108 +200,11 @@ function showNextCard() {
 }
 
 // ---------------------------
-// Final Result with Flip Card & Sparkles
-// ---------------------------
-
-// function showResult() {
-//     // Hide swipe deck & title
-//     container.style.display = "none";
-//     const mainTitle = document.querySelector("h1");
-//     if (mainTitle) mainTitle.style.display = "none";
-//
-//     // Clear and show result container
-//     resultEl.innerHTML = ""; // clear static content
-//     resultEl.style.display = "flex";
-//     resultEl.style.flexDirection = "column";
-//     resultEl.style.justifyContent = "center";
-//     resultEl.style.alignItems = "center";
-//     resultEl.style.height = "100vh";
-//     resultEl.style.margin = 0;
-//
-//     // Determine winner
-//     const winner = Object.keys(scores).reduce((a, b) =>
-//         scores[a] > scores[b] ? a : b
-//     );
-//     const recipe = recipes.find(r => r.name === winner);
-//
-//     // Sparkle container (behind card)
-//     const sparkleContainer = document.createElement("div");
-//     sparkleContainer.id = "sparkle-container";
-//     resultEl.appendChild(sparkleContainer);
-//
-//     // Flip card wrapper
-//     const wrapper = document.createElement("div");
-//     wrapper.classList.add("recipe-card-wrapper");
-//
-//     // Front (winner image)
-//     const front = document.createElement("div");
-//     front.classList.add("card-face", "front");
-//     const cardEl = document.createElement("img");
-//     cardEl.src = recipe.image;
-//     cardEl.alt = recipe.name;
-//     cardEl.id = "winner-card";
-//     front.appendChild(cardEl);
-//
-//     // Back (recipe info)
-//     const back = document.createElement("div");
-//     back.classList.add("card-face", "back");
-//     back.innerHTML = `
-//         <h2>${recipe.name}</h2>
-//         <p>Check out the recipe! 🍳</p>
-//         <a href="https://www.recipetineats.com/vegetable-stir-fry/" target="_blank">View Recipe</a>
-//     `;
-//
-//     wrapper.appendChild(front);
-//     wrapper.appendChild(back);
-//     resultEl.appendChild(wrapper);
-//
-//     // Headline below card
-//     const headline = document.createElement("div");
-//     headline.classList.add("headline");
-//     headline.innerText = "🎉 That's What's Cooking! 🎉";
-//     resultEl.appendChild(headline);
-//
-//     // Click to flip
-//     wrapper.addEventListener("click", () => {
-//         wrapper.classList.toggle("flipped");
-//     });
-//
-//     // Add sparkles around card (detached)
-//     cardEl.onload = () => {
-//         const rect = cardEl.getBoundingClientRect();
-//         const containerRect = resultEl.getBoundingClientRect();
-//         const centerX = rect.left - containerRect.left + rect.width / 2;
-//         const centerY = rect.top - containerRect.top + rect.height / 2;
-//
-//         for (let i = 0; i < 40; i++) { // more sparkles
-//             const sparkle = document.createElement("div");
-//             sparkle.classList.add("sparkle");
-//
-//             const size = 4 + Math.random() * 16; // more size variation
-//             const angle = Math.random() * Math.PI * 2;
-//             const radius = 80 + Math.random() * 180; // much more random radius
-//
-//             const x = centerX + radius * Math.cos(angle) - size/2;
-//             const y = centerY + radius * Math.sin(angle) - size/2;
-//
-//             sparkle.style.left = `${x}px`;
-//             sparkle.style.top = `${y}px`;
-//             sparkle.style.width = `${size}px`;
-//             sparkle.style.height = `${size}px`;
-//             sparkle.style.transform = `rotate(${Math.random() * 360}deg)`;
-//             sparkle.style.animationDelay = `${Math.random() * 2}s`; // more random delay
-//             sparkle.style.animationDuration = `${1.5 + Math.random() * 1.5}s`; // random duration
-//
-//             sparkleContainer.appendChild(sparkle);
-//         }
-//     };
-// }
-
-// ---------------------------
 // Generate Personalized Prompt Based on Vibe Profile
 // ---------------------------
 
 function generatePersonalizedPrompt() {
+    console.log("generatePersonalizedPrompt called. ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
     if (vibeProfile.length === 0) {
         return "Write me a delicious recipe that would be perfect for any occasion.";
     }
@@ -309,12 +213,17 @@ function generatePersonalizedPrompt() {
     const vibeDescriptions = vibeProfile.map(vibe => vibe.prompt);
     const combinedVibes = vibeDescriptions.join(", ");
     
-    const prompt = `Can you make a recipe for someone that has this vibe:
+    let prompt = `Can you make a recipe for someone that has this vibe:
 
 ${combinedVibes}
 
-Please write me a clear, well-formatted recipe that matches these preferences. 
-Structure it exactly like this (follow the formatting rules strictly):
+Please write me a clear, well-formatted recipe that matches these preferences. `;
+    
+    if (ingredientsAtHome) {
+        prompt += `Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
+    }
+    
+    prompt += `Structure it exactly like this (follow the formatting rules strictly):
 
 Recipe Name
 ===
@@ -418,21 +327,78 @@ async function showResult() {
     
     front.innerHTML = vibeSummary;
 
-    // Back (recipe info)
+    // Back (ingredients at home input)
     const back = document.createElement("div");
     back.classList.add("card-face", "back");
     back.innerHTML = `
-        <h2>Your Personalized Recipe</h2>
-        <p>Based on your vibe preferences, I'll create the perfect recipe just for you!</p>
-        <button class="generate-btn" data-prompt="${encodeURIComponent(personalizedPrompt)}">🍳 Generate My Recipe</button>
+        <h2>What do you have at home?</h2>
+        <p class="ingredients-subtitle">Optional: List ingredients you'd like to use (e.g., chicken, rice, tomatoes)</p>
+        <textarea class="ingredients-input" placeholder="e.g., chicken breast, rice, garlic, spinach..." rows="3"></textarea>
+        <div class="ingredients-buttons">
+            <button class="add-ingredients-btn">➕ Add Ingredients</button>
+            <button class="generate-btn">🍳 Generate My Recipe</button>
+        </div>
+        <div class="ingredients-confirmation"></div>
     `;
 
-    // Add event listener to the generate button
+    // Add event listeners
     const generateBtn = back.querySelector('.generate-btn');
+    const addBtn = back.querySelector('.add-ingredients-btn');
+    const ingredientsInput = back.querySelector('.ingredients-input');
+    const confirmation = back.querySelector('.ingredients-confirmation');
+
+    addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const rawValue = ingredientsInput.value.trim();
+        console.log("Add clicked. rawValue:", JSON.stringify(rawValue));
+        console.log("Current ingredientsAtHome before:", JSON.stringify(ingredientsAtHome));
+        if (rawValue) {
+            // Split new ingredients by commas, clean each, and filter empty
+            const newItems = rawValue.split(',')
+                .map(item => item.trim().toLowerCase())
+                .filter(item => item.length > 0);
+            
+            // Split existing ingredients (if any) and dedupe
+            const existingItems = ingredientsAtHome
+                ? ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
+                : [];
+            
+            // Combine and dedupe
+            const combined = [...existingItems, ...newItems];
+            const uniqueItems = [...new Set(combined)];
+            
+            // Update ingredientsAtHome with cleaned, unique list
+            ingredientsAtHome = uniqueItems.join(', ');
+            
+            // Clear the textarea for next entry
+            ingredientsInput.value = '';
+            
+            // Show confirmation
+            confirmation.textContent = `✅ Added: ${newItems.join(', ')}`;
+            confirmation.style.color = '#6a4e42';
+            console.log("newItems:", newItems);
+            console.log("existingItems:", existingItems);
+            console.log("uniqueItems:", uniqueItems);
+            console.log("Ingredients saved after:", JSON.stringify(ingredientsAtHome));
+        } else {
+            confirmation.textContent = '⚠️ Please enter ingredients first';
+            confirmation.style.color = '#c9a66b';
+        }
+    });
+
     generateBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent card flip
-        const prompt = decodeURIComponent(e.target.dataset.prompt);
-        generatePersonalizedRecipe(prompt);
+        console.log("Generating with ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
+        generatePersonalizedRecipe(personalizedPrompt, ingredientsAtHome);
+    });
+
+    // Prevent flip when clicking/focusing the textarea
+    ingredientsInput.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    ingredientsInput.addEventListener('focus', (e) => {
+        e.stopPropagation();
     });
 
     wrapper.appendChild(front);
@@ -564,8 +530,9 @@ function formatRecipeText(recipeText) {
 }
 
 // Global function to generate personalized recipe
-async function generatePersonalizedRecipe(prompt) {
-    console.log("generatePersonalizedRecipe called with prompt:", prompt);
+async function generatePersonalizedRecipe(basePrompt, ingredients) {
+    console.log("generatePersonalizedRecipe called with basePrompt:", basePrompt);
+    console.log("generatePersonalizedRecipe called with ingredients:", JSON.stringify(ingredients));
     
     const back = document.querySelector('.card-face.back');
     const button = back.querySelector('.generate-btn');
@@ -575,12 +542,23 @@ async function generatePersonalizedRecipe(prompt) {
         return;
     }
     
+    // Build the final prompt including ingredients if provided
+    let finalPrompt = basePrompt;
+    if (ingredients && ingredients.trim()) {
+        finalPrompt = basePrompt.replace(
+            "Please write me a clear, well-formatted recipe that matches these preferences. ",
+            `Please write me a clear, well-formatted recipe that matches these preferences. Try to incorporate these ingredients they already have: ${ingredients.trim()}. `
+        );
+    }
+    
+    console.log("Final prompt to Ollama:", finalPrompt);
+    
     // Show loading state with spinner
     button.innerHTML = '<span class="loading-spinner"></span> Generating... (this may take 30+ seconds)';
     button.disabled = true;
     
     try {
-        console.log("Sending personalized prompt:", prompt);
+        console.log("Sending final prompt:", finalPrompt);
         
         // Add timeout to handle slow Ollama responses
         const timeoutPromise = new Promise((_, reject) => 
@@ -588,7 +566,7 @@ async function generatePersonalizedRecipe(prompt) {
         );
         
         const recipeText = await Promise.race([
-            fetchLocalRecipe(prompt),
+            fetchLocalRecipe(finalPrompt),
             timeoutPromise
         ]);
         

@@ -36,14 +36,14 @@
 .vibe-name {
     font-size: 24px;
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.95);
+    color: #ffffff;
     margin-bottom: 10px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
 .vibe-description {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.85);
+    color: #ffffff;
     line-height: 1.4;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
     max-width: 260px;
@@ -82,12 +82,6 @@
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
-}
-
-.vibe-description {
-    font-size: 16px;
-    color: #666;
-    margin-top: 10px;
 }
 
 /* ----------------- Reset Button ----------------- */
@@ -279,11 +273,78 @@ h1 {
     width: 100%;
 }
 
+.ingredients-subtitle {
+    font-size: 14px;
+    color: #6a4e42;
+    text-align: center;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+}
+
+.ingredients-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(106, 78, 66, 0.25);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: 'Noto Sans', sans-serif;
+    color: #4a4a4a;
+    resize: none;
+    outline: none;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ingredients-input:focus {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(106, 78, 66, 0.45);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.12);
+}
+
+.ingredients-input::placeholder {
+    color: #8a7a6a;
+}
+
+.ingredients-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.add-ingredients-btn {
+    flex: 1;
+    background: linear-gradient(145deg, #f5f2ed, #eae6df);
+    color: #6a4e42;
+    border: 1px solid rgba(106, 78, 66, 0.25);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.add-ingredients-btn:hover {
+    background: linear-gradient(145deg, #eae6df, #dcd4c8);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.12);
+}
+
+.ingredients-confirmation {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 18px;
+}
+
 .recipe-content {
     flex: 1;
     overflow-y: auto;
     max-height: 280px;
     padding-right: 10px;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .recipe-toggle {
