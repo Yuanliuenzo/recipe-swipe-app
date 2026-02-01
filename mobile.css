@@ -421,28 +421,33 @@ body {
 
 .recipe-toggle-btn {
     flex: 1;
-    padding: 10px 16px;
+    padding: 14px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     background: transparent;
     color: #7f8c8d;
     font-family: 'Noto Sans', sans-serif;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .recipe-toggle-btn.active {
     background: linear-gradient(135deg, #2c3e50, #34495e);
     color: #ecf0f1;
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
+    transform: translateY(-1px);
 }
 
 .recipe-toggle-btn:hover:not(.active) {
     background: rgba(255, 255, 255, 0.3);
     color: #2c3e50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .recipe-title {
@@ -453,6 +458,289 @@ body {
     text-align: center;
     margin: 0 0 20px 0;
     line-height: 1.2;
+}
+
+.recipe-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+}
+
+.save-favorite-btn {
+    flex: 1;
+}
+
+/* Mobile Favorites Screen */
+.mobile-favorites-list {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.mobile-favorites-list h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #6a4e42;
+}
+
+.mobile-favorite-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mobile-favorite-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.mobile-favorite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #6a4e42;
+    margin: 0;
+    flex: 1;
+    padding-right: 12px;
+}
+
+.mobile-delete-favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.mobile-delete-favorite-btn:hover {
+    background: #fde3e3;
+}
+
+.mobile-favorite-body {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.mobile-favorite-footer {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 16px;
+}
+
+.mobile-favorite-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.mobile-star-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+
+.mobile-star-btn:hover {
+    transform: scale(1.2);
+}
+
+.mobile-star-btn.active {
+    color: #fbbf24;
+}
+
+.mobile-favorite-note {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 8px;
+}
+
+.mobile-save-note-btn {
+    background: #6a4e42;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.mobile-save-note-btn:hover {
+    background: #5a3e32;
+}
+
+.mobile-empty-favorites, .mobile-error-favorites {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin-top: 60px;
+}
+
+/* Mobile Skeleton Loading */
+.mobile-recipe-loading-status {
+    text-align: center;
+    color: #6a4e42;
+    font-size: 14px;
+    margin-bottom: 16px;
+    font-style: italic;
+}
+
+.mobile-recipe-skeleton {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mobile-recipe-skeleton .skeleton-line {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.2s infinite;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    height: 16px;
+}
+
+.mobile-recipe-skeleton .skeleton-title {
+    height: 28px;
+    width: 60%;
+}
+
+.mobile-recipe-skeleton .skeleton-subtitle {
+    height: 18px;
+    width: 40%;
+}
+
+.mobile-recipe-skeleton .skeleton-line.short {
+    width: 45%;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Mobile Loading Spinner */
+.mobile-loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.mobile-unified-dropdown {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.mobile-unified-btn {
+    background: #6a4e42;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.mobile-unified-btn:hover {
+    background: #5a3e32;
+}
+
+.mobile-unified-dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 140px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    z-index: 10000;
+}
+
+.mobile-unified-dropdown-content.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.mobile-unified-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.2s;
+}
+
+.mobile-unified-dropdown-item:hover {
+    background: #f5f5f5;
+}
+
+.mobile-unified-dropdown-item:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.mobile-unified-dropdown-item:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+/* Mobile Floating Back Button */
+.mobile-floating-back-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #6a4e42;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9998;
+}
+
+.mobile-floating-back-btn:hover {
+    background: #5a3e32;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
 }
 
 .mobile-recipe-section {
@@ -482,6 +770,71 @@ body {
     font-size: 14px;
     line-height: 1.5;
     color: #34495e;
+}
+
+/* Mobile Full-screen Favorites Container */
+.mobile-favorites-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f0f2f5;
+    z-index: 1000;
+    overflow-y: auto;
+    padding-top: 80px; /* Account for header */
+}
+
+.mobile-favorites-fullscreen .mobile-favorites-header {
+    padding: 20px;
+    text-align: center;
+}
+
+.mobile-favorites-fullscreen .mobile-favorites-header h2 {
+    color: #6a4e42;
+    margin: 0;
+}
+
+.mobile-favorites-fullscreen .mobile-favorites-grid {
+    padding: 0 20px 40px;
+}
+
+.mobile-favorites-fullscreen .debug-info {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 18px;
+    color: #666;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin: 0 20px;
+}
+
+/* Mobile Favorite Card Structure */
+.mobile-favorite-preview {
+    padding: 12px 0;
+}
+
+.mobile-star-display {
+    font-size: 16px;
+    margin-right: 4px;
+}
+
+.mobile-star-display.active {
+    color: #fbbf24;
+}
+
+.mobile-favorite-note-preview {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+.mobile-favorite-details {
+    padding-top: 16px;
+    margin-top: 0;
 }
 
 .ingredients-list li:before {
@@ -561,6 +914,157 @@ body {
     }
 }
 
+/* State-of-the-Art Back Button */
+.mobile-fab-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.mobile-fab-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-fab-back-btn:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.back-icon {
+    font-size: 18px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.mobile-fab-back-btn:hover .back-icon {
+    transform: translateX(-2px);
+}
+
+.back-text {
+    letter-spacing: 0.3px;
+}
+
+/* Entrance animation for the header */
+@keyframes slideDownFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.mobile-header {
+    animation: slideDownFromTop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Floating Back Button */
+.mobile-floating-back-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #6a4e42, #8b6f5e);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 18px;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(106, 78, 66, 0.4);
+    z-index: 1002;
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-floating-back-btn.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+.mobile-floating-back-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(106, 78, 66, 0.5);
+    background: linear-gradient(135deg, #7a5e52, #9b7f6e);
+}
+
+.mobile-floating-back-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 15px rgba(106, 78, 66, 0.4);
+}
+
+.floating-back-icon {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.floating-back-text {
+    letter-spacing: 0.2px;
+}
+.mobile-recipe-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: rgba(236, 240, 241, 0.5);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.mobile-recipe-toggle-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #7f8c8d;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mobile-recipe-toggle-btn.active {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
+    transform: translateY(-1px);
+}
+
+.mobile-recipe-toggle-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.3);
+    color: #2c3e50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
 @media (max-width: 380px) {
     .mobile-header h1 {
         font-size: 20px;
@@ -570,4 +1074,143 @@ body {
         max-width: 300px;
         height: 450px;
     }
+}
+
+/* Mobile FAB Navigation - State of the Art */
+.mobile-navigation {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+}
+
+.mobile-fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #2c3e50;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.mobile-fab:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.mobile-fab:active {
+    transform: scale(0.95);
+}
+
+.fab-icon {
+    filter: none;
+}
+
+.mobile-fab-menu {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    min-width: 280px;
+    max-width: 320px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.9);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 99998;
+    overflow: hidden;
+}
+
+.mobile-fab-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.fab-items {
+    padding: 0;
+}
+
+.fab-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 15px;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.fab-item:first-child {
+    border-radius: 16px 16px 0 0;
+}
+
+.fab-item:last-child {
+    border-radius: 0 0 16px 16px;
+}
+
+.fab-item:only-child {
+    border-radius: 16px;
+}
+
+.fab-item:hover {
+    background: rgba(106, 78, 66, 0.08);
+}
+
+.fab-item:active {
+    background: rgba(106, 78, 66, 0.12);
+    transform: scale(0.98);
+}
+
+.fab-item-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.fab-item-text {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.fab-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 99997;
+}
+
+.fab-overlay.show {
+    opacity: 1;
+    visibility: visible;
 }
