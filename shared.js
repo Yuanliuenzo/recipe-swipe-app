@@ -69,14 +69,33 @@ const vibes = [
     }
 ];
 
-// Shared state
+// Shared state (will be loaded from server)
 let vibeProfile = [];
+let ingredientsAtHome = '';
+let favorites = [];
+let currentUsername = '';
+
 const maxVibeRounds = 5;
 let currentVibeRound = 0;
 let shuffledVibes = [];
 
-// Make ingredientsAtHome truly global
-window.ingredientsAtHome = '';
+// Load user state from server
+async function loadUserState() {
+    try {
+        const res = await fetch('/api/me');
+        if (!res.ok) throw new Error('Not logged in');
+        const data = await res.json();
+        vibeProfile = data.vibeProfile || [];
+        ingredientsAtHome = data.ingredientsAtHome || '';
+        favorites = data.favorites || [];
+        currentUsername = data.username || '';
+        console.log('Loaded user state:', { currentUsername, vibeProfile, ingredientsAtHome, favorites });
+    } catch (e) {
+        console.error('Failed to load user state:', e);
+        // Fallback: redirect to profile picker
+        window.location.reload();
+    }
+}
 
 // Initialize shuffled vibes once (no repeats)
 function initializeShuffledVibes() {
@@ -98,7 +117,7 @@ function getNextVibe() {
 
 // Generate personalized prompt based on vibe profile
 function generatePersonalizedPrompt() {
-    console.log("generatePersonalizedPrompt called. ingredientsAtHome:", JSON.stringify(window.ingredientsAtHome));
+    console.log("generatePersonalizedPrompt called. ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
     
     if (vibeProfile.length === 0) {
         return "Write me a delicious recipe that would be perfect for any occasion.";
@@ -113,8 +132,8 @@ ${combinedVibes}
 
 Please write me a clear, well-formatted recipe that matches these preferences. `;
     
-    if (window.ingredientsAtHome) {
-        prompt += `Try to incorporate these ingredients they already have: ${window.ingredientsAtHome}. `;
+    if (ingredientsAtHome) {
+        prompt += `Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
     }
     
     prompt += `Structure it exactly like this (follow the formatting rules strictly):
@@ -177,7 +196,7 @@ async function fetchLocalRecipe(prompt) {
 }
 
 // Format recipe text for display
-function formatRecipeText(recipeText) {
+function formatRecipeText(recipeText, hideTitle = false) {
     const applyInlineFormatting = (text) => {
         if (typeof text !== 'string') return text;
         return text
@@ -235,7 +254,7 @@ function formatRecipeText(recipeText) {
 
     let html = '';
 
-    if (recipeTitle) {
+    if (recipeTitle && !hideTitle) {
         html += `<h2 class="recipe-title">${applyInlineFormatting(recipeTitle)}</h2>`;
     }
 

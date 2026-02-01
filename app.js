@@ -28,6 +28,10 @@ function createCard(vibe) {
     card.style.backgroundPosition = "center";
     card.style.border = `2px solid ${vibe.color}50`;
     card.style.top = `${currentVibeRound * 5}px`;
+    // Entrance animation state
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px) scale(0.95)';
+    card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
 
     const overlay = document.createElement("div");
     overlay.classList.add("overlay", "vibe-overlay");
@@ -38,6 +42,12 @@ function createCard(vibe) {
         <div class="vibe-description">${vibe.description}</div>
     `;
     card.appendChild(overlay);
+
+    // Trigger entrance animation after appending to DOM
+    requestAnimationFrame(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0) scale(1)';
+    });
 
     return card;
 }
@@ -211,7 +221,7 @@ async function showResult() {
         e.stopPropagation();
         const rawValue = ingredientsInput.value.trim();
         console.log("Add clicked. rawValue:", JSON.stringify(rawValue));
-        console.log("Current ingredientsAtHome before:", JSON.stringify(window.ingredientsAtHome));
+        console.log("Current ingredientsAtHome before:", JSON.stringify(ingredientsAtHome));
         
         if (rawValue) {
             // Split new ingredients by commas, clean each, and filter empty
@@ -220,8 +230,8 @@ async function showResult() {
                 .filter(item => item.length > 0);
             
             // Split existing ingredients (if any) and dedupe
-            const existingItems = window.ingredientsAtHome
-                ? window.ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
+            const existingItems = ingredientsAtHome
+                ? ingredientsAtHome.split(',').map(item => item.trim().toLowerCase())
                 : [];
             
             // Combine and dedupe
@@ -229,7 +239,7 @@ async function showResult() {
             const uniqueItems = [...new Set(combined)];
             
             // Update ingredientsAtHome with cleaned, unique list
-            window.ingredientsAtHome = uniqueItems.join(', ');
+            ingredientsAtHome = uniqueItems.join(', ');
             
             // Clear the textarea for next entry
             ingredientsInput.value = '';
@@ -246,7 +256,7 @@ async function showResult() {
             console.log("newItems:", newItems);
             console.log("existingItems:", existingItems);
             console.log("uniqueItems:", uniqueItems);
-            console.log("Ingredients saved after:", JSON.stringify(window.ingredientsAtHome));
+            console.log("Ingredients saved after:", JSON.stringify(ingredientsAtHome));
             
         } else {
             confirmation.textContent = '⚠️ Please enter ingredients first';
@@ -261,9 +271,9 @@ async function showResult() {
 
     generateBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent card flip
-        console.log("Generating with ingredientsAtHome:", JSON.stringify(window.ingredientsAtHome));
-        console.log("window.ingredientsAtHome type:", typeof window.ingredientsAtHome);
-        console.log("window.ingredientsAtHome length:", window.ingredientsAtHome ? window.ingredientsAtHome.length : 'null');
+        console.log("Generating with ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
+        console.log("ingredientsAtHome type:", typeof ingredientsAtHome);
+        console.log("ingredientsAtHome length:", ingredientsAtHome ? ingredientsAtHome.length : 'null');
         
         // Regenerate the prompt with current ingredients
         const currentPrompt = generatePersonalizedPrompt();
@@ -322,7 +332,7 @@ async function showResult() {
 // Global function to generate personalized recipe
 async function generatePersonalizedRecipe(prompt) {
     console.log("generatePersonalizedRecipe called with prompt:", prompt);
-    console.log("generatePersonalizedRecipe - window.ingredientsAtHome:", JSON.stringify(window.ingredientsAtHome));
+    console.log("generatePersonalizedRecipe - ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
     
     const back = document.querySelector('.card-face.back');
     const container = back.querySelector('.ingredients-container');
@@ -334,12 +344,25 @@ async function generatePersonalizedRecipe(prompt) {
     }
     
     // Store ingredients before replacing content
-    const storedIngredients = window.ingredientsAtHome;
+    const storedIngredients = ingredientsAtHome;
     console.log("Stored ingredients before content replacement:", storedIngredients);
     
     // Show loading state with spinner
     button.innerHTML = '<span class="loading-spinner"></span> Generating... (this may take 30+ seconds)';
     button.disabled = true;
+
+    // Show skeleton loading in the container
+    container.innerHTML = `
+        <h2>🍳 Your Personalized Recipe</h2>
+        <div class="recipe-loading-status">Generating your recipe...</div>
+        <div class="recipe-skeleton">
+            <div class="skeleton-line skeleton-title"></div>
+            <div class="skeleton-line skeleton-subtitle"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+        </div>
+    `;
     
     try {
         console.log("Sending personalized prompt:", prompt);
@@ -374,13 +397,22 @@ async function generatePersonalizedRecipe(prompt) {
                 </div>
             ` : ``}
             <div class="recipe-content">${recipeHtml}</div>
-            <button class="japandi-btn japandi-btn-primary reset-btn">🔄 Start Over</button>
+            <div class="recipe-action-bar">
+                <button class="action-btn primary save-favorite-btn" type="button">
+                    <span class="action-icon">⭐</span>
+                    <span class="action-text">Save to Favorites</span>
+                </button>
+                <button class="action-btn secondary back-to-swipe-btn" type="button">
+                    <span class="action-icon">🔄</span>
+                    <span class="action-text">Back to Swiping</span>
+                </button>
+            </div>
         `;
 
         // Restore ingredients after content replacement (in case they got reset)
-        if (storedIngredients && !window.ingredientsAtHome) {
-            window.ingredientsAtHome = storedIngredients;
-            console.log("Restored ingredients after content replacement:", window.ingredientsAtHome);
+        if (storedIngredients && !ingredientsAtHome) {
+            ingredientsAtHome = storedIngredients;
+            console.log("Restored ingredients after content replacement:", ingredientsAtHome);
         }
 
         if (showToggle) {
@@ -407,10 +439,51 @@ async function generatePersonalizedRecipe(prompt) {
             setActive('ingredients');
         }
 
-        // Add event listener to reset button
-        const resetBtn = container.querySelector('.reset-btn');
-        resetBtn.addEventListener('click', (e) => {
+        // Add event listener to save favorite button
+        const saveBtn = container.querySelector('.save-favorite-btn');
+        saveBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
+            const titleEl = container.querySelector('.recipe-title');
+            const title = titleEl ? titleEl.textContent.trim() : 'Untitled Recipe';
+            try {
+                saveBtn.disabled = true;
+                saveBtn.querySelector('.action-text').textContent = 'Saving...';
+                const res = await fetch('/api/favorites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipeText: recipeText,
+                        title,
+                        rating: null,
+                        note: null
+                    })
+                });
+                if (!res.ok) throw new Error('Failed to save');
+                saveBtn.querySelector('.action-text').textContent = 'Saved!';
+                // Show success message with next steps
+                const successMsg = document.createElement('div');
+                successMsg.className = 'save-success-message';
+                successMsg.innerHTML = `
+                    <div class="success-content">
+                        <strong>Recipe saved!</strong><br>
+                        <small>View your favorites from the profile menu or swipe for more recipes.</small>
+                    </div>
+                `;
+                container.insertBefore(successMsg, container.querySelector('.recipe-action-bar').nextSibling);
+                setTimeout(() => {
+                    saveBtn.querySelector('.action-text').textContent = 'Save to Favorites';
+                    saveBtn.disabled = false;
+                    successMsg.remove();
+                }, 4000);
+            } catch (err) {
+                console.error('Save favorite error:', err);
+                saveBtn.querySelector('.action-text').textContent = 'Save to Favorites';
+                saveBtn.disabled = false;
+            }
+        });
+
+        // Add event listener to back to swiping button
+        container.querySelector('.back-to-swipe-btn').addEventListener('click', () => {
             location.reload();
         });
         
@@ -422,8 +495,230 @@ async function generatePersonalizedRecipe(prompt) {
 }
 
 // ---------------------------
+// Favorites Screen
+// ---------------------------
+
+async function showFavoritesScreen() {
+    // Hide the swipe container and show full-screen favorites
+    const swipeContainer = document.querySelector('.swipe-container');
+    const resultContainer = document.getElementById('container');
+    const header = document.querySelector('.header');
+    
+    if (swipeContainer) swipeContainer.style.display = 'none';
+    if (resultContainer) resultContainer.style.display = 'none';
+    
+    header.innerHTML = `
+        <h1>🍳 Recipe Swipe</h1>
+        <div class="unified-dropdown">
+            <button class="unified-btn">👤 ${window.currentUser?.username || 'Profile'}</button>
+            <div class="unified-dropdown-content">
+                <button class="unified-dropdown-item back-to-swiping-btn">← Back to Swiping</button>
+                <button class="unified-dropdown-item favorites-btn">⭐ My Favorites</button>
+                <button class="unified-dropdown-item switch-profile-btn">🔄 Switch Profile</button>
+                <button class="unified-dropdown-item logout-btn">🚪 Logout</button>
+            </div>
+        </div>
+    `;
+    
+    // Create full-screen favorites container
+    const favoritesContainer = document.createElement('div');
+    favoritesContainer.className = 'favorites-fullscreen';
+    favoritesContainer.innerHTML = `
+        <div class="favorites-header">
+            <h2>⭐ My Favorites</h2>
+            <button class="japandi-btn japandi-btn-subtle back-to-main-btn">← Back to Swiping</button>
+        </div>
+        <div class="favorites-grid"></div>
+    `;
+    document.body.appendChild(favoritesContainer);
+    
+    const gridContainer = favoritesContainer.querySelector('.favorites-grid');
+    
+    // Re-attach dropdown events
+    const wrapper = header.querySelector('.unified-dropdown');
+    const btn = wrapper.querySelector('.unified-btn');
+    const dropdown = wrapper.querySelector('.unified-dropdown-content');
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    wrapper.querySelector('.back-to-swiping-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('show');
+        
+        // Start exit animation for favorites
+        favoritesContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        favoritesContainer.style.opacity = '0';
+        favoritesContainer.style.transform = 'translateY(30px) scale(0.98)';
+        
+        setTimeout(() => {
+            // Clean up
+            favoritesContainer.remove();
+            
+            // Show main containers
+            if (swipeContainer) swipeContainer.style.display = '';
+            if (resultContainer) resultContainer.style.display = '';
+            
+            // Restore the original header content
+            addHeaderControls();
+        }, 350);
+    });
+    
+    wrapper.querySelector('.favorites-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('show');
+        // Already on favorites screen
+    });
+    wrapper.querySelector('.switch-profile-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = '/profile-picker.html';
+    });
+    wrapper.querySelector('.logout-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = '/profile-picker.html';
+    });
+    
+    // Back button
+    favoritesContainer.querySelector('.back-to-main-btn').addEventListener('click', () => {
+        favoritesContainer.remove();
+        if (swipeContainer) swipeContainer.style.display = '';
+        if (resultContainer) resultContainer.style.display = '';
+    });
+    
+    try {
+        const res = await fetch('/api/favorites');
+        const { favorites } = await res.json();
+        if (!favorites || favorites.length === 0) {
+            gridContainer.innerHTML = '<p class="empty-favorites">No favorites yet. Swipe and save some recipes!</p>';
+            return;
+        }
+        favorites.forEach(fav => {
+            const card = document.createElement('div');
+            card.className = 'favorite-card';
+            card.innerHTML = `
+                <div class="favorite-header">
+                    <h3 class="favorite-title">${fav.title}</h3>
+                    <div class="favorite-meta">
+                        <span class="favorite-date">${new Date(fav.createdAt).toLocaleDateString()}</span>
+                        <button class="delete-favorite-btn" data-id="${fav.id}">🗑️</button>
+                    </div>
+                </div>
+                <div class="favorite-body">${fav.recipeText}</div>
+                <div class="favorite-footer">
+                    <div class="favorite-rating">
+                        ${Array.from({length:5}, (_, i) => `<button class="star-btn ${i < (fav.rating ?? -1) ? 'active' : ''}" data-id="${fav.id}" data-rating="${i+1}">${i < (fav.rating ?? -1) ? '⭐' : '☆'}</button>`).join('')}
+                    </div>
+                    <textarea class="favorite-note" placeholder="Add a note..." data-id="${fav.id}">${fav.note ?? ''}</textarea>
+                    <button class="save-note-btn" data-id="${fav.id}">💾 Save Note</button>
+                </div>
+            `;
+            gridContainer.appendChild(card);
+        });
+        // Delete handlers
+        container.querySelectorAll('.delete-favorite-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                if (!confirm('Delete this favorite?')) return;
+                await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
+                showFavoritesScreen(); // refresh
+            });
+        });
+        // Rating handlers
+        container.querySelectorAll('.star-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                const rating = parseInt(btn.dataset.rating);
+                await fetch(`/api/favorites/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rating })
+                });
+                showFavoritesScreen();
+            });
+        });
+        // Note handlers
+        container.querySelectorAll('.save-note-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                const noteEl = container.querySelector(`.favorite-note[data-id="${id}"]`);
+                const note = noteEl.value.trim();
+                await fetch(`/api/favorites/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note })
+                });
+                btn.textContent = '✅ Saved';
+                setTimeout(() => btn.textContent = '💾 Save Note', 1500);
+            });
+        });
+    } catch (err) {
+        console.error('Failed to load favorites:', err);
+        itemsContainer.innerHTML = '<p class="error-favorites">Failed to load favorites.</p>';
+    }
+}
+
+// ---------------------------
 // Start Web App
 // ---------------------------
 
-initializeShuffledVibes();
-showNextCard();
+async function startApp() {
+    await loadUserState();
+    initializeShuffledVibes();
+    showNextCard();
+    // Add header buttons on start
+    addHeaderControls();
+}
+
+function addHeaderControls() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+    // Avoid duplicates
+    if (document.querySelector('.unified-dropdown')) return;
+
+    // Clear header and rebuild with proper layout
+    header.innerHTML = `
+        <h1>🍳 Recipe Swipe</h1>
+        <div class="unified-dropdown">
+            <button class="unified-btn">👤 ${window.currentUser?.username || 'Profile'}</button>
+            <div class="unified-dropdown-content">
+                <button class="unified-dropdown-item favorites-btn">⭐ My Favorites</button>
+                <button class="unified-dropdown-item switch-profile-btn">🔄 Switch Profile</button>
+                <button class="unified-dropdown-item logout-btn">🚪 Logout</button>
+            </div>
+        </div>
+    `;
+
+    const wrapper = header.querySelector('.unified-dropdown');
+    const btn = wrapper.querySelector('.unified-btn');
+    const dropdown = wrapper.querySelector('.unified-dropdown-content');
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    wrapper.querySelector('.favorites-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showFavoritesScreen();
+    });
+    wrapper.querySelector('.switch-profile-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = '/profile-picker.html';
+    });
+    wrapper.querySelector('.logout-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = '/profile-picker.html';
+    });
+}
+
+startApp();

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Swipe - Choose Your Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .picker-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .picker-container h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: #6a4e42;
+            margin-bottom: 10px;
+        }
+        .picker-container p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .username-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background: #faf8f3;
+            color: #2c3e50;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .username-input:focus {
+            border-color: #8b7355;
+            background: #ffffff;
+        }
+        .username-input::placeholder {
+            color: #bdc3c7;
+            font-style: italic;
+        }
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8b7355, #6a4e42);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 78, 66, 0.3);
+        }
+        .continue-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error {
+            color: #c0392b;
+            margin-top: 12px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="picker-container">
+        <h1>🍳 Recipe Swipe</h1>
+        <p>Choose a name to get started</p>
+        <input type="text" class="username-input" id="username" placeholder="Enter your name" maxlength="30" autofocus>
+        <button class="continue-btn" id="continueBtn">Continue</button>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const continueBtn = document.getElementById('continueBtn');
+        const errorEl = document.getElementById('error');
+
+        function showError(msg) {
+            errorEl.textContent = msg;
+        }
+
+        function hideError() {
+            errorEl.textContent = '';
+        }
+
+        async function setProfile(username) {
+            try {
+                const res = await fetch('/set-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    showError(err.error || 'Something went wrong');
+                    return false;
+                }
+                // Success: reload to the app
+                window.location.reload();
+                return true;
+            } catch (e) {
+                showError('Network error');
+                return false;
+            }
+        }
+
+        continueBtn.addEventListener('click', async () => {
+            const name = usernameInput.value.trim();
+            if (!name) {
+                showError('Please enter a name');
+                return;
+            }
+            hideError();
+            continueBtn.disabled = true;
+            await setProfile(name);
+            continueBtn.disabled = false;
+        });
+
+        usernameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                continueBtn.click();
+            }
+        });
+
+        usernameInput.addEventListener('input', () => {
+            hideError();
+        });
+
+        // Focus input on load
+        usernameInput.focus();
+    </script>
+</body>
+</html>
