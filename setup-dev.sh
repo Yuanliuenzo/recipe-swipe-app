@@ -108,6 +108,19 @@ setup_git_hooks() {
     print_status "Git hooks configured"
 }
 
+# Configure Git for automatic upstream tracking
+setup_git_configuration() {
+    print_info "Configuring Git for automatic upstream tracking..."
+    
+    # Configure Git to automatically set upstream for new branches
+    git config push.autoSetupRemote true
+    
+    # Set push default to current branch
+    git config push.default current
+    
+    print_status "Git configured for automatic upstream tracking"
+}
+
 # Run initial tests
 run_tests() {
     print_info "Running initial tests..."
@@ -187,6 +200,7 @@ print_next_steps() {
     echo "2. Run 'npm run dev' to start development server"
     echo "3. Open http://localhost:3000 in your browser"
     echo "4. Make changes and commit with conventional commits"
+    echo "5. Git will automatically set upstream for new branches"
     echo ""
     echo -e "${GREEN}Available commands:${NC}"
     echo "  npm run dev          - Start development server"
@@ -197,10 +211,9 @@ print_next_steps() {
     echo "  npm run format       - Format code"
     echo "  npm run security:audit - Run security audit"
     echo ""
-    echo -e "${YELLOW}Development scripts:${NC}"
-    echo "  ./dev-start.sh      - Start development server"
-    echo "  ./test-watch.sh     - Run tests in watch mode"
-    echo "  ./security-check.sh - Run security checks"
+    echo -e "${YELLOW}Git utilities:${NC}"
+    echo "  ./setup-git.sh      - Configure Git upstream tracking"
+    echo "  git push            - Auto-set upstream if needed"
     echo ""
     echo -e "${BLUE}Documentation:${NC}"
     echo "  README.md           - Project overview"
@@ -219,6 +232,7 @@ main() {
     install_dependencies
     setup_environment
     setup_git_hooks
+    setup_git_configuration
     run_tests
     run_security_audit
     run_linting
