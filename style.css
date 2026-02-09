@@ -1419,6 +1419,11 @@ h1 {
     z-index: 9998;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .floating-back-btn:hover {
     background: #5a3e32;
     transform: translateY(-2px);

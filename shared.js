@@ -74,6 +74,11 @@ let vibeProfile = [];
 let ingredientsAtHome = '';
 let favorites = [];
 let currentUsername = '';
+let preferences = {
+    diet: 'None',
+    budget: 'No',
+    seasonalKing: 'No'
+};
 
 const maxVibeRounds = 5;
 let currentVibeRound = 0;
@@ -89,7 +94,12 @@ async function loadUserState() {
         ingredientsAtHome = data.ingredientsAtHome || '';
         favorites = data.favorites || [];
         currentUsername = data.username || '';
-        console.log('Loaded user state:', { currentUsername, vibeProfile, ingredientsAtHome, favorites });
+        preferences = data.preferences || {
+            diet: 'None',
+            budget: 'No',
+            seasonalKing: 'No'
+        };
+        console.log('Loaded user state:', { currentUsername, vibeProfile, ingredientsAtHome, favorites, preferences });
     } catch (e) {
         console.error('Failed to load user state:', e);
         // Fallback: redirect to profile picker
@@ -115,28 +125,48 @@ function getNextVibe() {
     return shuffledVibes.shift();
 }
 
-// Generate personalized prompt based on vibe profile
+// Generate personalized prompt based on vibe profile and preferences
 function generatePersonalizedPrompt() {
     console.log("generatePersonalizedPrompt called. ingredientsAtHome:", JSON.stringify(ingredientsAtHome));
+    console.log("generatePersonalizedPrompt called. preferences:", JSON.stringify(preferences));
+    
+    let basePrompt = '';
     
     if (vibeProfile.length === 0) {
-        return "Write me a delicious recipe that would be perfect for any occasion.";
+        basePrompt = "Write me a delicious recipe that would be perfect for any occasion.";
+    } else {
+        const vibeDescriptions = vibeProfile.map(vibe => vibe.prompt);
+        const combinedVibes = vibeDescriptions.join(", ");
+        basePrompt = `Can you make a recipe for someone that has this vibe:
+
+${combinedVibes}`;
     }
-
-    const vibeDescriptions = vibeProfile.map(vibe => vibe.prompt);
-    const combinedVibes = vibeDescriptions.join(", ");
     
-    let prompt = `Can you make a recipe for someone that has this vibe:
-
-${combinedVibes}
-
+    // Add dietary preferences
+    if (preferences.diet && preferences.diet !== 'None') {
+        basePrompt += ` Please make this recipe ${preferences.diet.toLowerCase()}.`;
+    }
+    
+    // Add budget preference
+    if (preferences.budget === 'Yes') {
+        basePrompt += ' Focus on affordable, budget-friendly ingredients.';
+    }
+    
+    // Add seasonal preference
+    if (preferences.seasonalKing === 'Yes') {
+        basePrompt += ' Prioritize seasonal, fresh ingredients that are currently in their peak season.';
+    }
+    
+    // Add ingredients preference
+    if (ingredientsAtHome) {
+        basePrompt += ` Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
+    }
+    
+    let fullPrompt = `${basePrompt}
+    
 Please write me a clear, well-formatted recipe that matches these preferences. `;
     
-    if (ingredientsAtHome) {
-        prompt += `Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
-    }
-    
-    prompt += `Structure it exactly like this (follow the formatting rules strictly):
+    fullPrompt += `Structure it exactly like this (follow the formatting rules strictly):
 
 Recipe Name
 ===
@@ -161,7 +191,7 @@ Formatting rules:
 
 Keep it concise but complete.`;
 
-    return prompt;
+    return fullPrompt;
 }
 
 // API call to fetch recipe from local server

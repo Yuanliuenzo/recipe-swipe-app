@@ -72,6 +72,11 @@ async function initializeAccounts() {
                 vibeProfile: [],
                 ingredientsAtHome: '',
                 favorites: [],
+                preferences: {
+                    diet: 'None',
+                    budget: 'No',
+                    seasonalKing: 'No'
+                },
                 createdAt: new Date().toISOString(),
                 lastLogin: null
             });
@@ -100,8 +105,12 @@ async function updateUser(username, updates) {
 // Middleware to load user from cookie
 app.use(async (req, res, next) => {
     const username = req.cookies?.profile;
+    console.log('=== DEBUG: Middleware - Cookie check ===');
+    console.log('DEBUG: Username from cookie:', username);
+    
     if (username) {
         req.user = getUser(username);
+        console.log('DEBUG: User found:', !!req.user);
     }
     next();
 });
@@ -132,6 +141,10 @@ app.get("/", (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+    console.log('=== DEBUG: Login attempt ===');
+    console.log('DEBUG: Request body:', req.body);
+    console.log('DEBUG: Request cookies:', req.cookies);
+    
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password required' });
@@ -139,18 +152,25 @@ app.post('/login', async (req, res) => {
     
     const user = getUser(username);
     if (!user) {
+        console.log('DEBUG: User not found:', username);
         return res.status(401).json({ error: 'Invalid credentials' });
     }
     
     const isValid = await bcrypt.compare(password, user.passwordHash);
+    console.log('DEBUG: Password validation result:', isValid);
+    
     if (!isValid) {
+        console.log('DEBUG: Invalid password for user:', username);
         return res.status(401).json({ error: 'Invalid credentials' });
     }
     
     // Update last login
     await updateUser(username, { lastLogin: new Date().toISOString() });
+    console.log('DEBUG: Updated last login for:', username);
     
+    console.log('DEBUG: Setting cookie with profile:', username);
     res.cookie('profile', username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+    console.log('DEBUG: Cookie set response headers:', res.getHeaders());
     res.json({ username });
 });
 
@@ -172,6 +192,11 @@ app.get("/api/me", (req, res) => {
         vibeProfile: req.user.vibeProfile,
         ingredientsAtHome: req.user.ingredientsAtHome,
         favorites: req.user.favorites,
+        preferences: req.user.preferences || {
+            diet: 'None',
+            budget: 'No',
+            seasonalKing: 'No'
+        },
         createdAt: req.user.createdAt,
         lastLogin: req.user.lastLogin
     });
@@ -234,6 +259,40 @@ app.patch("/api/favorites/:id", async (req, res) => {
     if (typeof note === 'string') fav.note = note.trim();
     await saveUsers(); // Save to file
     res.json({ favorite: fav });
+});
+
+// Preferences API endpoints
+app.get("/api/preferences", (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    res.json({ preferences: req.user.preferences || {
+        diet: 'None',
+        budget: 'No',
+        seasonalKing: 'No'
+    } });
+});
+
+app.patch("/api/preferences", async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ error: "Not logged in" });
+    }
+    const { diet, budget, seasonalKing } = req.body;
+    
+    const currentPrefs = req.user.preferences || {
+        diet: 'None',
+        budget: 'No',
+        seasonalKing: 'No'
+    };
+    
+    const updatedPrefs = {
+        diet: diet || currentPrefs.diet,
+        budget: budget || currentPrefs.budget,
+        seasonalKing: seasonalKing || currentPrefs.seasonalKing
+    };
+    
+    await updateUser(req.cookies.profile, { preferences: updatedPrefs });
+    res.json({ preferences: updatedPrefs });
 });
 
 // Serve static files from current directory (must be after / routing)
