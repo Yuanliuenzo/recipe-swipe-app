@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const fs = require('fs').promises;
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(cors());
@@ -22,26 +24,84 @@ function isMobile(req) {
     return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 }
 
-// In-memory user store
-const users = new Map();
+// File-based user store
+const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+let users = new Map();
 
-// Helper to get or create user
-function getOrCreateUser(username) {
-    if (!users.has(username)) {
-        users.set(username, {
-            vibeProfile: [],
-            ingredientsAtHome: '',
-            favorites: []
-        });
+// Load users from file on startup
+async function loadUsers() {
+    try {
+        const data = await fs.readFile(USERS_FILE, 'utf8');
+        const usersData = JSON.parse(data);
+        users = new Map(Object.entries(usersData));
+        console.log(`Loaded ${users.size} users from file`);
+    } catch (error) {
+        if (error.code !== 'ENOENT') {
+            console.error('Error loading users:', error);
+        }
+        users = new Map();
     }
+}
+
+// Save users to file
+async function saveUsers() {
+    try {
+        const usersData = Object.fromEntries(users);
+        await fs.writeFile(USERS_FILE, JSON.stringify(usersData, null, 2));
+    } catch (error) {
+        console.error('Error saving users:', error);
+    }
+}
+
+// Predefined accounts (you can modify these)
+const PREDEFINED_ACCOUNTS = [
+    { username: 'yuan', password: 'recipe123' },
+    { username: 'oscar', password: 'cooking456' },
+    { username: 'annie', password: 'food789' },
+    { username: 'bram', password: 'chef321' },
+    { username: 'elisa', password: 'tasty654' }
+];
+
+// Initialize predefined accounts
+async function initializeAccounts() {
+    for (const account of PREDEFINED_ACCOUNTS) {
+        if (!users.has(account.username)) {
+            const passwordHash = await bcrypt.hash(account.password, 10);
+            users.set(account.username, {
+                passwordHash,
+                vibeProfile: [],
+                ingredientsAtHome: '',
+                favorites: [],
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            });
+        }
+    }
+    await saveUsers();
+    console.log('Initialized predefined accounts');
+}
+
+// Helper to get user by username
+function getUser(username) {
     return users.get(username);
 }
 
+// Helper to update user and save to file
+async function updateUser(username, updates) {
+    const user = users.get(username);
+    if (user) {
+        Object.assign(user, updates);
+        await saveUsers();
+        return user;
+    }
+    return null;
+}
+
 // Middleware to load user from cookie
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     const username = req.cookies?.profile;
     if (username) {
-        req.user = getOrCreateUser(username);
+        req.user = getUser(username);
     }
     next();
 });
@@ -71,15 +131,36 @@ app.get("/", (req, res) => {
     }
 });
 
-app.post("/set-profile", (req, res) => {
-    const { username } = req.body;
-    if (!username || typeof username !== 'string' || username.trim().length === 0) {
-        return res.status(400).json({ error: "Invalid username" });
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password required' });
     }
-    const clean = username.trim().slice(0, 30); // simple limit
-    getOrCreateUser(clean); // ensure user exists
-    res.cookie('profile', clean, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true }); // 30 days
-    res.json({ username: clean });
+    
+    const user = getUser(username);
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isValid) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    // Update last login
+    await updateUser(username, { lastLogin: new Date().toISOString() });
+    
+    res.cookie('profile', username, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+    res.json({ username });
+});
+
+app.post('/logout', (req, res) => {
+    res.clearCookie('profile');
+    res.json({ ok: true });
+});
+
+app.post("/set-profile", (req, res) => {
+    return res.status(410).json({ error: 'This endpoint is deprecated. Please use /login instead.' });
 });
 
 app.get("/api/me", (req, res) => {
@@ -90,7 +171,9 @@ app.get("/api/me", (req, res) => {
         username: req.cookies.profile,
         vibeProfile: req.user.vibeProfile,
         ingredientsAtHome: req.user.ingredientsAtHome,
-        favorites: req.user.favorites
+        favorites: req.user.favorites,
+        createdAt: req.user.createdAt,
+        lastLogin: req.user.lastLogin
     });
 });
 
@@ -101,7 +184,7 @@ app.get("/api/favorites", (req, res) => {
     res.json({ favorites: req.user.favorites });
 });
 
-app.post("/api/favorites", (req, res) => {
+app.post("/api/favorites", async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Not logged in" });
     }
@@ -118,11 +201,12 @@ app.post("/api/favorites", (req, res) => {
         createdAt: new Date().toISOString()
     };
     req.user.favorites.unshift(favorite); // newest first
-    if (req.user.favorites.length > 50) req.user.favorites.pop(); // cap
+    if (req.user.favorites.length > 20) req.user.favorites.pop(); // cap at 20
+    await saveUsers(); // Save to file
     res.json({ favorite });
 });
 
-app.delete("/api/favorites/:id", (req, res) => {
+app.delete("/api/favorites/:id", async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Not logged in" });
     }
@@ -132,10 +216,11 @@ app.delete("/api/favorites/:id", (req, res) => {
         return res.status(404).json({ error: "Favorite not found" });
     }
     req.user.favorites.splice(idx, 1);
+    await saveUsers(); // Save to file
     res.json({ ok: true });
 });
 
-app.patch("/api/favorites/:id", (req, res) => {
+app.patch("/api/favorites/:id", async (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Not logged in" });
     }
@@ -147,6 +232,7 @@ app.patch("/api/favorites/:id", (req, res) => {
     }
     if (typeof rating === 'number') fav.rating = rating;
     if (typeof note === 'string') fav.note = note.trim();
+    await saveUsers(); // Save to file
     res.json({ favorite: fav });
 });
 
@@ -187,7 +273,15 @@ app.use((req, res) => {
     res.status(404).json({ error: "Not found", url: req.url });
 });
 
-app.listen(3000, '0.0.0.0', () => {
-    console.log("Server running on http://0.0.0.0:3000");
-    console.log("Access from your network: http://YOUR_LOCAL_IP:3000");
-});
+// Initialize server
+async function startServer() {
+    await loadUsers();
+    await initializeAccounts();
+    
+    app.listen(3000, '0.0.0.0', () => {
+        console.log("Server running on http://0.0.0.0:3000");
+        console.log("Access from your network: http://YOUR_LOCAL_IP:3000");
+    });
+}
+
+startServer().catch(console.error);
