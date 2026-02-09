@@ -421,8 +421,16 @@ async function generateMobileRecipe(prompt, recipeCard) {
 // Mobile Navigation Component
 // ---------------------------
 
+// Global navigation instance
+let mobileNavigationInstance = null;
+
 function createMobileNavigation() {
-    // Remove any existing navigation
+    // Return existing instance if already created
+    if (mobileNavigationInstance) {
+        return mobileNavigationInstance;
+    }
+    
+    // Remove any existing navigation (cleanup)
     const existingNav = document.querySelector('.mobile-navigation');
     if (existingNav) {
         existingNav.remove();
@@ -445,9 +453,9 @@ function createMobileNavigation() {
                     <span class="fab-item-icon">⭐</span>
                     <span class="fab-item-text">My Favorites</span>
                 </button>
-                <button class="fab-item switch-profile-btn">
-                    <span class="fab-item-icon">🔄</span>
-                    <span class="fab-item-text">Switch Profile</span>
+                <button class="fab-item preferences-btn">
+                    <span class="fab-item-icon">⚙️</span>
+                    <span class="fab-item-text">Preferences</span>
                 </button>
                 <button class="fab-item logout-btn">
                     <span class="fab-item-icon">🚪</span>
@@ -461,6 +469,16 @@ function createMobileNavigation() {
     // Add to body
     document.body.appendChild(nav);
     
+    // Initialize event handlers
+    initializeNavigationEvents(nav);
+    
+    // Store instance
+    mobileNavigationInstance = nav;
+    
+    return nav;
+}
+
+function initializeNavigationEvents(nav) {
     // Simple, reliable event handling
     const fab = document.getElementById('mobileFab');
     const menu = document.getElementById('mobileFabMenu');
@@ -500,11 +518,12 @@ function createMobileNavigation() {
         });
     }
     
-    const switchBtn = nav.querySelector('.switch-profile-btn');
-    if (switchBtn) {
-        switchBtn.addEventListener('click', (e) => {
+    const preferencesBtn = nav.querySelector('.preferences-btn');
+    if (preferencesBtn) {
+        preferencesBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            window.location.href = '/profile-picker.html';
+            closeMenu();
+            showMobilePreferencesScreen();
         });
     }
     
@@ -523,8 +542,6 @@ function createMobileNavigation() {
             }
         });
     }
-    
-    return nav;
 }
 
 function showBackToSwipingButton() {
@@ -539,31 +556,42 @@ function hideBackToSwipingButton() {
 
 function exitFavoritesView() {
     const favoritesContainer = document.querySelector('.mobile-favorites-fullscreen');
+    const preferencesContainer = document.querySelector('.mobile-preferences-fullscreen');
     const mobileContainer = document.getElementById('mobile-container');
     
     if (navigator.vibrate) navigator.vibrate(50);
     
-    if (favoritesContainer) {
-        favoritesContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        favoritesContainer.style.opacity = '0';
-        favoritesContainer.style.transform = 'translateY(30px) scale(0.98)';
+    // Hide both fullscreen containers if they exist
+    const hideContainer = (container) => {
+        if (container) {
+            container.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px) scale(0.98)';
+            
+            setTimeout(() => {
+                container.remove();
+            }, 350);
+        }
+    };
+    
+    hideContainer(favoritesContainer);
+    hideContainer(preferencesContainer);
+    
+    // Show main container
+    if (mobileContainer) {
+        mobileContainer.style.display = '';
+        mobileContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        mobileContainer.style.opacity = '0';
+        mobileContainer.style.transform = 'translateY(20px)';
         
         setTimeout(() => {
-            favoritesContainer.remove();
-            if (mobileContainer) {
-                mobileContainer.style.display = '';
-                mobileContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                mobileContainer.style.opacity = '0';
-                mobileContainer.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    mobileContainer.style.opacity = '1';
-                    mobileContainer.style.transform = 'translateY(0)';
-                }, 50);
-            }
-            hideBackToSwipingButton();
-        }, 350);
+            mobileContainer.style.opacity = '1';
+            mobileContainer.style.transform = 'translateY(0)';
+        }, 50);
     }
+    
+    // Hide back button when returning to main view
+    hideBackToSwipingButton();
 }
 
 // ---------------------------
@@ -574,6 +602,8 @@ async function showMobileFavoritesScreen() {
     console.log('DEBUG: showMobileFavoritesScreen called'); // Debug 7
     
     const mobileContainer = document.getElementById('mobile-container');
+    
+    // Ensure navigation exists but don't recreate it
     const nav = createMobileNavigation();
     
     console.log('DEBUG: mobileContainer found:', !!mobileContainer); // Debug 8
@@ -607,8 +637,7 @@ async function showMobileFavoritesScreen() {
     if (floatingBackBtn) {
         floatingBackBtn.addEventListener('click', () => {
             if (navigator.vibrate) navigator.vibrate(50);
-            const mainBackBtn = document.getElementById('backToFavorites');
-            if (mainBackBtn) mainBackBtn.click(); // Trigger the main back button
+            exitFavoritesView();
         });
         
         // Show/hide floating back button on scroll
@@ -758,11 +787,155 @@ async function showMobileFavoritesScreen() {
 // ---------------------------
 
 async function startMobileApp() {
+    console.log('=== DEBUG: Starting Mobile App ===');
+    console.log('DEBUG: Current preferences state:', preferences);
+    
     await loadUserState();
+    console.log('DEBUG: After loadUserState, preferences:', preferences);
+    console.log('DEBUG: Current username:', currentUsername);
+    
     initializeShuffledVibes();
     showNextMobileCard();
     addMobileHeaderControls();
+    
+    console.log('=== DEBUG: Mobile App Started ===');
 }
+
+// ---------------------------
+// Mobile Preferences Screen
+// ---------------------------
+
+async function showMobilePreferencesScreen() {
+    const mobileContainer = document.getElementById('mobile-container');
+    
+    // Ensure navigation exists but don't recreate it
+    const nav = createMobileNavigation();
+    
+    if (mobileContainer) {
+        mobileContainer.style.display = 'none';
+    }
+    
+    showBackToSwipingButton();
+    
+    // Create full-screen preferences container
+    const preferencesContainer = document.createElement('div');
+    preferencesContainer.className = 'mobile-preferences-fullscreen';
+    preferencesContainer.innerHTML = `
+        <div class="mobile-preferences-header">
+            <h2>⚙️ Preferences</h2>
+            <button class="mobile-floating-back-btn" id="floatingBackBtn">
+                <span class="floating-back-icon">←</span>
+                <span class="floating-back-text">Back</span>
+            </button>
+        </div>
+        <div class="mobile-preferences-content">
+            <div class="mobile-preference-group">
+                <h3>🥗 Diet</h3>
+                <div class="mobile-preference-options">
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="diet" value="None" ${preferences.diet === 'None' ? 'checked' : ''}>
+                        <span>No restriction</span>
+                    </label>
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="diet" value="Vegan" ${preferences.diet === 'Vegan' ? 'checked' : ''}>
+                        <span>Vegan</span>
+                    </label>
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="diet" value="Vegetarian" ${preferences.diet === 'Vegetarian' ? 'checked' : ''}>
+                        <span>Vegetarian</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mobile-preference-group">
+                <h3>💰 Budget</h3>
+                <div class="mobile-preference-options">
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="budget" value="No" ${preferences.budget === 'No' ? 'checked' : ''}>
+                        <span>No restriction</span>
+                    </label>
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="budget" value="Yes" ${preferences.budget === 'Yes' ? 'checked' : ''}>
+                        <span>Budget-friendly</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mobile-preference-group">
+                <h3>👑 Seasonal King</h3>
+                <div class="mobile-preference-options">
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="seasonalKing" value="No" ${preferences.seasonalKing === 'No' ? 'checked' : ''}>
+                        <span>No preference</span>
+                    </label>
+                    <label class="mobile-preference-option">
+                        <input type="radio" name="seasonalKing" value="Yes" ${preferences.seasonalKing === 'Yes' ? 'checked' : ''}>
+                        <span>Prioritize seasonal</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mobile-preference-actions">
+                <button class="japandi-btn japandi-btn-primary mobile-save-preferences-btn">💾 Save</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(preferencesContainer);
+    
+    // Add floating back button functionality
+    const floatingBackBtn = preferencesContainer.querySelector('#floatingBackBtn');
+    if (floatingBackBtn) {
+        floatingBackBtn.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(50);
+            exitFavoritesView();
+        });
+    }
+    
+    // Save preferences button
+    preferencesContainer.querySelector('.mobile-save-preferences-btn').addEventListener('click', async () => {
+        const selectedDiet = document.querySelector('input[name="diet"]:checked').value;
+        const selectedBudget = document.querySelector('input[name="budget"]:checked').value;
+        const selectedSeasonal = document.querySelector('input[name="seasonalKing"]:checked').value;
+        
+        try {
+            const res = await fetch('/api/preferences', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    diet: selectedDiet,
+                    budget: selectedBudget,
+                    seasonalKing: selectedSeasonal
+                })
+            });
+            
+            if (!res.ok) throw new Error('Failed to save preferences');
+            
+            // Update local state
+            preferences.diet = selectedDiet;
+            preferences.budget = selectedBudget;
+            preferences.seasonalKing = selectedSeasonal;
+            
+            // Haptic feedback
+            if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+            
+            // Show success message
+            const saveBtn = preferencesContainer.querySelector('.mobile-save-preferences-btn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '✅ Saved!';
+            saveBtn.disabled = true;
+            
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            },2000);
+            
+        } catch (error) {
+            console.error('Save preferences error:', error);
+        }
+    });
+}
+
+// ---------------------------
 
 function addMobileHeaderControls() {
     const header = document.querySelector('.mobile-header');

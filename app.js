@@ -591,6 +591,17 @@ async function showFavoritesScreen() {
         }
     });
     
+    // Add preferences button
+    const preferencesBtn = document.createElement('button');
+    preferencesBtn.className = 'unified-dropdown-item preferences-btn';
+    preferencesBtn.innerHTML = '⚙️ Preferences';
+    preferencesBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('show');
+        showPreferencesScreen();
+    });
+    wrapper.querySelector('.unified-dropdown-content').appendChild(preferencesBtn);
+    
     // Back button
     favoritesContainer.querySelector('.back-to-main-btn').addEventListener('click', () => {
         favoritesContainer.remove();
@@ -735,4 +746,194 @@ function addHeaderControls() {
     });
 }
 
-startApp();
+// ---------------------------
+// Preferences Screen
+// ---------------------------
+
+async function showPreferencesScreen() {
+    // Hide main containers
+    const swipeContainer = document.querySelector('.swipe-container');
+    const resultContainer = document.getElementById('container');
+    const header = document.querySelector('.header');
+    
+    if (swipeContainer) swipeContainer.style.display = 'none';
+    if (resultContainer) resultContainer.style.display = 'none';
+    
+    // Update header
+    header.innerHTML = `
+        <h1>🍳 Recipe Swipe</h1>
+        <div class="unified-dropdown">
+            <button class="unified-btn">👤 ${currentUsername || 'Profile'}</button>
+            <div class="unified-dropdown-content">
+                <button class="unified-dropdown-item preferences-btn">⚙️ Preferences</button>
+                <button class="unified-dropdown-item favorites-btn">⭐ My Favorites</button>
+                <button class="unified-dropdown-item switch-profile-btn">🔄 Switch Profile</button>
+                <button class="unified-dropdown-item logout-btn">🚪 Logout</button>
+            </div>
+        </div>
+    `;
+    
+    // Create preferences container
+    const preferencesContainer = document.createElement('div');
+    preferencesContainer.className = 'preferences-fullscreen';
+    preferencesContainer.innerHTML = `
+        <div class="preferences-header">
+            <h2>⚙️ Preferences</h2>
+            <p>Customize your recipe generation</p>
+            <button class="japandi-btn japandi-btn-subtle back-to-main-btn">← Back to Swiping</button>
+        </div>
+        <div class="preferences-content">
+            <div class="preference-group">
+                <h3>🥗 Diet</h3>
+                <div class="preference-options">
+                    <label class="preference-option">
+                        <input type="radio" name="diet" value="None" ${preferences.diet === 'None' ? 'checked' : ''}>
+                        <span>No restriction</span>
+                    </label>
+                    <label class="preference-option">
+                        <input type="radio" name="diet" value="Vegan" ${preferences.diet === 'Vegan' ? 'checked' : ''}>
+                        <span>Vegan</span>
+                    </label>
+                    <label class="preference-option">
+                        <input type="radio" name="diet" value="Vegetarian" ${preferences.diet === 'Vegetarian' ? 'checked' : ''}>
+                        <span>Vegetarian</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="preference-group">
+                <h3>💰 Budget</h3>
+                <div class="preference-options">
+                    <label class="preference-option">
+                        <input type="radio" name="budget" value="No" ${preferences.budget === 'No' ? 'checked' : ''}>
+                        <span>No restriction</span>
+                    </label>
+                    <label class="preference-option">
+                        <input type="radio" name="budget" value="Yes" ${preferences.budget === 'Yes' ? 'checked' : ''}>
+                        <span>Budget-friendly</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="preference-group">
+                <h3>👑 Seasonal King</h3>
+                <div class="preference-options">
+                    <label class="preference-option">
+                        <input type="radio" name="seasonalKing" value="No" ${preferences.seasonalKing === 'No' ? 'checked' : ''}>
+                        <span>No preference</span>
+                    </label>
+                    <label class="preference-option">
+                        <input type="radio" name="seasonalKing" value="Yes" ${preferences.seasonalKing === 'Yes' ? 'checked' : ''}>
+                        <span>Prioritize seasonal ingredients</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="preference-actions">
+                <button class="japandi-btn japandi-btn-primary save-preferences-btn">💾 Save Preferences</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(preferencesContainer);
+    
+    // Re-attach dropdown events
+    const wrapper = header.querySelector('.unified-dropdown');
+    const btn = wrapper.querySelector('.unified-btn');
+    const dropdown = wrapper.querySelector('.unified-dropdown-content');
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    wrapper.querySelector('.preferences-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('show');
+        // Already on preferences screen
+    });
+    wrapper.querySelector('.favorites-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('show');
+        showFavoritesScreen();
+    });
+    wrapper.querySelector('.switch-profile-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = '/profile-picker.html';
+    });
+    wrapper.querySelector('.logout-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        try {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/profile-picker.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Fallback: clear client-side cookie anyway
+            document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/profile-picker.html';
+        }
+    });
+    
+    // Back button
+    preferencesContainer.querySelector('.back-to-main-btn').addEventListener('click', () => {
+        preferencesContainer.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        preferencesContainer.style.opacity = '0';
+        preferencesContainer.style.transform = 'translateY(30px) scale(0.98)';
+        
+        setTimeout(() => {
+            // Clean up
+            preferencesContainer.remove();
+            
+            // Show main containers
+            if (swipeContainer) swipeContainer.style.display = '';
+            if (resultContainer) resultContainer.style.display = '';
+            
+            // Restore the original header content
+            addHeaderControls();
+        }, 350);
+    });
+    
+    // Save preferences button
+    preferencesContainer.querySelector('.save-preferences-btn').addEventListener('click', async () => {
+        const selectedDiet = document.querySelector('input[name="diet"]:checked').value;
+        const selectedBudget = document.querySelector('input[name="budget"]:checked').value;
+        const selectedSeasonal = document.querySelector('input[name="seasonalKing"]:checked').value;
+        
+        try {
+            const res = await fetch('/api/preferences', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    diet: selectedDiet,
+                    budget: selectedBudget,
+                    seasonalKing: selectedSeasonal
+                })
+            });
+            
+            if (!res.ok) throw new Error('Failed to save preferences');
+            
+            // Update local state
+            preferences.diet = selectedDiet;
+            preferences.budget = selectedBudget;
+            preferences.seasonalKing = selectedSeasonal;
+            
+            // Show success message
+            const saveBtn = preferencesContainer.querySelector('.save-preferences-btn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '✅ Saved!';
+            saveBtn.disabled = true;
+            
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Save preferences error:', error);
+        }
+    });
+}
+
+// ---------------------------

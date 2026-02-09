@@ -14,7 +14,12 @@
       }
     ],
     "createdAt": "2026-02-09T19:23:06.690Z",
-    "lastLogin": "2026-02-09T19:32:48.229Z"
+    "lastLogin": "2026-02-09T20:11:41.045Z",
+    "preferences": {
+      "diet": "None",
+      "budget": "Yes",
+      "seasonalKing": "Yes"
+    }
   },
   "oscar": {
     "passwordHash": "$2b$10$qJ9y7FfO4uv5hiMbeyhfIeAGNfaPwWVsIX7/pYcoyc/G4ul4tpA0W",

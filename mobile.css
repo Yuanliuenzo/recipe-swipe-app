@@ -810,6 +810,121 @@ body {
     margin: 0 20px;
 }
 
+/* Mobile Full-screen Preferences Container */
+.mobile-preferences-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f0f2f5;
+    z-index: 1000;
+    overflow-y: auto;
+    padding-top: 80px; /* Account for header */
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-header {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-header h2 {
+    color: #6a4e42;
+    margin: 0;
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-content {
+    padding: 0 20px 40px;
+}
+
+.mobile-preference-group {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.mobile-preference-group h3 {
+    color: #6a4e42;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+
+.mobile-preference-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-preference-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-preference-option:hover {
+    background-color: #f8f9fa;
+}
+
+.mobile-preference-option input[type="radio"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: #6a4e42;
+}
+
+.mobile-preference-option span {
+    font-size: 16px;
+    color: #34495e;
+}
+
+.mobile-preference-actions {
+    padding: 20px;
+    text-align: center;
+}
+
+.mobile-floating-back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1001;
+    transition: all 0.2s ease;
+}
+
+.mobile-floating-back-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.mobile-floating-back-btn:active {
+    transform: translateY(0);
+}
+
+.floating-back-icon {
+    font-size: 16px;
+    color: #6a4e42;
+}
+
+.floating-back-text {
+    font-size: 14px;
+    color: #6a4e42;
+    font-weight: 500;
+}
+
 /* Mobile Favorite Card Structure */
 .mobile-favorite-preview {
     padding: 12px 0;
