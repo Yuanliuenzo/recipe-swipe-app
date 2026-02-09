@@ -578,10 +578,17 @@ async function showFavoritesScreen() {
         e.stopPropagation();
         window.location.href = '/profile-picker.html';
     });
-    wrapper.querySelector('.logout-btn').addEventListener('click', (e) => {
+    wrapper.querySelector('.logout-btn').addEventListener('click', async (e) => {
         e.stopPropagation();
-        document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = '/profile-picker.html';
+        try {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/profile-picker.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Fallback: clear client-side cookie anyway
+            document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/profile-picker.html';
+        }
     });
     
     // Back button
@@ -714,10 +721,17 @@ function addHeaderControls() {
         e.stopPropagation();
         window.location.href = '/profile-picker.html';
     });
-    wrapper.querySelector('.logout-btn').addEventListener('click', (e) => {
+    wrapper.querySelector('.logout-btn').addEventListener('click', async (e) => {
         e.stopPropagation();
-        document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = '/profile-picker.html';
+        try {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = '/profile-picker.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Fallback: clear client-side cookie anyway
+            document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/profile-picker.html';
+        }
     });
 }
 

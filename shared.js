@@ -93,7 +93,7 @@ async function loadUserState() {
     } catch (e) {
         console.error('Failed to load user state:', e);
         // Fallback: redirect to profile picker
-        window.location.reload();
+        window.location.href = '/profile-picker.html';
     }
 }
 

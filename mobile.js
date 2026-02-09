@@ -510,10 +510,17 @@ function createMobileNavigation() {
     
     const logoutBtn = nav.querySelector('.logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            window.location.href = '/profile-picker.html';
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = '/profile-picker.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Fallback: clear client-side cookie anyway
+                document.cookie = 'profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/profile-picker.html';
+            }
         });
     }
     

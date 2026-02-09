@@ -1,0 +1,51 @@
+{
+  "yuan": {
+    "passwordHash": "$2b$10$WWQk5.ba.nlqqaptyVYt/uim.QH5cnNBIXzlpixKOmrXpgiRa5eNO",
+    "vibeProfile": [],
+    "ingredientsAtHome": "",
+    "favorites": [
+      {
+        "id": "1770665083041",
+        "recipeText": " Recipe Name: Apple, Kale, and Walnut Salad\n\nIngredients:\n• 5 cups kale, chopped\n• 1 medium apple, sliced\n• 1/2 cup walnuts, chopped\n\nInstructions:\n1. Wash the kale thoroughly and chop into bite-sized pieces. Place in a large salad bowl.\n2. Core and slice the apple, add it to the bowl with the kale.\n3. Sprinkle the chopped walnuts over the top of the salad.\n4. Dress the salad with your choice of light vinaigrette or lemon juice and olive oil, toss to combine.\n5. Serve immediately, enjoy your healthy, fresh, and satisfying Apple, Kale, and Walnut Salad!",
+        "title": "Apple, Kale, and Walnut Salad",
+        "rating": null,
+        "note": null,
+        "createdAt": "2026-02-09T19:24:43.041Z"
+      }
+    ],
+    "createdAt": "2026-02-09T19:23:06.690Z",
+    "lastLogin": "2026-02-09T19:32:48.229Z"
+  },
+  "oscar": {
+    "passwordHash": "$2b$10$qJ9y7FfO4uv5hiMbeyhfIeAGNfaPwWVsIX7/pYcoyc/G4ul4tpA0W",
+    "vibeProfile": [],
+    "ingredientsAtHome": "",
+    "favorites": [],
+    "createdAt": "2026-02-09T19:23:06.765Z",
+    "lastLogin": null
+  },
+  "annie": {
+    "passwordHash": "$2b$10$XTiIkStaLjOCJhM6yq71reFnPBCDi7aluZ4YvH7xigj2w0dxlvGom",
+    "vibeProfile": [],
+    "ingredientsAtHome": "",
+    "favorites": [],
+    "createdAt": "2026-02-09T19:23:06.838Z",
+    "lastLogin": null
+  },
+  "bram": {
+    "passwordHash": "$2b$10$5PvLjnvKbermfzssELs3zO3QXPfauwMHKZPcAVSSOLA0maIn.oy42",
+    "vibeProfile": [],
+    "ingredientsAtHome": "",
+    "favorites": [],
+    "createdAt": "2026-02-09T19:23:06.911Z",
+    "lastLogin": null
+  },
+  "elisa": {
+    "passwordHash": "$2b$10$WY5gn/WgyMmpoxBFkezj8uIdURcFGkBYTTQPUjQdcFqDG9ehYYX7C",
+    "vibeProfile": [],
+    "ingredientsAtHome": "",
+    "favorites": [],
+    "createdAt": "2026-02-09T19:23:06.984Z",
+    "lastLogin": null
+  }
+}
