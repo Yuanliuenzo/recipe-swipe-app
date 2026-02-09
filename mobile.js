@@ -214,6 +214,12 @@ function showNextMobileCard() {
 // ---------------------------
 
 function showMobileResult() {
+    // Check if FAB overlay is visible and hide it
+    const fabOverlay = document.getElementById('fabOverlay');
+    if (fabOverlay && fabOverlay.classList.contains('show')) {
+        fabOverlay.classList.remove('show');
+    }
+    
     // Hide main container
     document.querySelector(".mobile-container").style.display = "none";
     
@@ -286,19 +292,28 @@ function showMobileResult() {
     });
 
     generateBtn.addEventListener('click', () => {
-        const prompt = generatePersonalizedPrompt();
-        generateMobileRecipe(prompt, recipeCard);
+        try {
+            const prompt = generatePersonalizedPrompt();
+            generateMobileRecipe(prompt, recipeCard);
+        } catch (error) {
+            console.error('Error in generate button handler:', error);
+        }
     });
 }
 
 async function generateMobileRecipe(prompt, recipeCard) {
     const button = recipeCard.querySelector('.mobile-generate-btn');
     
-    // Show loading state
+    if (!button) {
+        console.error('Generate button not found in recipeCard');
+        return;
+    }
+    
     button.innerHTML = '<span class="mobile-loading-spinner"></span> Generating... (this may take 30+ seconds)';
     button.disabled = true;
 
-    // Show skeleton loading in the card
+    // Show skeleton loading in the card (but keep the button)
+    const currentContent = recipeCard.innerHTML;
     recipeCard.innerHTML = `
         <div class="mobile-recipe-loading-status">Generating your recipe...</div>
         <div class="mobile-recipe-skeleton">
@@ -309,6 +324,13 @@ async function generateMobileRecipe(prompt, recipeCard) {
             <div class="skeleton-line short"></div>
         </div>
     `;
+    
+    // Re-add the button at the bottom
+    const newButton = document.createElement('button');
+    newButton.className = 'japandi-btn japandi-btn-primary mobile-generate-btn';
+    newButton.innerHTML = '<span class="mobile-loading-spinner"></span> Generating... (this may take 30+ seconds)';
+    newButton.disabled = true;
+    recipeCard.appendChild(newButton);
     
     try {
         // Add timeout for slow Ollama responses
@@ -412,8 +434,8 @@ async function generateMobileRecipe(prompt, recipeCard) {
         
     } catch (error) {
         console.error("Failed to fetch recipe:", error);
-        button.textContent = 'Try Again';
-        button.disabled = false;
+        newButton.textContent = 'Try Again';
+        newButton.disabled = false;
     }
 }
 

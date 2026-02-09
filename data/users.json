@@ -5,6 +5,14 @@
     "ingredientsAtHome": "",
     "favorites": [
       {
+        "id": "1770668906487",
+        "recipeText": " **Recipe Name: Spicy Chicken Fajita Tacos**\n\nIngredients:\n• 4 chicken thighs\n• 1 bell pepper (preferably red or yellow, in season)\n• 1 large onion\n• 1 can of black beans (drained and rinsed)\n• 8 corn tortillas\n• 3 tablespoons olive oil\n• 2 tablespoons lime juice\n• 2 tablespoons chili powder\n• 1 teaspoon cumin\n• Salt to taste\n• 1 cup shredded cheese (optional, for garnish)\n\nInstructions:\n1. Season the chicken thighs with salt, chili powder, and cumin. Heat 1 tablespoon of olive oil in a large skillet over medium-high heat. Add the seasoned chicken thighs and cook until browned on both sides and cooked through, about 6-8 minutes per side. Remove from skillet and set aside.\n2. In the same skillet, add another tablespoon of olive oil. Slice the bell pepper and onion into thin strips, and sauté them in the skillet until tender, about 5 minutes.\n3. Add the drained black beans to the skillet and stir to combine with the peppers and onions. Squeeze lime juice over the mixture.\n4. Slice the cooked chicken thighs into thin strips. Return them to the skillet and toss everything together to combine. Cook for an additional 2 minutes to heat the chicken through.\n5. Warm the corn tortillas in a dry skillet or microwave. Serve the fajita mixture in the warm tortillas, garnished with shredded cheese if desired. Enjoy your spicy and adventurous Chicken Fajita Tacos!",
+        "title": "Recipe Name: Spicy Chicken Fajita Tacos",
+        "rating": null,
+        "note": null,
+        "createdAt": "2026-02-09T20:28:26.487Z"
+      },
+      {
         "id": "1770665083041",
         "recipeText": " Recipe Name: Apple, Kale, and Walnut Salad\n\nIngredients:\n• 5 cups kale, chopped\n• 1 medium apple, sliced\n• 1/2 cup walnuts, chopped\n\nInstructions:\n1. Wash the kale thoroughly and chop into bite-sized pieces. Place in a large salad bowl.\n2. Core and slice the apple, add it to the bowl with the kale.\n3. Sprinkle the chopped walnuts over the top of the salad.\n4. Dress the salad with your choice of light vinaigrette or lemon juice and olive oil, toss to combine.\n5. Serve immediately, enjoy your healthy, fresh, and satisfying Apple, Kale, and Walnut Salad!",
         "title": "Apple, Kale, and Walnut Salad",
@@ -14,10 +22,10 @@
       }
     ],
     "createdAt": "2026-02-09T19:23:06.690Z",
-    "lastLogin": "2026-02-09T20:11:41.045Z",
+    "lastLogin": "2026-02-09T20:27:33.632Z",
     "preferences": {
       "diet": "None",
-      "budget": "Yes",
+      "budget": "No",
       "seasonalKing": "Yes"
     }
   },

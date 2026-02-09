@@ -162,7 +162,7 @@ ${combinedVibes}`;
         basePrompt += ` Try to incorporate these ingredients they already have: ${ingredientsAtHome}. `;
     }
     
-    const fullPrompt = `${basePrompt}
+    let fullPrompt = `${basePrompt}
     
 Please write me a clear, well-formatted recipe that matches these preferences. `;
     
