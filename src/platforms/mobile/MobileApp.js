@@ -84,8 +84,8 @@ export class MobileApp {
   
   // Setup DOM containers
   setupContainers() {
-    this.containers.cardContainer = DomUtils.find('#mobile-card-container');
-    this.containers.resultContainer = DomUtils.find('#mobile-result');
+    this.containers.cardContainer = DomUtils.find('mobile-card-container');
+    this.containers.resultContainer = DomUtils.find('mobile-result');
     this.containers.headerContainer = DomUtils.find('.mobile-header');
     
     if (!this.containers.cardContainer) {

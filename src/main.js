@@ -17,6 +17,20 @@ import { Component } from './components/Component.js';
 import { Card } from './components/Card/Card.js';
 import { VibeCard } from './components/Card/VibeCard.js';
 
+// Platform detection
+const isMobile = () => {
+  return window.location.pathname.includes('mobile.html') || 
+         document.querySelector('.mobile-container') !== null ||
+         DeviceUtils.isMobile();
+};
+
+console.log('🔍 Platform detection:', {
+  isMobile: isMobile(),
+  pathname: window.location.pathname,
+  hasMobileContainer: !!document.querySelector('.mobile-container'),
+  deviceUtilsMobile: DeviceUtils.isMobile()
+});
+
 // Create global instances
 const vibeEngine = new VibeEngine();
 
@@ -129,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ First card created successfully');
         
         // Add working swipe functionality
-        const cardElement = container.querySelector('.vibe-card');
+        const cardElement = container.querySelector('.vibe-card') || container.querySelector('.mobile-vibe-card');
         if (cardElement) {
           // Use our working SwipeUtils
           SwipeUtils.addSwipeHandler(
@@ -247,7 +261,7 @@ function showNextCard() {
     card.mount();
     
     // Add event listeners
-    const cardElement = container.querySelector('.vibe-card');
+    const cardElement = container.querySelector('.vibe-card') || container.querySelector('.mobile-vibe-card');
     if (cardElement) {
       // Use our working SwipeUtils
       SwipeUtils.addSwipeHandler(
@@ -286,76 +300,202 @@ function showResult() {
 
 function showRecipeGeneration(container, profile) {
   console.log('🎯 showRecipeGeneration called with profile:', profile);
+  console.log('🔍 Platform detection:', isMobile() ? 'Mobile' : 'Web');
   
-  container.innerHTML = `
-    <div style="
-      text-align: center; 
-      padding: 40px; 
-      color: white;
-      font-family: 'Noto Sans', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 15px;
-      margin: 0 auto;
-      max-width: 400px;
-    ">
-      <h2 style="font-size: 28px; margin-bottom: 15px;">🎉 Your Vibe Profile</h2>
-      <div style="margin-bottom: 20px;">
-        ${profile.map(vibe => `<span style="margin: 5px; font-size: 24px;">${vibe.emoji}</span>`).join('')}
+  if (isMobile()) {
+    // Mobile-specific handling
+    console.log('🔍 DOM elements check:');
+    console.log('- mobileContainer:', document.querySelector('.mobile-container'));
+    console.log('- resultContainer:', document.querySelector('.mobile-result'));
+    console.log('- mobile-recipe-card:', document.getElementById('mobile-recipe-card'));
+    
+    // Hide main container and show result container
+    const mobileContainer = document.querySelector('.mobile-container');
+    const resultContainer = document.querySelector('.mobile-result');
+    
+    if (mobileContainer) {
+      mobileContainer.style.display = 'none';
+      console.log('✅ Hidden mobile container');
+    } else {
+      console.warn('⚠️ mobile-container not found');
+    }
+    
+    if (resultContainer) {
+      resultContainer.classList.add('show');
+      console.log('✅ Showed result container');
+    } else {
+      console.warn('⚠️ mobile-result not found');
+    }
+    
+    // Use the result container instead of the card container
+    let recipeCard = document.getElementById('mobile-recipe-card');
+    if (!recipeCard) {
+      console.error('❌ mobile-recipe-card not found - creating it dynamically');
+      
+      // Create the element dynamically if it doesn't exist
+      const resultContent = document.querySelector('.mobile-result-content');
+      if (resultContent) {
+        recipeCard = document.createElement('div');
+        recipeCard.className = 'mobile-recipe-card';
+        recipeCard.id = 'mobile-recipe-card';
+        resultContent.appendChild(recipeCard);
+        console.log('✅ Created mobile-recipe-card dynamically');
+      } else {
+        console.error('❌ mobile-result-content not found either');
+        return;
+      }
+    }
+    
+    // Get the recipe card (either original or dynamically created)
+    const finalRecipeCard = document.getElementById('mobile-recipe-card');
+    console.log('📱 Using recipe card:', finalRecipeCard);
+    
+    // Create vibe summary using your beautiful old structure
+    const vibeSummary = profile.length > 0 
+      ? `<div class="mobile-vibe-summary">
+          <h2>🎯 Your Vibe Profile</h2>
+          <div class="mobile-selected-vibes">
+              ${profile.map(vibe => `<span class="mobile-vibe-tag">${vibe.emoji} ${vibe.name}</span>`).join('')}
+          </div>
+          <p style="color: #666; margin-top: 10px;">Ready for your personalized recipe?</p>
+         </div>`
+      : `<div class="mobile-vibe-summary">
+          <h2>🍳 Ready to Cook!</h2>
+          <p style="color: #666;">Let's find you a delicious recipe!</p>
+         </div>`;
+    
+    finalRecipeCard.innerHTML = `
+      ${vibeSummary}
+      <div class="ingredients-container">
+          <h2>🏡 What do you have at home?</h2>
+          <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
+          <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
+          <div class="ingredients-actions">
+              <button class="japandi-btn japandi-btn-subtle add-ingredients-btn" type="button">+ Add Ingredients</button>
+          </div>
+          <div class="ingredients-confirmation"></div>
       </div>
-      <p style="font-size: 16px; margin-bottom: 25px;">Ready for your personalized recipe!</p>
-      
-      <div style="margin-bottom: 20px; text-align: left;">
-        <label style="display: block; margin-bottom: 10px; font-size: 14px;">What do you have at home? (optional)</label>
-        <textarea id="ingredients-input" placeholder="chicken, rice, garlic, spinach..." style="
-          width: 100%;
-          padding: 10px;
-          border: none;
-          border-radius: 8px;
-          resize: vertical;
-          min-height: 60px;
-          font-family: inherit;
-          margin-bottom: 10px;
-        "></textarea>
-        <button id="add-ingredients-btn" onclick="addIngredients()" style="
-          background: rgba(255,255,255,0.2);
-          color: white;
-          border: 1px solid rgba(255,255,255,0.3);
-          padding: 8px 16px;
-          border-radius: 15px;
-          font-size: 12px;
-          cursor: pointer;
-          margin-bottom: 15px;
-        ">+ Add Ingredients</button>
-        <div id="ingredients-confirmation" style="font-size: 12px; margin-top: 5px; min-height: 16px;"></div>
-      </div>
-      
-      <button onclick="generateRecipe()" style="
-        background: white;
-        color: #667eea;
-        border: none;
-        padding: 15px 30px;
-        border-radius: 25px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 15px;
-        transition: all 0.3s ease;
-      ">🍳 Generate My Recipe</button>
-      
-      <button onclick="location.reload()" style="
-        background: transparent;
+      <button class="japandi-btn japandi-btn-primary mobile-generate-btn" type="button">🍳 Generate My Recipe</button>
+    `;
+    
+    // Setup event listeners using your old approach
+    const addBtn = finalRecipeCard.querySelector('.add-ingredients-btn');
+    const ingredientsInput = finalRecipeCard.querySelector('.ingredients-input');
+    const confirmation = finalRecipeCard.querySelector('.ingredients-confirmation');
+    const generateBtn = finalRecipeCard.querySelector('.mobile-generate-btn');
+
+    addBtn.addEventListener('click', () => {
+      const rawValue = ingredientsInput.value.trim();
+      if (rawValue) {
+        const newItems = rawValue
+          .split(',')
+          .map(item => item.trim().toLowerCase())
+          .filter(item => item.length > 0);
+
+        const existingItems = globalStateManager.get('ingredientsAtHome')
+          ? globalStateManager.get('ingredientsAtHome').split(',').map(item => item.trim().toLowerCase())
+          : [];
+
+        const combined = [...existingItems, ...newItems];
+        const uniqueItems = [...new Set(combined)];
+        
+        globalStateManager.setState({ ingredientsAtHome: uniqueItems.join(', ') });
+
+        ingredientsInput.value = '';
+
+        confirmation.textContent = `✅ Added: ${newItems.join(', ')}`;
+        confirmation.style.color = '#4CAF50';
+        confirmation.classList.add('show');
+        setTimeout(() => confirmation.classList.remove('show'), 3000);
+      } else {
+        confirmation.textContent = '⚠️ Please enter ingredients first';
+        confirmation.style.color = '#c9a66b';
+        confirmation.classList.add('show');
+        setTimeout(() => confirmation.classList.remove('show'), 3000);
+      }
+    });
+
+    generateBtn.addEventListener('click', () => {
+      try {
+        generateRecipe();
+      } catch (error) {
+        console.error('Error in generate button handler:', error);
+      }
+    });
+    
+    console.log('✅ Recipe generation UI rendered with beautiful styling');
+  } else {
+    // Web-specific handling (original working version)
+    container.innerHTML = `
+      <div style="
+        text-align: center; 
+        padding: 40px; 
         color: white;
-        border: 2px solid white;
-        padding: 10px 20px;
-        border-radius: 20px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-left: 10px;
-      ">Start Over</button>
-    </div>
-  `;
-  
-  console.log('✅ Recipe generation UI rendered');
+        font-family: 'Noto Sans', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        margin: 0 auto;
+        max-width: 400px;
+      ">
+        <h2 style="font-size: 28px; margin-bottom: 15px;">🎉 Your Vibe Profile</h2>
+        <div style="margin-bottom: 20px;">
+          ${profile.map(vibe => `<span style="margin: 5px; font-size: 24px;">${vibe.emoji}</span>`).join('')}
+        </div>
+        <p style="font-size: 16px; margin-bottom: 25px;">Ready for your personalized recipe!</p>
+        
+        <div style="margin-bottom: 20px; text-align: left;">
+          <label style="display: block; margin-bottom: 10px; font-size: 14px;">What do you have at home? (optional)</label>
+          <textarea id="ingredients-input" placeholder="chicken, rice, garlic, spinach..." style="
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            margin-bottom: 10px;
+          "></textarea>
+          <button id="add-ingredients-btn" onclick="addIngredients()" style="
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+          ">+ Add Ingredients</button>
+          <div id="ingredients-confirmation" style="font-size: 12px; margin-top: 5px; min-height: 16px;"></div>
+        </div>
+        
+        <button onclick="generateRecipe()" style="
+          background: white;
+          color: #667eea;
+          border: none;
+          padding: 15px 30px;
+          border-radius: 25px;
+          font-size: 18px;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 15px;
+          transition: all 0.3s ease;
+        ">🍳 Generate My Recipe</button>
+        
+        <button onclick="location.reload()" style="
+          background: transparent;
+          color: white;
+          border: 2px solid white;
+          padding: 10px 20px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+          margin-left: 10px;
+        ">Start Over</button>
+      </div>
+    `;
+    
+    console.log('✅ Recipe generation UI rendered for web');
+  }
 }
 
 function showSimpleResult(container) {
@@ -431,6 +571,7 @@ function addIngredients() {
 // Recipe generation function
 async function generateRecipe() {
   console.log('🎯 generateRecipe() called');
+  console.log('🔍 Platform detection:', isMobile() ? 'Mobile' : 'Web');
   
   const profile = globalStateManager.get('vibeProfile');
   const ingredients = document.getElementById('ingredients-input')?.value || globalStateManager.get('ingredientsAtHome') || '';
@@ -438,45 +579,82 @@ async function generateRecipe() {
   console.log('🍳 Generating recipe with profile:', profile);
   console.log('🥘 Using ingredients:', ingredients);
   
+  // Get appropriate container for both platforms
+  const container = document.querySelector('.card-container') || document.querySelector('.mobile-card-container');
+  
   // Move progressInterval outside try-catch so it's accessible in both
   let progressInterval = null;
   
   try {
-    // Show loading state
-    const container = document.querySelector('.card-container') || document.querySelector('.mobile-card-container');
-    container.innerHTML = `
-      <div style="
-        text-align: center; 
-        padding: 40px; 
-        color: white;
-        font-family: 'Noto Sans', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        margin: 0 auto;
-        max-width: 400px;
-      ">
-        <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
-        <h2 style="font-size: 24px; margin-bottom: 15px;">Generating Recipe...</h2>
-        <p style="font-size: 16px;">This may take 30+ seconds</p>
-        <div style="font-size: 12px; margin-top: 10px; opacity: 0.8;">Debug: Calling API with 60 second timeout...</div>
-        <div id="progress-container" style="margin-top: 20px;">
-          <div style="width: 200px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin: 0 auto;">
-            <div id="progress-bar" style="width: 0%; height: 100%; background: white; border-radius: 2px; transition: width 1s linear;"></div>
-          </div>
-          <div id="progress-text" style="font-size: 12px; margin-top: 10px; opacity: 0.8;">0%</div>
+    if (isMobile()) {
+      // Mobile loading state
+      let recipeCard = document.getElementById('mobile-recipe-card');
+      if (!recipeCard) {
+        console.error('❌ mobile-recipe-card not found for loading state - creating it dynamically');
+        
+        // Create the element dynamically if it doesn't exist
+        const resultContent = document.querySelector('.mobile-result-content');
+        if (resultContent) {
+          recipeCard = document.createElement('div');
+          recipeCard.className = 'mobile-recipe-card';
+          recipeCard.id = 'mobile-recipe-card';
+          resultContent.appendChild(recipeCard);
+          console.log('✅ Created mobile-recipe-card dynamically for loading');
+        } else {
+          console.error('❌ mobile-result-content not found either');
+          return;
+        }
+      }
+      
+      recipeCard.innerHTML = `
+        <div class="mobile-recipe-loading-status">Generating your personalized recipe...</div>
+        <div class="mobile-recipe-skeleton">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
         </div>
-      </div>
-    `;
-    
-    // Start progress animation
-    let progress = 0;
-    progressInterval = setInterval(() => {
-      progress = Math.min(progress + 2, 95);
-      const progressBar = document.getElementById('progress-bar');
-      const progressText = document.getElementById('progress-text');
-      if (progressBar) progressBar.style.width = progress + '%';
-      if (progressText) progressText.textContent = progress + '%';
-    }, 600);
+        <div class="mobile-recipe-loading-status">This may take 30+ seconds...</div>
+      `;
+    } else {
+      // Web loading state
+      container.innerHTML = `
+        <div style="
+          text-align: center; 
+          padding: 40px; 
+          color: white;
+          font-family: 'Noto Sans', sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 15px;
+          margin: 0 auto;
+          max-width: 400px;
+        ">
+          <div style="font-size: 48px; margin-bottom: 20px;">⏳</div>
+          <h2 style="font-size: 24px; margin-bottom: 15px;">Generating Recipe...</h2>
+          <p style="font-size: 16px;">This may take 30+ seconds</p>
+          <div style="font-size: 12px; margin-top: 10px; opacity: 0.8;">Debug: Calling API with 60 second timeout...</div>
+          <div id="progress-container" style="margin-top: 20px;">
+            <div style="width: 200px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin: 0 auto;">
+              <div id="progress-bar" style="width: 0%; height: 100%; background: white; border-radius: 2px; transition: width 1s linear;"></div>
+            </div>
+            <div id="progress-text" style="font-size: 12px; margin-top: 10px; opacity: 0.8;">0%</div>
+          </div>
+        </div>
+      `;
+      
+      // Start progress animation
+      let progress = 0;
+      progressInterval = setInterval(() => {
+        progress = Math.min(progress + 2, 95);
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        if (progressBar) progressBar.style.width = progress + '%';
+        if (progressText) progressText.textContent = progress + '%';
+      }, 600);
+    }
     
     // Build prompt
     const prompt = PromptBuilder.generatePersonalizedPrompt(
@@ -578,49 +756,83 @@ async function generateRecipe() {
       stack: error.stack
     });
     
-    // Show error with fallback
-    const container = document.querySelector('.card-container') || document.querySelector('.mobile-card-container');
-    container.innerHTML = `
-      <div style="
-        text-align: center; 
-        padding: 40px; 
-        color: white;
-        font-family: 'Noto Sans', sans-serif;
-        background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
-        border-radius: 15px;
-        margin: 0 auto;
-        max-width: 400px;
-      ">
-        <h2 style="font-size: 24px; margin-bottom: 15px;">⚠️ Recipe Generation Failed</h2>
-        <p style="font-size: 16px; margin-bottom: 20px;">${error.message}</p>
-        <p style="font-size: 14px; margin-bottom: 25px;">Make sure your backend server is running on port 3000</p>
-        <div style="font-size: 12px; margin-bottom: 20px; opacity: 0.8;">
-          Debug: Check browser console for more details
+    // Show error with platform-specific styling
+    if (isMobile()) {
+      // Mobile error styling
+      let recipeCard = document.getElementById('mobile-recipe-card');
+      if (!recipeCard) {
+        console.error('❌ mobile-recipe-card not found for error display - creating it dynamically');
+        
+        // Create the element dynamically if it doesn't exist
+        const resultContent = document.querySelector('.mobile-result-content');
+        if (resultContent) {
+          recipeCard = document.createElement('div');
+          recipeCard.className = 'mobile-recipe-card';
+          recipeCard.id = 'mobile-recipe-card';
+          resultContent.appendChild(recipeCard);
+          console.log('✅ Created mobile-recipe-card dynamically for error');
+        } else {
+          console.error('❌ mobile-result-content not found either');
+          return;
+        }
+      }
+      
+      recipeCard.innerHTML = `
+        <div class="mobile-vibe-summary">
+          <h2>⚠️ Recipe Generation Failed</h2>
+          <p style="color: #666; margin-bottom: 15px;">${error.message}</p>
+          <p style="color: #999; font-size: 14px; margin-bottom: 20px;">Make sure your backend server is running on port 3000</p>
         </div>
-        <div style="margin: 20px 0;">
-          <button onclick="tryAgain()" style="
-            background: white;
-            color: #f44336;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-          ">Try Again</button>
-          <button onclick="showMockRecipe()" style="
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 5px;
-          ">Show Mock Recipe</button>
+        <div class="mobile-recipe-actions">
+          <button class="japandi-btn japandi-btn-subtle" onclick="tryAgain()" type="button">Try Again</button>
+          <button class="japandi-btn japandi-btn-primary" onclick="showMockRecipe()" type="button">Show Mock Recipe</button>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      // Web error styling
+      const container = document.querySelector('.card-container') || document.querySelector('.mobile-card-container');
+      container.innerHTML = `
+        <div style="
+          text-align: center; 
+          padding: 40px; 
+          color: white;
+          font-family: 'Noto Sans', sans-serif;
+          background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+          border-radius: 15px;
+          margin: 0 auto;
+          max-width: 400px;
+        ">
+          <h2 style="font-size: 24px; margin-bottom: 15px;">⚠️ Recipe Generation Failed</h2>
+          <p style="font-size: 16px; margin-bottom: 20px;">${error.message}</p>
+          <p style="font-size: 14px; margin-bottom: 25px;">Make sure your backend server is running on port 3000</p>
+          <div style="font-size: 12px; margin-bottom: 20px; opacity: 0.8;">
+            Debug: Check browser console for more details
+          </div>
+          <div style="margin: 20px 0;">
+            <button onclick="tryAgain()" style="
+              background: white;
+              color: #f44336;
+              border: none;
+              padding: 12px 24px;
+              border-radius: 25px;
+              font-size: 16px;
+              cursor: pointer;
+              margin: 5px;
+            ">Try Again</button>
+            <button onclick="showMockRecipe()" style="
+              background: transparent;
+              color: white;
+              border: 2px solid white;
+              padding: 10px 20px;
+              border-radius: 20px;
+              font-size: 14px;
+              cursor: pointer;
+              margin: 5px;
+            ">Show Mock Recipe</button>
+          </div>
+        </div>
+      `;
+    }
   }
 }
 
@@ -629,42 +841,145 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
     formattedRecipe,
     rawRecipe: rawRecipe?.substring(0, 100) + '...'
   });
+  console.log('🔍 Platform detection:', isMobile() ? 'Mobile' : 'Web');
   
-  if (!formattedRecipe || !formattedRecipe.html) {
-    console.error('❌ No formatted recipe HTML available');
-    console.log('📝 Raw recipe text:', rawRecipe);
+  if (isMobile()) {
+    // Mobile recipe display
+    let recipeCard = document.getElementById('mobile-recipe-card');
+    if (!recipeCard) {
+      console.error('❌ mobile-recipe-card not found for recipe display - creating it dynamically');
+      
+      // Create the element dynamically if it doesn't exist
+      const resultContent = document.querySelector('.mobile-result-content');
+      if (resultContent) {
+        recipeCard = document.createElement('div');
+        recipeCard.className = 'mobile-recipe-card';
+        recipeCard.id = 'mobile-recipe-card';
+        resultContent.appendChild(recipeCard);
+        console.log('✅ Created mobile-recipe-card dynamically for recipe display');
+      } else {
+        console.error('❌ mobile-result-content not found either');
+        return;
+      }
+    }
+    
+    if (!formattedRecipe || !formattedRecipe.html) {
+      console.error('❌ No formatted recipe HTML available');
+      console.log('📝 Raw recipe text:', rawRecipe);
+    }
+    
+    // Check if we should show toggle buttons
+    const hasIngredients = formattedRecipe.html.includes('Ingredients:');
+    const hasInstructions = formattedRecipe.html.includes('Instructions:');
+    
+    recipeCard.innerHTML = `
+      ${hasIngredients && hasInstructions ? `
+        <div class="mobile-recipe-toggle">
+          <button type="button" class="mobile-recipe-toggle-btn active" data-target="ingredients">Ingredients</button>
+          <button type="button" class="mobile-recipe-toggle-btn" data-target="instructions">Instructions</button>
+        </div>
+      ` : ''}
+      <h2 class="recipe-title">${formattedRecipe.title || '🍳 Your Personalized Recipe'}</h2>
+      <div class="mobile-recipe-content">${formattedRecipe.html || '<p style="color: #666; font-style: italic;">No recipe content available</p>'}</div>
+      <div class="mobile-recipe-actions">
+        <button class="save-favorite-btn japandi-btn japandi-btn-subtle" type="button">⭐ Save Favorite</button>
+        <button class="mobile-reset-btn japandi-btn japandi-btn-primary" type="button">🔄 Start Over</button>
+      </div>
+    `;
+    
+    // Setup toggle functionality if needed
+    if (hasIngredients && hasInstructions) {
+      const toggleBtns = recipeCard.querySelectorAll('.mobile-recipe-toggle-btn');
+      const content = recipeCard.querySelector('.mobile-recipe-content');
+      
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const target = btn.dataset.target;
+          
+          // Update button states
+          toggleBtns.forEach(b => b.classList.toggle('active', b.dataset.target === target));
+          
+          // Show/hide sections
+          content.querySelectorAll('[data-recipe-section]').forEach(section => {
+            section.style.display = section.dataset.recipeSection === target ? '' : 'none';
+          });
+        });
+      });
+    }
+    
+    // Setup action buttons
+    const saveBtn = recipeCard.querySelector('.save-favorite-btn');
+    const resetBtn = recipeCard.querySelector('.mobile-reset-btn');
+    
+    if (saveBtn) {
+      saveBtn.addEventListener('click', async () => {
+        try {
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving...';
+          
+          await apiService.saveFavorite({
+            recipeText: rawRecipe,
+            title: formattedRecipe.title || 'Untitled Recipe',
+            rating: null,
+            note: null
+          });
+          
+          saveBtn.textContent = '✅ Saved';
+          
+          setTimeout(() => {
+            saveBtn.textContent = '⭐ Save Favorite';
+            saveBtn.disabled = false;
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Failed to save favorite:', error);
+          saveBtn.textContent = '⭐ Save Favorite';
+          saveBtn.disabled = false;
+        }
+      });
+    }
+    
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        location.reload();
+      });
+    }
+  } else {
+    // Web recipe display (original working version)
+    container.innerHTML = `
+      <div style="
+        padding: 20px; 
+        font-family: 'Noto Sans', sans-serif;
+        background: white;
+        border-radius: 15px;
+        margin: 0 auto;
+        max-width: 500px;
+        color: #333;
+        max-height: 70vh;
+        overflow-y: auto;
+      ">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #667eea; margin-bottom: 10px;">🍳 Your Personalized Recipe</h2>
+        </div>
+        ${formattedRecipe.html || '<p style="color: #666; font-style: italic;">No recipe content available</p>'}
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+          <button onclick="location.reload()" style="
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+          ">🔄 Start Over</button>
+        </div>
+      </div>
+    `;
   }
-  
-  container.innerHTML = `
-    <div style="
-      padding: 20px; 
-      font-family: 'Noto Sans', sans-serif;
-      background: white;
-      border-radius: 15px;
-      margin: 0 auto;
-      max-width: 500px;
-      color: #333;
-      max-height: 70vh;
-      overflow-y: auto;
-    ">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: #667eea; margin-bottom: 10px;">🍳 Your Personalized Recipe</h2>
-      </div>
-      ${formattedRecipe.html || '<p style="color: #666; font-style: italic;">No recipe content available</p>'}
-      <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-        <button onclick="location.reload()" style="
-          background: #667eea;
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 25px;
-          font-size: 16px;
-          cursor: pointer;
-          margin: 5px;
-        ">🔄 Start Over</button>
-      </div>
-    </div>
-  `;
 }
 
 // Mock recipe function for testing without backend
