@@ -25,7 +25,7 @@ function isMobile(req) {
 }
 
 // File-based user store
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+const USERS_FILE = path.join(__dirname, 'src', 'data', 'users.json');
 let users = new Map();
 
 // Load users from file on startup
@@ -129,14 +129,14 @@ app.get("/", (req, res) => {
         // User already selected a profile; serve the app
         if (isMobile(req)) {
             console.log("Serving mobile version");
-            res.sendFile(path.join(__dirname, 'mobile.html'));
+            res.sendFile(path.join(__dirname, 'public', 'mobile.html'));
         } else {
             console.log("Serving desktop version");
-            res.sendFile(path.join(__dirname, 'index.html'));
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
         }
     } else {
         // No profile cookie; show picker
-        res.sendFile(path.join(__dirname, 'profile-picker.html'));
+        res.sendFile(path.join(__dirname, 'public', 'profile-picker.html'));
     }
 });
 
@@ -295,8 +295,10 @@ app.patch("/api/preferences", async (req, res) => {
     res.json({ preferences: updatedPrefs });
 });
 
-// Serve static files from current directory (must be after / routing)
-app.use(express.static(path.join(__dirname)));
+// Serve static files from public directory (must be after / routing)
+app.use(express.static(path.join(__dirname, 'public')));
+// Serve source files for ES6 modules
+app.use('/src', express.static(path.join(__dirname, 'src')));
 
 app.post('/api/generateRecipe', async (req, res) => {
     console.log("POST /api/generateRecipe called with body:", req.body);

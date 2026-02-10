@@ -62,13 +62,30 @@ node server.js
 
 ```
 recipe-swipe-app/
-├── index.html          # Main HTML file
-├── app.js             # Frontend JavaScript
-├── server.js          # Backend server
-├── style.css          # Styling
-├── package.json       # Dependencies
-├── images/            # Recipe images
-└── README.md          # This file
+├── src/                    # Source code
+│   ├── App.js             # Main application logic
+│   ├── components/        # Reusable UI components
+│   ├── core/             # Core functionality
+│   ├── platforms/        # Platform-specific code
+│   ├── shared/           # Shared utilities
+│   ├── utils/            # Helper functions
+│   └── data/             # Application data
+├── public/                # Static assets
+│   ├── index.html        # Main HTML file
+│   ├── mobile.html       # Mobile version
+│   ├── profile-picker.html # Profile selection
+│   ├── css/              # Stylesheets
+│   │   ├── style.css     # Main styles
+│   │   └── mobile.css    # Mobile styles
+│   └── images/           # Recipe images
+├── archive/               # Archived legacy files
+├── config/               # Configuration files
+├── scripts/              # Build and utility scripts
+├── server.js             # Express server
+├── package.json          # Dependencies and scripts
+├── Dockerfile            # Docker configuration
+├── docker-compose.yml    # Docker Compose setup
+└── README.md             # This file
 ```
 
 ## Customization
