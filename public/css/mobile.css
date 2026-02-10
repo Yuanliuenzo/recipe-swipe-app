@@ -1330,3 +1330,33 @@ body {
     opacity: 1;
     visibility: visible;
 }
+
+/* --- Section visibility --- */
+.recipe-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.recipe-section.is-active {
+    display: block;
+}
+
+/* --- Actions --- */
+.mobile-recipe-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* --- Loading state --- */
+.is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* --- Animation --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}

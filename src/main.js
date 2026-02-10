@@ -841,141 +841,177 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
     formattedRecipe,
     rawRecipe: rawRecipe?.substring(0, 100) + '...'
   });
+
   console.log('🔍 Platform detection:', isMobile() ? 'Mobile' : 'Web');
-  
+
+  if (!formattedRecipe || !formattedRecipe.html) {
+    console.error('❌ No formatted recipe HTML available');
+    return;
+  }
+
+  // ----------------------------
+  // MOBILE VERSION
+  // ----------------------------
   if (isMobile()) {
-    // Mobile recipe display
+
+    // Get or create mobile recipe card safely
     let recipeCard = document.getElementById('mobile-recipe-card');
+
     if (!recipeCard) {
-      console.error('❌ mobile-recipe-card not found for recipe display - creating it dynamically');
-      
-      // Create the element dynamically if it doesn't exist
       const resultContent = document.querySelector('.mobile-result-content');
-      if (resultContent) {
-        recipeCard = document.createElement('div');
-        recipeCard.className = 'mobile-recipe-card';
-        recipeCard.id = 'mobile-recipe-card';
-        resultContent.appendChild(recipeCard);
-        console.log('✅ Created mobile-recipe-card dynamically for recipe display');
-      } else {
-        console.error('❌ mobile-result-content not found either');
+      if (!resultContent) {
+        console.error('❌ mobile-result-content not found');
         return;
       }
+
+      recipeCard = document.createElement('div');
+      recipeCard.className = 'mobile-recipe-card';
+      recipeCard.id = 'mobile-recipe-card';
+      resultContent.appendChild(recipeCard);
+
+      console.log('✅ Created mobile-recipe-card dynamically');
     }
-    
-    if (!formattedRecipe || !formattedRecipe.html) {
-      console.error('❌ No formatted recipe HTML available');
-      console.log('📝 Raw recipe text:', rawRecipe);
-    }
-    
-    // Check if we should show toggle buttons
-    const hasIngredients = formattedRecipe.html.includes('Ingredients:');
-    const hasInstructions = formattedRecipe.html.includes('Instructions:');
-    
+
+    // Detect sections safely
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = formattedRecipe.html;
+
+    const hasIngredients = !!tempDiv.querySelector('[data-recipe-section="ingredients"]');
+    const hasInstructions = !!tempDiv.querySelector('[data-recipe-section="instructions"]');
+
+    // ----------------------------
+    // Render layout
+    // ----------------------------
     recipeCard.innerHTML = `
       ${hasIngredients && hasInstructions ? `
-        <div class="mobile-recipe-toggle">
-          <button type="button" class="mobile-recipe-toggle-btn active" data-target="ingredients">Ingredients</button>
-          <button type="button" class="mobile-recipe-toggle-btn" data-target="instructions">Instructions</button>
+        <div class="mobile-recipe-toggle" role="tablist">
+          <button 
+            type="button"
+            class="mobile-recipe-toggle-btn active"
+            data-target="ingredients"
+            role="tab"
+            aria-selected="true">
+            🥘 Ingredients
+          </button>
+          <button 
+            type="button"
+            class="mobile-recipe-toggle-btn"
+            data-target="instructions"
+            role="tab"
+            aria-selected="false">
+            👨‍🍳 Instructions
+          </button>
         </div>
       ` : ''}
-      <h2 class="recipe-title">${formattedRecipe.title || '🍳 Your Personalized Recipe'}</h2>
-      <div class="mobile-recipe-content">${formattedRecipe.html || '<p style="color: #666; font-style: italic;">No recipe content available</p>'}</div>
+
+      <div class="mobile-recipe-content">
+        ${formattedRecipe.html}
+      </div>
+
       <div class="mobile-recipe-actions">
-        <button class="save-favorite-btn japandi-btn japandi-btn-subtle" type="button">⭐ Save Favorite</button>
-        <button class="mobile-reset-btn japandi-btn japandi-btn-primary" type="button">🔄 Start Over</button>
+        <button class="mobile-reset-btn japandi-btn japandi-btn-subtle" type="button">
+          🔄 Start Over
+        </button>
+        <button class="save-favorite-btn japandi-btn japandi-btn-primary" type="button">
+          ⭐ Save Favorite
+        </button>
       </div>
     `;
-    
-    // Setup toggle functionality if needed
+
+    const content = recipeCard.querySelector('.mobile-recipe-content');
+
+    // ----------------------------
+    // TOGGLE FUNCTIONALITY
+    // ----------------------------
     if (hasIngredients && hasInstructions) {
       const toggleBtns = recipeCard.querySelectorAll('.mobile-recipe-toggle-btn');
-      const content = recipeCard.querySelector('.mobile-recipe-content');
-      
+      const sections = content.querySelectorAll('[data-recipe-section]');
+
+      // Show ingredients by default
+      sections.forEach(section => {
+        section.classList.toggle(
+            'is-active',
+            section.dataset.recipeSection === 'ingredients'
+        );
+      });
+
       toggleBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
+        btn.addEventListener('click', () => {
           const target = btn.dataset.target;
-          
+
           // Update button states
-          toggleBtns.forEach(b => b.classList.toggle('active', b.dataset.target === target));
-          
-          // Show/hide sections
-          content.querySelectorAll('[data-recipe-section]').forEach(section => {
-            section.style.display = section.dataset.recipeSection === target ? '' : 'none';
+          toggleBtns.forEach(b => {
+            const isActive = b.dataset.target === target;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-selected', isActive);
+          });
+
+          // Toggle sections
+          sections.forEach(section => {
+            section.classList.toggle(
+                'is-active',
+                section.dataset.recipeSection === target
+            );
           });
         });
       });
     }
-    
-    // Setup action buttons
+
+    // ----------------------------
+    // SAVE FAVORITE
+    // ----------------------------
     const saveBtn = recipeCard.querySelector('.save-favorite-btn');
     const resetBtn = recipeCard.querySelector('.mobile-reset-btn');
-    
+
     if (saveBtn) {
       saveBtn.addEventListener('click', async () => {
         try {
           saveBtn.disabled = true;
+          saveBtn.classList.add('is-loading');
           saveBtn.textContent = 'Saving...';
-          
+
           await apiService.saveFavorite({
             recipeText: rawRecipe,
-            title: formattedRecipe.title || 'Untitled Recipe',
-            rating: null,
-            note: null
+            title: formattedRecipe.title || 'Untitled Recipe'
           });
-          
-          saveBtn.textContent = '✅ Saved';
-          
+
+          saveBtn.textContent = '✅ Saved!';
           setTimeout(() => {
             saveBtn.textContent = '⭐ Save Favorite';
             saveBtn.disabled = false;
+            saveBtn.classList.remove('is-loading');
           }, 2000);
-          
+
         } catch (error) {
-          console.error('Failed to save favorite:', error);
-          saveBtn.textContent = '⭐ Save Favorite';
-          saveBtn.disabled = false;
+          console.error('❌ Failed to save favorite:', error);
+          saveBtn.textContent = '❌ Failed';
+          setTimeout(() => {
+            saveBtn.textContent = '⭐ Save Favorite';
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('is-loading');
+          }, 2000);
         }
       });
     }
-    
+
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
         location.reload();
       });
     }
+
   } else {
-    // Web recipe display (original working version)
+
+    // ----------------------------
+    // WEB VERSION
+    // ----------------------------
     container.innerHTML = `
-      <div style="
-        padding: 20px; 
-        font-family: 'Noto Sans', sans-serif;
-        background: white;
-        border-radius: 15px;
-        margin: 0 auto;
-        max-width: 500px;
-        color: #333;
-        max-height: 70vh;
-        overflow-y: auto;
-      ">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="color: #667eea; margin-bottom: 10px;">🍳 Your Personalized Recipe</h2>
-        </div>
-        ${formattedRecipe.html || '<p style="color: #666; font-style: italic;">No recipe content available</p>'}
-        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-          <button onclick="location.reload()" style="
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-          ">🔄 Start Over</button>
+      <div class="web-recipe-wrapper">
+        ${formattedRecipe.html}
+        <div class="web-recipe-actions">
+          <button onclick="location.reload()" class="primary-btn">
+            🔄 Start Over
+          </button>
         </div>
       </div>
     `;
