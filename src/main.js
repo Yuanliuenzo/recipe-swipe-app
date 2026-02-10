@@ -891,7 +891,7 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
             data-target="ingredients"
             role="tab"
             aria-selected="true">
-            🥘 Ingredients
+            Ingredients
           </button>
           <button 
             type="button"
@@ -899,13 +899,17 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
             data-target="instructions"
             role="tab"
             aria-selected="false">
-            👨‍🍳 Instructions
+            Instructions
           </button>
         </div>
       ` : ''}
 
       <div class="mobile-recipe-content">
         ${formattedRecipe.html}
+      </div>
+
+      <div class="scroll-to-top" id="scroll-to-top" title="Scroll to top">
+        ↑
       </div>
 
       <div class="mobile-recipe-actions">
@@ -927,17 +931,22 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
       const toggleBtns = recipeCard.querySelectorAll('.mobile-recipe-toggle-btn');
       const sections = content.querySelectorAll('[data-recipe-section]');
 
-      // Show ingredients by default
+      // Set initial positions and show ingredients by default
       sections.forEach(section => {
-        section.classList.toggle(
-            'is-active',
-            section.dataset.recipeSection === 'ingredients'
-        );
+        if (section.dataset.recipeSection === 'ingredients') {
+          section.classList.add('is-active');
+        } else {
+          section.style.transform = 'translateX(100%)';
+        }
       });
 
       toggleBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           const target = btn.dataset.target;
+          const currentActive = content.querySelector('.recipe-section.is-active');
+          const targetSection = content.querySelector(`[data-recipe-section="${target}"]`);
+
+          if (!targetSection || currentActive === targetSection) return;
 
           // Update button states
           toggleBtns.forEach(b => {
@@ -946,12 +955,29 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
             b.setAttribute('aria-selected', isActive);
           });
 
-          // Toggle sections
-          sections.forEach(section => {
-            section.classList.toggle(
-                'is-active',
-                section.dataset.recipeSection === target
-            );
+          // Smooth transition: slide out current, slide in new
+          currentActive.classList.remove('is-active');
+          currentActive.classList.add('prev-active');
+          
+          // Slide in new section
+          targetSection.style.transform = 'translateX(100%)';
+          targetSection.classList.add('is-active');
+          
+          // Force reflow for smooth animation
+          targetSection.offsetHeight;
+          
+          targetSection.style.transform = 'translateX(0)';
+          
+          // Clean up previous section after transition
+          setTimeout(() => {
+            currentActive.classList.remove('prev-active');
+            currentActive.style.transform = 'translateX(100%)';
+          }, 500);
+
+          // Smooth scroll to top of recipe content
+          content.scrollTo({
+            top: 0,
+            behavior: 'smooth'
           });
         });
       });
@@ -997,6 +1023,31 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
         location.reload();
+      });
+    }
+
+    // ----------------------------
+    // SCROLL TO TOP FUNCTIONALITY
+    // ----------------------------
+    const scrollToTopBtn = recipeCard.querySelector('#scroll-to-top');
+    const recipeContent = recipeCard.querySelector('.mobile-recipe-content');
+
+    if (scrollToTopBtn && recipeContent) {
+      // Show/hide scroll-to-top button based on scroll position
+      recipeContent.addEventListener('scroll', () => {
+        if (recipeContent.scrollTop > 100) {
+          scrollToTopBtn.classList.add('visible');
+        } else {
+          scrollToTopBtn.classList.remove('visible');
+        }
+      });
+
+      // Scroll to top when clicked
+      scrollToTopBtn.addEventListener('click', () => {
+        recipeContent.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       });
     }
 

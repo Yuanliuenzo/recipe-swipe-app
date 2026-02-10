@@ -185,9 +185,15 @@ body {
 .mobile-recipe-card {
     background: white;
     border-radius: 20px;
-    padding: 30px;
+    padding: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     text-align: center;
+    width: 90vw;
+    max-width: 400px;
+    margin: 0 auto;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .ingredients-container {
@@ -1343,10 +1349,331 @@ body {
 
 /* --- Actions --- */
 .mobile-recipe-actions {
-    margin-top: 24px;
+    margin-top: 16px;
     display: flex;
-    flex-direction: column;
     gap: 12px;
+    padding: 0 8px;
+}
+
+/* --- Enhanced Recipe Content --- */
+.mobile-recipe-content {
+    text-align: left;
+    margin-top: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    scroll-behavior: smooth;
+}
+
+.mobile-recipe-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.2);
+    border-radius: 2px;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.3);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.5);
+}
+
+/* --- Smooth Section Transitions --- */
+.recipe-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.recipe-section.is-active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.recipe-section.prev-active {
+    transform: translateX(-100%);
+}
+
+/* Container for sections */
+.mobile-recipe-content {
+    text-align: left;
+    margin-top: 16px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    scroll-behavior: smooth;
+    position: relative;
+}
+
+/* --- Enhanced Toggle Buttons --- */
+.mobile-recipe-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: rgba(236, 240, 241, 0.3);
+    padding: 4px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-recipe-toggle-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #7f8c8d;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-recipe-toggle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-recipe-toggle-btn:hover::before {
+    opacity: 1;
+}
+
+.mobile-recipe-toggle-btn.active {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.2);
+    transform: translateY(-2px);
+}
+
+.mobile-recipe-toggle-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.2);
+    color: #2c3e50;
+    transform: translateY(-1px);
+}
+
+/* --- Japandi Recipe Sections --- */
+.recipe-section {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.recipe-section h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.recipe-section h3::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: linear-gradient(135deg, #8b7355, #6a4e42);
+    border-radius: 2px;
+}
+
+/* --- Enhanced Lists --- */
+.ingredients-list, .instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ingredients-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(236, 240, 241, 0.5);
+    position: relative;
+    padding-left: 28px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #34495e;
+    transition: all 0.2s ease;
+}
+
+.ingredients-list li:hover {
+    padding-left: 32px;
+    color: #2c3e50;
+}
+
+.ingredients-list li:before {
+    content: "•";
+    position: absolute;
+    left: 10px;
+    color: #8b7355;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.instructions-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(236, 240, 241, 0.5);
+    position: relative;
+    padding-left: 40px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #34495e;
+    counter-increment: step-counter;
+    transition: all 0.2s ease;
+}
+
+.instructions-list li:hover {
+    padding-left: 44px;
+    color: #2c3e50;
+}
+
+.instructions-list li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    background: linear-gradient(135deg, #8b7355, #a0826d);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+}
+
+/* --- Enhanced Button Styling --- */
+.mobile-recipe-actions .japandi-btn {
+    flex: 1;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-recipe-actions .japandi-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.mobile-recipe-actions .japandi-btn:hover::before {
+    left: 100%;
+}
+
+.mobile-recipe-actions .japandi-btn:active {
+    transform: scale(0.98);
+}
+
+/* --- Loading States --- */
+.is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    transform: scale(0.98);
+}
+
+/* --- Micro-interactions --- */
+.mobile-recipe-card {
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Scroll to Top Animation --- */
+.scroll-to-top {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #8b7355, #6a4e42);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(106, 78, 66, 0.3);
+    z-index: 1000;
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 78, 66, 0.4);
+}
+
+/* --- Responsive Enhancements --- */
+@media (max-width: 380px) {
+    .mobile-recipe-toggle-btn {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    
+    .recipe-section {
+        padding: 20px;
+    }
+    
+    .recipe-section h3 {
+        font-size: 18px;
+    }
 }
 
 /* --- Loading state --- */
