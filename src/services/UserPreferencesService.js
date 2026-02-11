@@ -1,162 +1,259 @@
-// User Preferences Service
-// Manages user preferences with state management and API integration
-
 export class UserPreferencesService {
-  constructor(stateManager, apiService) {
+  constructor(stateManager) {
     this.stateManager = stateManager;
-    this.api = apiService;
+    this.initialized = false;
+    this.loadingPromise = null; // prevents race conditions
   }
-  
+
+  /* ===============================
+     INITIALIZATION
+  =============================== */
+
   async initialize() {
-    try {
-      console.log('🔧 Initializing User Preferences Service...');
-      
-      // Load preferences from state or API
-      const state = this.stateManager.getState();
-      if (!state.preferences) {
-        await this.loadUserPreferences();
-      }
-      
-      console.log('✅ User Preferences Service initialized');
-    } catch (error) {
-      console.error('❌ Failed to initialize User Preferences Service:', error);
-      throw error;
-    }
+    if (this.initialized) return;
+
+    await this.ensureLoaded();
+    this.initialized = true;
   }
-  
+
+  async ensureLoaded() {
+    if (this.loadingPromise) return this.loadingPromise;
+
+    this.loadingPromise = this.loadUserPreferences()
+        .finally(() => {
+          this.loadingPromise = null;
+        });
+
+    return this.loadingPromise;
+  }
+
+  /* ===============================
+     LOAD
+  =============================== */
+
   async loadUserPreferences() {
     try {
-      const data = await this.api.getUserData();
-      const preferences = data.preferences || {
-        diet: 'None',
-        budget: 'No',
-        seasonalKing: 'No'
-      };
-      
+      const response = await fetch('/api/preferences', {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return this.setDefaults();
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || typeof data.preferences !== 'object') {
+        throw new Error('Invalid preferences response shape');
+      }
+
+      const preferences = this.normalize(data.preferences);
+
       this.stateManager.setState({ preferences });
-      console.log('📋 Preferences loaded:', preferences);
+
+      console.log('✅ Preferences loaded:', preferences);
+
       return preferences;
+
     } catch (error) {
       console.error('❌ Failed to load preferences:', error);
-      throw error;
+      return this.setDefaults();
     }
   }
-  
+
+  /* ===============================
+     SAVE
+  =============================== */
+
   async saveUserPreferences(preferences) {
+    const normalized = this.normalize(preferences);
+
     try {
-      await this.api.updatePreferences(preferences);
-      this.stateManager.setState({ preferences });
-      console.log('💾 Preferences saved:', preferences);
-      return preferences;
+      const response = await fetch('/api/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(normalized)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const updated = this.normalize(data.preferences);
+
+      this.stateManager.setState({ preferences: updated });
+
+      console.log('💾 Preferences saved:', updated);
+
+      return updated;
+
     } catch (error) {
-      console.error('❌ Failed to save preferences:', error);
+      console.error('❌ Save failed:', error);
       throw error;
     }
   }
-  
+
+  /* ===============================
+     STATE HELPERS
+  =============================== */
+
+  normalize(prefs = {}) {
+    return {
+      diet: prefs.diet || 'None',
+      budget: prefs.budget || 'No',
+      seasonalKing: prefs.seasonalKing || 'No'
+    };
+  }
+
+  setDefaults() {
+    const defaults = this.normalize();
+    this.stateManager.setState({ preferences: defaults });
+    return defaults;
+  }
+
   getPreferences() {
     return this.stateManager.get('preferences');
   }
-  
-  updatePreference(key, value) {
+
+  async updatePreference(key, value) {
+    await this.ensureLoaded();
     const current = this.getPreferences();
     const updated = { ...current, [key]: value };
     return this.saveUserPreferences(updated);
   }
-  
-  // Show preferences modal
-  showPreferences() {
-    try {
-      const preferences = this.getPreferences();
-      
-      // Create preferences modal
-      const modal = document.createElement('div');
-      modal.className = 'preferences-modal';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <h2>Preferences</h2>
-          <div class="preference-group">
-            <label>Dietary Restrictions:</label>
-            <select id="diet-select">
-              <option value="None" ${preferences.diet === 'None' ? 'selected' : ''}>None</option>
-              <option value="Vegetarian" ${preferences.diet === 'Vegetarian' ? 'selected' : ''}>Vegetarian</option>
-              <option value="Vegan" ${preferences.diet === 'Vegan' ? 'selected' : ''}>Vegan</option>
-              <option value="Gluten-Free" ${preferences.diet === 'Gluten-Free' ? 'selected' : ''}>Gluten-Free</option>
-            </select>
-          </div>
-          <div class="preference-group">
-            <label>Budget:</label>
-            <select id="budget-select">
-              <option value="No" ${preferences.budget === 'No' ? 'selected' : ''}>No</option>
-              <option value="Yes" ${preferences.budget === 'Yes' ? 'selected' : ''}>Yes</option>
-            </select>
-          </div>
-          <div class="preference-group">
-            <label>Seasonal King:</label>
-            <select id="seasonal-select">
-              <option value="No" ${preferences.seasonalKing === 'No' ? 'selected' : ''}>No</option>
-              <option value="Yes" ${preferences.seasonalKing === 'Yes' ? 'selected' : ''}>Yes</option>
-            </select>
-          </div>
-          <div class="modal-actions">
-            <button onclick="window.recipeApp.services.userPreferences.saveFromModal()">Save</button>
-            <button onclick="this.closest('.preferences-modal').remove()">Cancel</button>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-    } catch (error) {
-      console.error('❌ Failed to show preferences:', error);
-      throw error;
-    }
+
+  /* ===============================
+     UI
+  =============================== */
+
+  async showPreferences() {
+    await this.ensureLoaded();
+
+    const preferences = this.getPreferences();
+
+    // Prevent duplicate screen
+    if (document.querySelector('.mobile-preferences-fullscreen')) return;
+
+    const container = document.querySelector('.mobile-container');
+    if (container) container.style.display = 'none';
+
+    const screen = document.createElement('div');
+    screen.className = 'mobile-preferences-fullscreen';
+
+    screen.innerHTML = this.renderPreferencesHTML(preferences);
+
+    document.body.appendChild(screen);
+
+    this.attachEvents(screen);
   }
-  
-  // Save preferences from modal
-  async saveFromModal() {
+
+  renderPreferencesHTML(preferences) {
+    return `
+      <button class="mobile-floating-back-btn">
+        <span>←</span> Back
+      </button>
+
+      <div class="mobile-preferences-header">
+        <h2>Preferences</h2>
+      </div>
+
+      <div class="mobile-preferences-content">
+
+        ${this.renderRadioGroup(
+        'Dietary Restrictions',
+        'diet',
+        ['None', 'Vegetarian', 'Vegan', 'Gluten-Free'],
+        preferences.diet
+    )}
+
+        ${this.renderRadioGroup(
+        'Budget',
+        'budget',
+        ['No', 'Yes'],
+        preferences.budget
+    )}
+
+        ${this.renderRadioGroup(
+        'Seasonal King',
+        'seasonalKing',
+        ['No', 'Yes'],
+        preferences.seasonalKing
+    )}
+
+        <div class="mobile-preference-actions">
+          <button class="mobile-save-btn">Save Preferences</button>
+        </div>
+
+      </div>
+    `;
+  }
+
+  renderRadioGroup(title, name, options, selected) {
+    return `
+      <div class="mobile-preference-group">
+        <h3>${title}</h3>
+        <div class="mobile-preference-options">
+          ${options.map(opt => `
+            <label class="mobile-preference-option">
+              <input type="radio" name="${name}" value="${opt}"
+                ${selected === opt ? 'checked' : ''}>
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  attachEvents(screen) {
+    screen.querySelector('.mobile-floating-back-btn')
+        .addEventListener('click', () => this.closePreferences());
+
+    screen.querySelector('.mobile-save-btn')
+        .addEventListener('click', () => this.saveFromModal(screen));
+  }
+
+  closePreferences() {
+    const screen = document.querySelector('.mobile-preferences-fullscreen');
+    if (screen) screen.remove();
+
+    const container = document.querySelector('.mobile-container');
+    if (container) container.style.display = '';
+  }
+
+  async saveFromModal(screen) {
+    const diet = screen.querySelector('input[name="diet"]:checked')?.value;
+    const budget = screen.querySelector('input[name="budget"]:checked')?.value;
+    const seasonalKing = screen.querySelector('input[name="seasonalKing"]:checked')?.value;
+
+    const preferences = this.normalize({ diet, budget, seasonalKing });
+
     try {
-      const diet = document.getElementById('diet-select').value;
-      const budget = document.getElementById('budget-select').value;
-      const seasonalKing = document.getElementById('seasonal-select').value;
-      
-      const preferences = { diet, budget, seasonalKing };
       await this.saveUserPreferences(preferences);
-      
-      // Remove modal
-      document.querySelector('.preferences-modal')?.remove();
-      
-      // Show success message
-      this.showAlert('Preferences saved successfully!');
-      
-    } catch (error) {
-      console.error('❌ Failed to save preferences from modal:', error);
-      this.showAlert('Failed to save preferences');
+      this.closePreferences();
+      this.showToast('Preferences saved successfully!');
+    } catch {
+      this.showToast('Failed to save preferences');
     }
   }
-  
-  // Show alert message
-  showAlert(message) {
-    try {
-      const modal = document.createElement('div');
-      modal.className = 'alert-modal';
-      modal.innerHTML = `
-        <div class="modal-content">
-          <p>${message}</p>
-          <button onclick="this.closest('.alert-modal').remove()">OK</button>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-      
-      // Auto-remove after 3 seconds
-      setTimeout(() => {
-        modal.remove();
-      }, 3000);
-      
-    } catch (error) {
-      console.error('❌ Failed to show alert:', error);
-      alert(message); // Fallback
-    }
+
+  /* ===============================
+     UX
+  =============================== */
+
+  showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 3000);
   }
 }

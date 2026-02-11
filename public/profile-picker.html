@@ -137,8 +137,16 @@
                     showError(err.error || 'Something went wrong');
                     return false;
                 }
-                // Success: redirect to the app
-                window.location.href = '/';
+                // Success: check response and redirect
+                const data = await res.json();
+                console.log('✅ Login successful:', data);
+                
+                // Small delay to ensure cookie is set
+                setTimeout(() => {
+                    console.log('🔄 Redirecting to main app...');
+                    window.location.href = '/';
+                }, 500);
+                
                 return true;
             } catch (e) {
                 showError('Network error');

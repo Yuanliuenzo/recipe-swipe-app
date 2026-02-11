@@ -491,13 +491,7 @@ body {
     color: #6a4e42;
 }
 
-.mobile-favorite-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
+
 
 .mobile-favorite-header {
     display: flex;
@@ -1198,6 +1192,420 @@ body {
     }
 }
 
+/* Mobile Favorites Screen */
+.mobile-favorites-list {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.mobile-favorites-list h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #6a4e42;
+}
+
+.mobile-favorite-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.mobile-favorite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #6a4e42;
+    margin: 0;
+    flex: 1;
+    padding-right: 12px;
+}
+
+.mobile-delete-favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.mobile-delete-favorite-btn:hover {
+    background: #fde3e3;
+}
+
+.mobile-favorite-body {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.mobile-favorite-footer {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 16px;
+}
+
+.mobile-favorite-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.mobile-star-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+
+.mobile-star-btn:hover {
+    transform: scale(1.2);
+}
+
+.mobile-star-btn.active {
+    color: #fbbf24;
+}
+
+.mobile-favorite-note {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 8px;
+}
+
+.mobile-save-note-btn {
+    background: #6a4e42;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.mobile-save-note-btn:hover {
+    background: #5a3e32;
+}
+
+.mobile-empty-favorites, .mobile-error-favorites {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin-top: 60px;
+}
+
+/* Mobile Full-screen Preferences Container */
+.mobile-preferences-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f0f2f5;
+    z-index: 1000;
+    overflow-y: auto;
+    padding-top: 80px; /* Account for header */
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-header {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-header h2 {
+    color: #6a4e42;
+    margin: 0;
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-content {
+    padding: 0 20px 40px;
+}
+
+.mobile-preference-group {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.mobile-preference-group h3 {
+    color: #6a4e42;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+
+.mobile-preference-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-preference-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-preference-option:hover {
+    background-color: #f8f9fa;
+}
+
+.mobile-preference-option input[type="radio"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: #6a4e42;
+}
+
+.mobile-preference-option span {
+    font-size: 16px;
+    color: #34495e;
+}
+
+.mobile-preference-actions {
+    padding: 20px;
+    text-align: center;
+}
+
+.mobile-floating-back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1001;
+    transition: all 0.2s ease;
+}
+
+.mobile-floating-back-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.mobile-floating-back-btn:active {
+    transform: translateY(0);
+}
+
+.floating-back-icon {
+    font-size: 16px;
+    color: #6a4e42;
+}
+
+.floating-back-text {
+    font-size: 14px;
+    color: #6a4e42;
+    font-weight: 500;
+}
+
+/* Mobile Favorite Card Structure */
+.mobile-favorite-preview {
+    padding: 12px 0;
+}
+
+.mobile-star-display {
+    font-size: 16px;
+    margin-right: 4px;
+}
+
+.mobile-star-display.active {
+    color: #fbbf24;
+}
+
+.mobile-favorite-note-preview {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+.mobile-favorite-details {
+    padding-top: 16px;
+    margin-top: 0;
+}
+
+.ingredients-list li:before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: #dcb984;
+    font-weight: bold;
+}
+
+.instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: step-counter;
+}
+
+.instructions-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 40px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #34495e;
+    counter-increment: step-counter;
+}
+
+.instructions-list li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 8px;
+    top: 12px;
+    background: linear-gradient(135deg, #8b7355, #a0826d);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mobile-reset-btn {
+    background: linear-gradient(135deg, #8b7355, #6a4e42);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.mobile-reset-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Favorite Modal Overlay */
+.favorite-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    padding: 20px;
+}
+
+.favorite-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.favorite-modal-close:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.favorite-note-display {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    font-style: italic;
+    color: #666;
+    border-left: 3px solid #8b7355;
+}
+
+.japandi-btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.japandi-btn-group .japandi-btn {
+    flex: 1;
+}
+
+/* Alert Modal (keep this one) */
+.alert-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    padding: 20px;
+}
+
+.alert-modal .modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 300px;
+    width: 100%;
+    text-align: center;
+}
+
+.alert-modal .modal-content p {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+}
+
+.alert-modal .modal-content button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 /* Mobile FAB Navigation - State of the Art */
 .mobile-navigation {
     position: fixed;
@@ -1409,12 +1817,15 @@ body {
 /* Container for sections */
 .mobile-recipe-content {
     text-align: left;
-    margin-top: 16px;
+    margin-top: 20px;
     flex: 1;
     overflow-y: auto;
-    padding-right: 8px;
+    padding: 20px;
+    padding-right: 12px;
     scroll-behavior: smooth;
     position: relative;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 /* --- Enhanced Toggle Buttons --- */

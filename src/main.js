@@ -17,6 +17,10 @@ import { Component } from './components/Component.js';
 import { Card } from './components/Card/Card.js';
 import { VibeCard } from './components/Card/VibeCard.js';
 
+// Import services
+import { FavoritesService } from './services/FavoritesService.js';
+import { UserPreferencesService } from './services/UserPreferencesService.js';
+
 // Platform detection
 const isMobile = () => {
   return window.location.pathname.includes('mobile.html') || 
@@ -34,6 +38,10 @@ console.log('🔍 Platform detection:', {
 // Create global instances
 const vibeEngine = new VibeEngine();
 
+// Create service instances
+const favoritesService = new FavoritesService(globalStateManager, apiService);
+const userPreferencesService = new UserPreferencesService(globalStateManager, apiService);
+
 // Expose to global scope for existing code
 window.recipeApp = {
   // Core instances
@@ -41,6 +49,12 @@ window.recipeApp = {
   eventBus: globalEventBus,
   api: apiService,
   vibeEngine: vibeEngine,
+  
+  // Services
+  services: {
+    favorites: favoritesService,
+    userPreferences: userPreferencesService
+  },
   
   // Utilities
   utils: {
@@ -110,6 +124,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 DOM Content Loaded - Starting Recipe Swipe App...');
   
   try {
+    // Initialize services first
+    console.log('🔧 Initializing services...');
+    await window.recipeApp.services.favorites.initialize();
+    await window.recipeApp.services.userPreferences.initialize();
+    console.log('✅ Services initialized');
+    
     // Step 1: Basic setup first
     console.log('📦 Step 1: Basic setup...');
     vibeEngine.reset();
@@ -1111,10 +1131,124 @@ window.addIngredients = addIngredients;
 window.generateRecipe = generateRecipe;
 window.tryAgain = generateRecipe; // Retry generation
 window.showMockRecipe = showMockRecipe; // Show mock recipe for testing
+window.showFavorites = showFavorites;
+window.showPreferences = showPreferences;
+window.logout = logout;
+window.refreshPreferences = () => window.recipeApp.services.userPreferences.refreshPreferences();
+
+// Helper to check login status
+window.checkLoginStatus = async () => {
+  try {
+    const response = await fetch('/api/me');
+    const data = await response.json();
+    console.log('🔍 Current login status:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Failed to check login status:', error);
+    return { error: 'Not logged in' };
+  }
+};
+
+// Helper to login as yuan
+window.loginAsYuan = async () => {
+  try {
+    console.log('🔑 Attempting login as yuan...');
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'yuan' })
+    });
+    const data = await response.json();
+    console.log('✅ Login response:', data);
+    
+    if (data.username) {
+      console.log('🎉 Successfully logged in as yuan!');
+      // Refresh preferences after login
+      setTimeout(() => window.refreshPreferences(), 500);
+    } else {
+      console.error('❌ Login failed:', data);
+    }
+    return data;
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    return { error: 'Login failed' };
+  }
+};
+
+// Mobile Navigation Functions
+function showFavorites() {
+  console.log('🌟 showFavorites() called!');
+  try {
+    if (!window.recipeApp?.services?.favorites) {
+      console.error('❌ Favorites service not available');
+      return;
+    }
+    console.log('🔧 Calling favorites service...');
+    window.recipeApp.services.favorites.showFavorites();
+  } catch (error) {
+    console.error('❌ Failed to show favorites:', error);
+  }
+}
+
+function showPreferences() {
+  console.log('⚙️ showPreferences() called!');
+  try {
+    if (!window.recipeApp?.services?.userPreferences) {
+      console.error('❌ UserPreferences service not available');
+      return;
+    }
+    console.log('🔧 Calling userPreferences service...');
+    window.recipeApp.services.userPreferences.showPreferences();
+  } catch (error) {
+    console.error('❌ Failed to show preferences:', error);
+  }
+}
+
+function logout() {
+  console.log('🚪 logout() called!');
+  try {
+    // Clear user data and redirect to login/home
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/'; // Adjust based on your app's login route
+  } catch (error) {
+    console.error('❌ Failed to logout:', error);
+  }
+}
+
+// FAB Menu Toggle
+document.addEventListener('DOMContentLoaded', () => {
+  const fab = document.querySelector('.mobile-fab');
+  const fabMenu = document.querySelector('.mobile-fab-menu');
+  const fabOverlay = document.querySelector('.fab-overlay');
+  
+  if (fab && fabMenu && fabOverlay) {
+    fab.addEventListener('click', () => {
+      const isOpen = fabMenu.classList.contains('show');
+      
+      if (isOpen) {
+        fabMenu.classList.remove('show');
+        fabOverlay.classList.remove('show');
+      } else {
+        fabMenu.classList.add('show');
+        fabOverlay.classList.add('show');
+      }
+    });
+    
+    // Close menu when clicking overlay
+    fabOverlay.addEventListener('click', () => {
+      fabMenu.classList.remove('show');
+      fabOverlay.classList.remove('show');
+    });
+  }
+});
 
 console.log('🎯 Functions exposed to global scope:', {
   addIngredients: typeof window.addIngredients,
   generateRecipe: typeof window.generateRecipe,
   tryAgain: typeof window.tryAgain,
-  showMockRecipe: typeof window.showMockRecipe
+  showMockRecipe: typeof window.showMockRecipe,
+  showFavorites: typeof window.showFavorites,
+  showPreferences: typeof window.showPreferences,
+  logout: typeof window.logout
 });

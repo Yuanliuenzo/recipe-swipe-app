@@ -18,10 +18,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// Detect mobile user agents
+// Detect mobile user agents (more comprehensive)
 function isMobile(req) {
     const userAgent = req.headers['user-agent'] || '';
-    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    console.log('🔍 User-Agent detection:', userAgent);
+    
+    // More comprehensive mobile detection
+    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 }
 
 // File-based user store
@@ -109,8 +113,18 @@ app.use(async (req, res, next) => {
     console.log('DEBUG: Username from cookie:', username);
     
     if (username) {
-        req.user = getUser(username);
+        const userData = getUser(username);
+        req.user = userData;
         console.log('DEBUG: User found:', !!req.user);
+        console.log('DEBUG: User data:', JSON.stringify(req.user, null, 2));
+        
+        // Ensure preferences are immediately available
+        if (userData && userData.preferences) {
+            req.user.preferences = userData.preferences;
+            console.log('✅ Preferences set in middleware:', JSON.stringify(req.user.preferences, null, 2));
+        } else {
+            console.log('⚠️ userData.preferences not available in middleware');
+        }
     }
     next();
 });
@@ -266,12 +280,16 @@ app.get("/api/preferences", (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Not logged in" });
     }
-    res.json({ preferences: req.user.preferences || {
-        diet: 'None',
-        budget: 'No',
-        seasonalKing: 'No'
-    } });
+
+    const safePreferences = {
+        diet: req.user.preferences?.diet || 'None',
+        budget: req.user.preferences?.budget || 'No',
+        seasonalKing: req.user.preferences?.seasonalKing || 'No'
+    };
+
+    res.json({ preferences: safePreferences });
 });
+
 
 app.patch("/api/preferences", async (req, res) => {
     if (!req.user) {
