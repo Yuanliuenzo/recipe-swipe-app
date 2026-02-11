@@ -1134,46 +1134,6 @@ window.showMockRecipe = showMockRecipe; // Show mock recipe for testing
 window.showFavorites = showFavorites;
 window.showPreferences = showPreferences;
 window.logout = logout;
-window.refreshPreferences = () => window.recipeApp.services.userPreferences.refreshPreferences();
-
-// Helper to check login status
-window.checkLoginStatus = async () => {
-  try {
-    const response = await fetch('/api/me');
-    const data = await response.json();
-    console.log('🔍 Current login status:', data);
-    return data;
-  } catch (error) {
-    console.error('❌ Failed to check login status:', error);
-    return { error: 'Not logged in' };
-  }
-};
-
-// Helper to login as yuan
-window.loginAsYuan = async () => {
-  try {
-    console.log('🔑 Attempting login as yuan...');
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'yuan' })
-    });
-    const data = await response.json();
-    console.log('✅ Login response:', data);
-    
-    if (data.username) {
-      console.log('🎉 Successfully logged in as yuan!');
-      // Refresh preferences after login
-      setTimeout(() => window.refreshPreferences(), 500);
-    } else {
-      console.error('❌ Login failed:', data);
-    }
-    return data;
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    return { error: 'Login failed' };
-  }
-};
 
 // Mobile Navigation Functions
 function showFavorites() {

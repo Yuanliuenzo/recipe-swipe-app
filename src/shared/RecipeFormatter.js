@@ -1,110 +1,92 @@
 // Recipe text formatting and processing
 export class RecipeFormatter {
   // Main formatting function
-  static format(recipeText, options = {}) {
-    const { hideTitle = false } = options;
-    
-    if (!recipeText || typeof recipeText !== 'string') {
+  static format(rawText = '') {
+    if (!rawText || typeof rawText !== 'string') {
       return {
-        html: '<p>No recipe content available</p>',
+        html: '<p>No recipe available</p>',
+        title: 'Untitled Recipe',
         hasIngredients: false,
-        hasInstructions: false,
-        title: 'Untitled Recipe'
+        hasInstructions: false
       };
     }
-    
-    const applyInlineFormatting = (text) => {
-      return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    };
-    
-    const introLines = [];
-    const ingredientLines = [];
-    const instructionLines = [];
-    let recipeTitle = '';
-    
-    let mode = 'intro';
-    const lines = recipeText.split('\n');
-    
-    for (const rawLine of lines) {
-      const line = rawLine.trim();
-      if (!line) continue;
-      
-      // Detect section headers
-      if (line.toLowerCase() === 'ingredients:' || line.toLowerCase().startsWith('ingredients:')) {
-        mode = 'ingredients';
-        continue;
+
+    const lines = rawText.split('\n').map(l => l.trim());
+
+    let title = 'Untitled Recipe';
+    let ingredients = [];
+    let instructions = [];
+    let currentSection = null;
+
+    lines.forEach(line => {
+      if (!line) return;
+
+      const lower = line.toLowerCase();
+
+      // Check for section headers FIRST
+      if (lower.includes('ingredients')) {
+        currentSection = 'ingredients';
+        return;
       }
-      if (line.toLowerCase() === 'instructions:' || line.toLowerCase().startsWith('instructions:')) {
-        mode = 'instructions';
-        continue;
+
+      if (lower.includes('instructions') || lower.includes('directions')) {
+        currentSection = 'instructions';
+        return;
       }
-      
-      // Skip separator lines
-      if (line === '===') continue;
-      
-      // Handle numbered ingredients (switch to instructions mode)
-      if (mode === 'ingredients' && /^\d+(\.|\))\s+/.test(line)) {
-        mode = 'instructions';
+
+      // Set title if not set yet
+      if (!title || title === 'Untitled Recipe') {
+        title = line;
+        return;
       }
-      
-      // Parse content based on current mode
-      if (mode === 'intro') {
-        if (!recipeTitle) {
-          // Extract title from first line
-          let cleanLine = line.replace(/^(Recipe Name:|Recipe:)\s*/i, '').trim();
-          if (cleanLine && !cleanLine.toLowerCase().includes('ingredients') && !cleanLine.toLowerCase().includes('instructions')) {
-            recipeTitle = cleanLine;
-          } else {
-            introLines.push(line);
-          }
-        } else {
-          introLines.push(line);
+
+      // Only add to sections if we're in a valid section
+      if (currentSection === 'ingredients') {
+        // Don't add numbered items to ingredients (they're likely instructions)
+        if (!/^\d+[\.\)]/.test(line)) {
+          ingredients.push(line.replace(/^[-•\d.]+\s*/, ''));
         }
-      } else if (mode === 'ingredients') {
-        ingredientLines.push(line);
-      } else if (mode === 'instructions') {
-        instructionLines.push(line);
       }
-    }
-    
-    const hasIngredients = ingredientLines.length > 0;
-    const hasInstructions = instructionLines.length > 0;
-    
-    // Build HTML
-    let html = '';
-    
-    if (recipeTitle && !hideTitle) {
-      html += `<h2 class="recipe-title">${applyInlineFormatting(recipeTitle)}</h2>`;
-    }
-    
-    if (introLines.length) {
-      html += `<div class="recipe-intro">${applyInlineFormatting(introLines.join('\n'))}</div>`;
-    }
-    
-    if (hasIngredients) {
-      html += this._formatIngredients(ingredientLines, applyInlineFormatting);
-    }
-    
-    if (hasInstructions) {
-      html += this._formatInstructions(instructionLines, applyInlineFormatting);
-    }
-    
-    // Fallback if no structured content found
-    if (!html) {
-      html = `<p>${applyInlineFormatting(recipeText)}</p>`;
-    }
-    
+
+      if (currentSection === 'instructions') {
+        instructions.push(line.replace(/^\d+[\).\s]*/, ''));
+      }
+    });
+
+    const hasIngredients = ingredients.length > 0;
+    const hasInstructions = instructions.length > 0;
+
+    const html = `
+    <div class="recipe-wrapper">
+      ${hasIngredients ? `
+        <div class="recipe-section" data-recipe-section="ingredients">
+          <h3>🥘 Ingredients</h3>
+          <ul class="ingredients-list">
+            ${ingredients.map(i => `<li>${i}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      ${hasInstructions ? `
+        <div class="recipe-section" data-recipe-section="instructions">
+          <h3>👨‍🍳 Instructions</h3>
+          <ol class="instructions-list">
+            ${instructions.map(i => `<li>${i}</li>`).join('')}
+          </ol>
+        </div>
+      ` : ''}
+    </div>
+  `;
+
     return {
       html,
+      title,
       hasIngredients,
-      hasInstructions,
-      title: recipeTitle || 'Untitled Recipe',
-      introLines,
-      ingredientLines,
-      instructionLines
+      hasInstructions
     };
   }
-  
+
+
   // Format ingredients section
   static _formatIngredients(ingredientLines, applyInlineFormatting) {
     const cleanedIngredients = ingredientLines
