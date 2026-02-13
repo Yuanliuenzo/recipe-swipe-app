@@ -20,6 +20,7 @@ import { VibeCard } from './components/Card/VibeCard.js';
 // Import services
 import { FavoritesService } from './services/FavoritesService.js';
 import { UserPreferencesService } from './services/UserPreferencesService.js';
+import { NavigationService } from './services/NavigationService.js';
 
 // Platform detection
 const isMobile = () => {
@@ -41,6 +42,7 @@ const vibeEngine = new VibeEngine();
 // Create service instances
 const favoritesService = new FavoritesService(globalStateManager, apiService);
 const userPreferencesService = new UserPreferencesService(globalStateManager, apiService);
+const navigationService = new NavigationService();
 
 // Expose to global scope for existing code
 window.recipeApp = {
@@ -53,7 +55,8 @@ window.recipeApp = {
   // Services
   services: {
     favorites: favoritesService,
-    userPreferences: userPreferencesService
+    userPreferences: userPreferencesService,
+    navigation: navigationService
   },
   
   // Utilities
@@ -1135,33 +1138,18 @@ window.showFavorites = showFavorites;
 window.showPreferences = showPreferences;
 window.logout = logout;
 
+// Expose navigation globally for HTML onclick handlers
+window.nav = navigationService;
+
 // Mobile Navigation Functions
 function showFavorites() {
   console.log('🌟 showFavorites() called!');
-  try {
-    if (!window.recipeApp?.services?.favorites) {
-      console.error('❌ Favorites service not available');
-      return;
-    }
-    console.log('🔧 Calling favorites service...');
-    window.recipeApp.services.favorites.showFavorites();
-  } catch (error) {
-    console.error('❌ Failed to show favorites:', error);
-  }
+  navigationService.go('favorites');
 }
 
 function showPreferences() {
   console.log('⚙️ showPreferences() called!');
-  try {
-    if (!window.recipeApp?.services?.userPreferences) {
-      console.error('❌ UserPreferences service not available');
-      return;
-    }
-    console.log('🔧 Calling userPreferences service...');
-    window.recipeApp.services.userPreferences.showPreferences();
-  } catch (error) {
-    console.error('❌ Failed to show preferences:', error);
-  }
+  navigationService.go('preferences');
 }
 
 function logout() {

@@ -15,19 +15,31 @@
     <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
-    <!-- Mobile swipe deck + main title -->
-    <div class="mobile-container">
-        <h1></h1>
-        <div class="mobile-card-container" id="card-container"></div>
-    </div>
+    <!-- App Root with Navigation Views -->
+    <div id="app-root">
+        <!-- Main View -->
+        <div id="view-main" class="app-view is-active">
+            <!-- Mobile swipe deck + main title -->
+            <div class="mobile-container">
+                <h1></h1>
+                <div class="mobile-card-container" id="card-container"></div>
+            </div>
 
-    <!-- Final result container (hidden initially) -->
-    <div class="mobile-result" id="mobile-result">
-        <div class="mobile-result-content">
-            <div class="mobile-recipe-card" id="mobile-recipe-card">
-                <!-- Content will be dynamically inserted -->
+            <!-- Final result container (hidden initially) -->
+            <div class="mobile-result" id="mobile-result">
+                <div class="mobile-result-content">
+                    <div class="mobile-recipe-card" id="mobile-recipe-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Favorites View -->
+        <div id="view-favorites" class="app-view"></div>
+
+        <!-- Preferences View -->
+        <div id="view-preferences" class="app-view"></div>
     </div>
 
     <!-- Mobile Navigation -->
@@ -35,8 +47,8 @@
         <div class="mobile-fab">☰</div>
         <div class="mobile-fab-menu">
             <div class="fab-items">
-                <button class="fab-item" onclick="showFavorites()">⭐ Favorites</button>
-                <button class="fab-item" onclick="showPreferences()">⚙️ Preferences</button>
+                <button class="fab-item" onclick="nav.go('favorites')">⭐ Favorites</button>
+                <button class="fab-item" onclick="nav.go('preferences')">⚙️ Preferences</button>
                 <button class="fab-item" onclick="logout()">🚪 Logout</button>
             </div>
         </div>

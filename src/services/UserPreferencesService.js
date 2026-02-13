@@ -133,29 +133,25 @@ export class UserPreferencesService {
   =============================== */
 
   async showPreferences() {
+    console.log('🔧 showPreferences() called');
+    
     await this.ensureLoaded();
-
     const preferences = this.getPreferences();
 
-    // Prevent duplicate screen
-    if (document.querySelector('.mobile-preferences-screen')) return;
-
-    // Close any existing overlay screens
-    const existingScreen = document.querySelector('.mobile-favorites-screen');
-    if (existingScreen) {
-      existingScreen.remove();
-    }
-
-    document.body.classList.add('app--overlay-open');
-
+    // Create preferences content
     const screen = document.createElement('div');
     screen.className = 'mobile-preferences-screen';
-
     screen.innerHTML = this.renderPreferencesHTML(preferences);
 
-    document.body.appendChild(screen);
+    // Add close handler
+    screen.querySelector('.mobile-favorites-close')
+      .addEventListener('click', () => {
+        window.recipeApp.services.navigation.go('main');
+      });
 
-    this.attachEvents(screen);
+    // Render into the preferences view
+    window.recipeApp.services.navigation.renderPreferences(screen);
+    console.log('✅ Preferences screen rendered');
   }
 
   renderPreferencesHTML(preferences) {

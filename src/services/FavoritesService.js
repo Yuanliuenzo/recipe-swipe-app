@@ -109,54 +109,49 @@ export class FavoritesService {
   ===================================================== */
 
   async showFavorites() {
+    console.log('🔧 showFavorites() called');
+    
     const favorites = await this.loadFavorites();
 
-    // Prevent duplicate screen
-    if (document.querySelector('.mobile-favorites-screen')) return;
-
-    // Close any existing overlay screens
-    const existingScreen = document.querySelector('.mobile-preferences-screen');
-    if (existingScreen) {
-      existingScreen.remove();
-    }
-
-    document.body.classList.add('app--overlay-open');
-
+    // Create favorites content
     const screen = document.createElement('div');
     screen.className = 'mobile-favorites-screen';
 
     screen.innerHTML = `
       <div class="mobile-favorites-header">
-        <button class="mobile-favorites-close">←</button>
+        <button class="mobile-favorites-close" onclick="nav.go('main')">←</button>
         <h2>My Favorites</h2>
       </div>
       <div class="mobile-favorites-list"></div>
     `;
 
-    document.body.appendChild(screen);
-
     // Add close handler
     screen.querySelector('.mobile-favorites-close')
-      .addEventListener('click', () => this.closeFavorites());
+      .addEventListener('click', () => {
+        window.recipeApp.services.navigation.go('main');
+      });
 
     const list = screen.querySelector('.mobile-favorites-list');
 
     if (!favorites.length) {
       list.innerHTML = `<div class="mobile-empty-favorites">No favorites yet.</div>`;
-      return;
+    } else {
+      favorites.forEach(fav => {
+        const card = document.createElement('div');
+        card.className = 'mobile-favorite-card';
+        card.innerHTML = `
+          <div class="mobile-favorite-header">
+            <h3 class="mobile-favorite-title">${fav.title}</h3>
+          </div>
+        `;
+        card.addEventListener('click', () => this.openFavoriteModal(fav));
+        list.appendChild(card);
+      });
     }
 
-    favorites.forEach(fav => {
-      const card = document.createElement('div');
-      card.className = 'mobile-favorite-card';
-      card.innerHTML = `
-        <div class="mobile-favorite-header">
-          <h3 class="mobile-favorite-title">${fav.title}</h3>
-        </div>
-      `;
-      card.addEventListener('click', () => this.openFavoriteModal(fav));
-      list.appendChild(card);
-    });
+    // Render into the favorites view
+    window.recipeApp.services.navigation.renderFavorites(screen);
+    console.log('✅ Favorites screen rendered');
   }
 
   closeFavorites() {

@@ -486,6 +486,37 @@ body {
     overflow: hidden;
 }
 
+/* =====================================================
+   STATE-OF-THE-ART NAVIGATION SYSTEM
+===================================================== */
+
+.app-view {
+    position: fixed;
+    inset: 0;
+    background: #fdfbf7;
+
+    opacity: 0;
+    transform: translateX(30px);
+    pointer-events: none;
+
+    transition:
+        transform 280ms cubic-bezier(.22,.61,.36,1),
+        opacity 220ms ease;
+
+    will-change: transform, opacity;
+}
+
+.app-view.is-active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Subtle depth layering */
+#view-main { z-index: 1; }
+#view-favorites { z-index: 2; }
+#view-preferences { z-index: 3; }
+
 
 /* =====================================================
    FAVORITES FULL SCREEN
