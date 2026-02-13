@@ -684,7 +684,18 @@ async function generateRecipe() {
       }
       
       recipeCard.innerHTML = `
-        <div class="mobile-recipe-loading-status">Generating your personalized recipe...</div>
+        <div class="mobile-recipe-loading-container">
+          <div class="loading-icon">🍳</div>
+          <div class="loading-title">Creating Your Recipe</div>
+          <div class="loading-subtitle">This may take 30+ seconds...</div>
+          <div class="loading-progress">
+            <div class="loading-dots">
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+            </div>
+          </div>
+        </div>
         <div class="mobile-recipe-skeleton">
           <div class="skeleton-line skeleton-title"></div>
           <div class="skeleton-line skeleton-subtitle"></div>
@@ -694,7 +705,6 @@ async function generateRecipe() {
           <div class="skeleton-line short"></div>
           <div class="skeleton-line"></div>
         </div>
-        <div class="mobile-recipe-loading-status">This may take 30+ seconds...</div>
       `;
     } else {
       // Web loading state
