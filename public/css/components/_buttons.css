@@ -149,9 +149,10 @@
     font-weight: 700;
     letter-spacing: 0.6px;
     border-radius: var(--radius-lg);
-    margin-top: var(--space-xs);
+    margin-top: var(--space-sm);
     min-height: 50px;
 }
+
 
 /* Recipe Toggle Buttons - Japandi Style */
 .mobile-recipe-toggle {
