@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/mobile-new.css">
 </head>
 <body>
     <!-- App Root with Navigation Views -->
@@ -21,7 +21,12 @@
         <div id="view-main" class="app-view is-active">
             <!-- Mobile swipe deck + main title -->
             <div class="mobile-container">
-                <h1></h1>
+                <div class="mobile-header">
+                    <h1></h1>
+                    <div class="round-indicator">
+                        Round <span class="current-round">1</span> of 5
+                    </div>
+                </div>
                 <div class="mobile-card-container" id="card-container"></div>
             </div>
 

@@ -1,0 +1,344 @@
+/* Scrollbars - Custom Scrollbar Styling */
+
+/* Base Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    transition: background var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+}
+
+/* Recipe Content Scrollbar */
+.recipe-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.recipe-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.recipe-content::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.recipe-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-dark);
+}
+
+/* Mobile Recipe Content Scrollbar */
+.mobile-recipe-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 3px;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+/* Bottom Sheet Content Scrollbar */
+.favorite-sheet-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.favorite-sheet-content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 6px;
+}
+
+/* Favorites List Scrollbar */
+.mobile-favorites-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-favorites-list::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 3px;
+}
+
+.mobile-favorites-list::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.mobile-favorites-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+/* Preferences Content Scrollbar */
+.mobile-preferences-fullscreen::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-preferences-fullscreen::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 3px;
+}
+
+.mobile-preferences-fullscreen::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.mobile-preferences-fullscreen::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+/* Full-screen Favorites Scrollbar */
+.favorites-fullscreen::-webkit-scrollbar {
+    width: 8px;
+}
+
+.favorites-fullscreen::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 4px;
+}
+
+.favorites-fullscreen::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 4px;
+}
+
+.favorites-fullscreen::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+/* Mobile Full-screen Favorites Scrollbar */
+.mobile-favorites-fullscreen::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-favorites-fullscreen::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+    border-radius: 3px;
+}
+
+.mobile-favorites-fullscreen::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.mobile-favorites-fullscreen::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+/* Thin Scrollbar Variant */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Invisible Scrollbar (for touch devices) */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Primary Colored Scrollbar */
+.scrollbar-primary::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+}
+
+.scrollbar-primary::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Accent Colored Scrollbar */
+.scrollbar-accent::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+}
+
+.scrollbar-accent::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-dark);
+}
+
+/* Dark Scrollbar */
+.scrollbar-dark::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Light Scrollbar */
+.scrollbar-light::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.scrollbar-light::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.scrollbar-light::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Rounded Scrollbar */
+.scrollbar-rounded::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+}
+
+.scrollbar-rounded::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+/* Auto-hide Scrollbar */
+.scrollbar-autohide {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(149, 165, 166, 0.5) transparent;
+}
+
+.scrollbar-autohide::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollbar-autohide::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-autohide::-webkit-scrollbar-thumb {
+    background: rgba(149, 165, 166, 0.5);
+    border-radius: 3px;
+}
+
+.scrollbar-autohide::-webkit-scrollbar-thumb:hover {
+    background: rgba(149, 165, 166, 0.7);
+}
+
+.scrollbar-autohide:hover::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.3);
+}
+
+/* Firefox Scrollbar Styling */
+.scrollbar-firefox {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) #f1f1f1;
+}
+
+.scrollbar-firefox-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(149, 165, 166, 0.5) transparent;
+}
+
+.scrollbar-firefox-none {
+    scrollbar-width: none;
+}
+
+/* Smooth Scrolling */
+.smooth-scroll {
+    scroll-behavior: smooth;
+}
+
+/* Scroll Snap */
+.scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+}
+
+.scroll-snap-y {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+.scroll-snap-child {
+    scroll-snap-align: start;
+}
+
+/* Custom Scrollbar for Modals */
+.modal-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+    background: rgba(236, 240, 241, 0.2);
+    border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(106, 78, 66, 0.3);
+    border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 78, 66, 0.5);
+}
+
+/* Scrollbar Utilities */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Responsive Scrollbar */
+@media (max-width: 768px) {
+    .scrollbar-responsive::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .scrollbar-responsive::-webkit-scrollbar-thumb {
+        background: rgba(149, 165, 166, 0.3);
+    }
+}
+
+@media (hover: none) {
+    .scrollbar-touch::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .scrollbar-touch::-webkit-scrollbar-thumb {
+        background: rgba(149, 165, 166, 0.2);
+    }
+}

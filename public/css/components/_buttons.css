@@ -1,0 +1,329 @@
+/* Buttons - Japandi-inspired Button System */
+
+/* Base Japandi Button */
+.japandi-btn {
+    padding: var(--space-lg) var(--space-2xl);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    box-sizing: border-box;
+    transform: translateZ(0); /* hardware acceleration */
+}
+
+.japandi-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.japandi-btn:hover::before {
+    left: 100%;
+}
+
+/* Primary Button */
+.japandi-btn-primary {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    margin-top: var(--space-lg);
+    box-shadow: var(--shadow-xs);
+}
+
+.japandi-btn-primary:hover {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Subtle Button */
+.japandi-btn-subtle {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    color: #ecf0f1;
+    box-shadow: var(--shadow-xs);
+}
+
+.japandi-btn-subtle:hover {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: var(--shadow-md);
+}
+
+/* Generate Button (Mobile) */
+.mobile-generate-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    width: 100%;
+    margin-top: var(--space-xl);
+}
+
+.mobile-generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(106, 78, 66, 0.25);
+}
+
+.mobile-generate-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Generate Button (Desktop) */
+.generate-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: var(--space-lg) var(--space-2xl);
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-slow);
+    margin: var(--space-lg) 0;
+    font-family: var(--font-primary);
+}
+
+.generate-btn:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 78, 66, 0.3);
+}
+
+.generate-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Reset Button */
+.reset-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: var(--space-lg) var(--space-2xl);
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: var(--space-xl);
+    transition: all var(--transition-slow);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Mobile Reset Button */
+.mobile-reset-btn {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: var(--space-lg) 25px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform var(--transition-base);
+    width: 100%;
+    margin-top: var(--space-xl);
+}
+
+.mobile-reset-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Action Buttons */
+.action-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 12px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+}
+
+.action-btn.primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.action-btn.primary:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 78, 66, 0.3);
+}
+
+.action-btn.secondary:hover {
+    background: #f5f5f5;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-icon {
+    font-size: 20px;
+}
+
+.action-text {
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Add Ingredients Button */
+.add-ingredients-btn {
+    flex: 1;
+    background: var(--gradient-surface);
+    color: var(--color-primary);
+    border: 1px solid rgba(106, 78, 66, 0.25);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-family: var(--font-primary);
+}
+
+.add-ingredients-btn:hover {
+    background: linear-gradient(145deg, #eae6df, #dcd4c8);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.12);
+}
+
+/* Save Note Button */
+.save-note-btn {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background var(--transition-base);
+}
+
+.save-note-btn:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Favorite Save Button */
+.favorite-save-btn {
+    width: 100%;
+    margin-bottom: var(--space-sm);
+}
+
+/* Delete Buttons */
+.delete-favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-base);
+}
+
+.delete-favorite-btn:hover {
+    background: #fde3e3;
+}
+
+.mobile-delete-favorite-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity var(--transition-base);
+}
+
+.mobile-delete-favorite-btn:hover {
+    opacity: 1;
+}
+
+.favorite-delete-btn {
+    background: none;
+    border: none;
+    color: var(--color-danger);
+    font-size: 14px;
+    opacity: 0.6;
+    display: block;
+    margin: 0 auto;
+    transition: opacity var(--transition-base);
+}
+
+.favorite-delete-btn:hover {
+    opacity: 1;
+}
+
+/* Close Buttons */
+.mobile-favorites-close,
+.mobile-preferences-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--color-primary);
+    padding: var(--space-sm);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-base);
+}
+
+.mobile-favorites-close:hover,
+.mobile-preferences-close:hover {
+    background: rgba(106, 78, 66, 0.1);
+}
+
+.favorite-sheet-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-base);
+}
+
+.favorite-sheet-close:hover {
+    opacity: 1;
+}

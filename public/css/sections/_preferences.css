@@ -1,0 +1,374 @@
+/* Preferences Sections - Preferences Screens and Options */
+
+/* Mobile Preferences Full-screen */
+.mobile-preferences-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg);
+    z-index: var(--z-modal-backdrop);
+    overflow-y: auto;
+    padding-top: 80px; /* Account for header */
+}
+
+/* Mobile Preferences Screen */
+.mobile-preferences-screen {
+    position: fixed;
+    inset: 0;
+    background: #fdfbf7;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Mobile Preferences Header */
+.mobile-preferences-fullscreen .mobile-preferences-header {
+    padding: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+    background: #fdfbf7;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.mobile-preferences-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-base);
+}
+
+.mobile-preferences-close:hover {
+    background: rgba(106, 78, 66, 0.1);
+}
+
+.mobile-preferences-fullscreen .mobile-preferences-header h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+/* Mobile Preferences Content */
+.mobile-preferences-fullscreen .mobile-preferences-content {
+    padding: 0 var(--space-xl) 40px;
+}
+
+/* Preference Groups */
+.mobile-preference-group {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-xl);
+}
+
+.mobile-preference-group h3 {
+    color: var(--color-primary);
+    margin: 0 0 var(--space-lg) 0;
+    font-size: 18px;
+}
+
+/* Preference Options */
+.mobile-preference-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.mobile-preference-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-base);
+}
+
+.mobile-preference-option:hover {
+    background-color: #f8f9fa;
+}
+
+.mobile-preference-option input[type="radio"] {
+    margin-right: var(--space-lg);
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+}
+
+.mobile-preference-option span {
+    font-size: 16px;
+    color: var(--color-text);
+}
+
+/* Preference Actions */
+.mobile-preference-actions {
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+/* Preference Categories */
+.preference-category {
+    margin-bottom: var(--space-2xl);
+}
+
+.preference-category-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-light);
+    margin-bottom: var(--space-lg);
+    padding: 0 var(--space-xl);
+}
+
+/* Preference Items */
+.preference-item {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-md);
+    overflow: hidden;
+}
+
+.preference-item-header {
+    padding: var(--space-lg) var(--space-xl);
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preference-item-title {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.preference-item-description {
+    font-size: 12px;
+    color: var(--color-text-light);
+    margin-top: var(--space-xs);
+}
+
+.preference-item-content {
+    padding: var(--space-xl);
+}
+
+/* Toggle Switch Preferences */
+.preference-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-xl);
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-md);
+}
+
+.preference-toggle-label {
+    flex: 1;
+}
+
+.preference-toggle-title {
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.preference-toggle-description {
+    font-size: 12px;
+    color: var(--color-text-light);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: #ccc;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background var(--transition-base);
+}
+
+.toggle-switch.active {
+    background: var(--color-primary);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform var(--transition-base);
+    box-shadow: var(--shadow-xs);
+}
+
+.toggle-switch.active::after {
+    transform: translateX(24px);
+}
+
+/* Select Preferences */
+.preference-select {
+    width: 100%;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: white;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color var(--transition-base);
+}
+
+.preference-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(106, 78, 66, 0.2);
+}
+
+/* Slider Preferences */
+.preference-slider {
+    width: 100%;
+    margin: var(--space-lg) 0;
+}
+
+.preference-slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.preference-slider-title {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.preference-slider-value {
+    font-size: 12px;
+    color: var(--color-text-light);
+    background: var(--color-bg);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+}
+
+.preference-slider input[type="range"] {
+    width: 100%;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.preference-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+}
+
+.preference-slider input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+    border: none;
+}
+
+/* Color Preferences */
+.preference-colors {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.preference-color {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all var(--transition-base);
+}
+
+.preference-color:hover {
+    transform: scale(1.1);
+}
+
+.preference-color.selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(106, 78, 66, 0.2);
+}
+
+/* Preferences Footer */
+.mobile-preference-actions {
+    padding: var(--space-xl);
+    text-align: center;
+    border-top: 1px solid var(--color-border);
+    background: white;
+}
+
+/* Preferences Loading */
+.preferences-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-3xl);
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+.preferences-loading .loading-spinner {
+    margin-right: var(--space-sm);
+}
+
+/* Preferences Success */
+.preferences-saved {
+    text-align: center;
+    padding: var(--space-lg);
+    background: rgba(21, 87, 36, 0.1);
+    border-radius: var(--radius-md);
+    margin: var(--space-lg);
+    border: 1px solid rgba(21, 87, 36, 0.2);
+    color: var(--color-success);
+    font-size: 14px;
+}
+
+/* Responsive Preferences */
+@media (max-width: 480px) {
+    .mobile-preference-group {
+        padding: var(--space-lg);
+    }
+    
+    .mobile-preference-option {
+        padding: var(--space-lg);
+    }
+    
+    .preference-item-header {
+        padding: var(--space-lg);
+    }
+    
+    .preference-item-content {
+        padding: var(--space-lg);
+    }
+}

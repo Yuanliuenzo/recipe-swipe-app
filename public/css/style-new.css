@@ -1,0 +1,180 @@
+/* Desktop CSS Entry File - Modular Japandi-inspired Design System */
+
+/* ================================
+   BASE LAYER
+   ================================ */
+
+/* Reset & Global Box-Sizing */
+@import 'base/_reset.css';
+
+/* Design Tokens & Variables */
+@import 'base/_variables.css';
+
+/* Typography System */
+@import 'base/_typography.css';
+
+/* Utility Classes */
+@import 'base/_helpers.css';
+
+/* ================================
+   LAYOUT LAYER
+   ================================ */
+
+/* Mobile Container & App Layout */
+@import 'layout/_mobile-container.css';
+
+/* Headers */
+@import 'layout/_headers.css';
+
+/* Footers & Floating Action Buttons */
+@import 'layout/_footers.css';
+
+/* Navigation - FAB, Bottom Sheet, Dropdown */
+@import 'layout/_navigation.css';
+
+/* ================================
+   COMPONENTS LAYER
+   ================================ */
+
+/* Buttons - Japandi Button System */
+@import 'components/_buttons.css';
+
+/* Cards - Recipe, Vibe, Favorite Cards */
+@import 'components/_cards.css';
+
+/* Modals - Alert, Bottom Sheet, Overlays */
+@import 'components/_modals.css';
+
+/* Toggles - Recipe Toggle, Preference Toggle */
+@import 'components/_toggles.css';
+
+/* Ratings - Star Rating System */
+@import 'components/_ratings.css';
+
+/* Forms - Inputs, Textareas, Form Elements */
+@import 'components/_forms.css';
+
+/* Spinners - Loading, Skeleton Loaders */
+@import 'components/_spinners.css';
+
+/* ================================
+   SECTIONS LAYER
+   ================================ */
+
+/* Recipe Sections - Recipe List, Instructions, Ingredients */
+@import 'sections/_recipe.css';
+
+/* Favorites Sections - Favorites Screens and Grids */
+@import 'sections/_favorites.css';
+
+/* Preferences Sections - Preferences Screens and Options */
+@import 'sections/_preferences.css';
+
+/* Vibes Sections - Mobile Vibe Cards, Overlays, Summaries */
+@import 'sections/_vibes.css';
+
+/* ================================
+   UTILITIES LAYER
+   ================================ */
+
+/* Animations - Keyframes, Transitions, Motion Effects */
+@import 'utilities/_animations.css';
+
+/* Scrollbars - Custom Scrollbar Styling */
+@import 'utilities/_scrollbars.css';
+
+/* Responsive - Media Queries and Responsive Utilities */
+@import 'utilities/_responsive.css';
+
+/* Z-Index - Layering & Stacking Helpers */
+@import 'utilities/_z-index.css';
+
+/* ================================
+   DESKTOP-SPECIFIC ENHANCEMENTS
+   ================================ */
+
+/* Desktop-specific layout adjustments */
+@media (min-width: 768px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .swipe-container {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card-container {
+        position: relative;
+        width: 320px;
+        height: 450px;
+        margin: 0 auto;
+    }
+    
+    .app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+    }
+}
+
+/* Desktop-specific hover effects */
+@media (hover: hover) {
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .recipe-card-wrapper:hover {
+        transform: scale(1.02);
+    }
+    
+    .generate-btn:hover:not(:disabled) {
+        transform: translateY(-2px) scale(1.05);
+    }
+}
+
+/* Desktop animations and transitions */
+@media (prefers-reduced-motion: no-preference) {
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .recipe-card-wrapper {
+        transition: transform 0.8s ease;
+    }
+    
+    .badge {
+        transition: all 0.2s ease;
+    }
+}
+
+/* Desktop typography adjustments */
+@media (min-width: 1024px) {
+    h1 {
+        font-size: 42px;
+    }
+    
+    .headline {
+        font-size: 56px;
+    }
+}
+
+/* Desktop performance optimizations */
+@media (min-width: 768px) {
+    .card,
+    .recipe-card-wrapper,
+    .sparkle {
+        will-change: transform;
+    }
+}
