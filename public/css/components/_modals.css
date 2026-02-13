@@ -1,0 +1,277 @@
+/* Modals - Alert Modal, Bottom Sheet, Overlays */
+
+/* Alert Modal (Refined) */
+.alert-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-toast);
+}
+
+.alert-modal .modal-content {
+    background: #fff;
+    padding: var(--space-xl) var(--space-2xl);
+    border-radius: var(--radius-2xl);
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+}
+
+.alert-modal button {
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--color-primary);
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Bottom Sheet Modal (Premium Mobile Pattern) */
+.favorite-bottom-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+}
+
+/* Bottom Sheet Overlay */
+.favorite-sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--color-overlay);
+    backdrop-filter: blur(4px);
+}
+
+/* Bottom Sheet Container */
+.favorite-sheet-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 85%;
+    background: var(--color-surface);
+    border-radius: var(--radius-5xl) var(--radius-5xl) 0 0;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.25s ease;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.08);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* Optional drag indicator */
+.favorite-sheet-container::before {
+    content: "";
+    width: 40px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 4px;
+    align-self: center;
+    margin-bottom: 14px;
+}
+
+/* Bottom Sheet Header */
+.favorite-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.favorite-sheet-header h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--color-primary);
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+
+.favorite-sheet-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-base);
+}
+
+.favorite-sheet-close:hover {
+    opacity: 1;
+}
+
+/* Bottom Sheet Content */
+.favorite-sheet-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Bottom Sheet Footer */
+.favorite-sheet-footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+    margin-top: var(--space-md);
+}
+
+.favorite-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+/* Full-screen overlays */
+.mobile-result {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-bg);
+    display: none;
+    z-index: var(--z-modal-backdrop);
+}
+
+.mobile-result.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-xl);
+}
+
+/* Full-screen screens */
+.mobile-favorites-screen,
+.mobile-preferences-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--color-surface);
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Swipe glow effects */
+.swipe-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.like-glow {
+    background: radial-gradient(circle at center, rgba(188, 170, 164, 0.3) 0%, rgba(188, 170, 164, 0.15) 40%, transparent 70%);
+}
+
+.nope-glow {
+    background: radial-gradient(circle at center, rgba(205, 180, 140, 0.3) 0%, rgba(205, 180, 140, 0.15) 40%, transparent 70%);
+}
+
+.glow-icon {
+    font-size: 80px;
+    opacity: 0.6;
+    animation: pulse 2s infinite;
+    color: var(--color-primary);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Sparkles container */
+#sparkle-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0; /* behind the card */
+}
+
+/* Sparkles */
+.sparkle {
+    position: absolute;
+    background: gold;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.9;
+    box-shadow: 0 0 12px 6px rgba(255,215,0,0.9);
+    animation: sparkleTwinkle 2s infinite;
+}
+
+@keyframes sparkleTwinkle {
+    0% { 
+        transform: scale(0.3) translateY(0px); 
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.2) translateY(-10px); 
+        opacity: 1;
+    }
+    80% {
+        opacity: 0.6;
+    }
+    100% { 
+        transform: scale(0.7) translateY(5px); 
+        opacity: 0;
+    }
+}
+
+/* Save Success Message */
+.save-success-message {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg) var(--space-xl);
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: var(--radius-md);
+    color: var(--color-success);
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.success-content strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.success-content small {
+    opacity: 0.9;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

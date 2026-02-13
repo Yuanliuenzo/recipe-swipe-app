@@ -1,0 +1,182 @@
+/* Ratings - Star Ratings System */
+
+/* Favorite Rating (Desktop) */
+.favorite-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: var(--space-lg);
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: transform var(--transition-base);
+}
+
+.star-btn:hover {
+    transform: scale(1.2);
+}
+
+.star-btn.active {
+    color: #fbbf24;
+}
+
+/* Mobile Rating System (Subtle + Elegant) */
+.favorite-rating .star {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #ccc;
+    transition: transform var(--transition-fast), color var(--transition-base);
+}
+
+.favorite-rating .star:hover {
+    transform: scale(1.2);
+}
+
+.favorite-rating .star.active {
+    color: #d4a017;
+}
+
+/* Star Display (non-interactive) */
+.mobile-star-display {
+    font-size: 16px;
+    margin-right: var(--space-sm);
+}
+
+.mobile-star-display.active {
+    color: #fbbf24;
+}
+
+/* Rating Container */
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.rating-label {
+    font-size: 14px;
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+/* Rating States */
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-stars .star {
+    color: #ddd;
+    transition: color var(--transition-base);
+}
+
+.rating-stars .star.filled {
+    color: #fbbf24;
+}
+
+.rating-stars .star.half-filled {
+    background: linear-gradient(90deg, #fbbf24 50%, #ddd 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Interactive Rating Hover Effects */
+.rating-interactive .star {
+    cursor: pointer;
+    transition: transform var(--transition-fast), color var(--transition-base);
+}
+
+.rating-interactive .star:hover {
+    transform: scale(1.1);
+}
+
+.rating-interactive .star.hover {
+    color: #fbbf24;
+}
+
+/* Rating Input (for forms) */
+.rating-input {
+    display: none;
+}
+
+.rating-input:checked + .star {
+    color: #fbbf24;
+}
+
+/* Rating Feedback */
+.rating-feedback {
+    font-size: 12px;
+    color: var(--color-text-light);
+    margin-top: var(--space-sm);
+    font-style: italic;
+}
+
+/* Rating Sizes */
+.rating-sm .star {
+    font-size: 16px;
+}
+
+.rating-md .star {
+    font-size: 20px;
+}
+
+.rating-lg .star {
+    font-size: 24px;
+}
+
+.rating-xl .star {
+    font-size: 28px;
+}
+
+/* Rating Animations */
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.star.pulse {
+    animation: starPulse 0.3s ease;
+}
+
+/* Rating Accessibility */
+.star:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Rating in Cards */
+.card-rating {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.card-rating .stars {
+    display: flex;
+    gap: 1px;
+}
+
+.card-rating .count {
+    font-size: 12px;
+    color: var(--color-text-light);
+}
+
+/* Rating in Sheets */
+.sheet-rating {
+    display: flex;
+    gap: var(--space-sm);
+    margin: 0;
+}
+
+.sheet-rating .star {
+    font-size: 22px;
+}

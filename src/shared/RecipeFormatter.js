@@ -36,7 +36,18 @@ export class RecipeFormatter {
 
       // Set title if not set yet
       if (!title || title === 'Untitled Recipe') {
-        title = line;
+        // Clean up the title - remove asterisks, bold markers, and extra formatting
+        title = line
+          .replace(/\*\*/g, '') // Remove asterisks
+          .replace(/\*\*/g, '') // Remove double asterisks (bold)
+          .replace(/__+/g, '') // Remove underscores (underline)
+          .replace(/^#+\s*/, '') // Remove markdown headers
+          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markdown but keep text
+          .replace(/_([^_]+)_/g, '$1') // Remove italic markdown but keep text
+          .replace(/^Recipe\s+Name:\s*/i, '') // Remove "Recipe Name:" prefix
+          .replace(/^Recipe:\s*/i, '') // Remove "Recipe:" prefix
+          .replace(/^Name:\s*/i, '') // Remove "Name:" prefix
+          .trim();
         return;
       }
 

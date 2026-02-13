@@ -1,0 +1,162 @@
+/* Mobile CSS Entry File - Modular Japandi-inspired Design System */
+
+/* ================================
+   BASE LAYER
+   ================================ */
+
+/* Reset & Global Box-Sizing */
+@import 'base/_reset.css';
+
+/* Design Tokens & Variables */
+@import 'base/_variables.css';
+
+/* Typography System */
+@import 'base/_typography.css';
+
+/* Utility Classes */
+@import 'base/_helpers.css';
+
+/* ================================
+   LAYOUT LAYER
+   ================================ */
+
+/* Mobile Container & App Layout */
+@import 'layout/_mobile-container.css';
+
+/* Headers */
+@import 'layout/_headers.css';
+
+/* Footers & Floating Action Buttons */
+@import 'layout/_footers.css';
+
+/* Navigation - FAB, Bottom Sheet, Dropdown */
+@import 'layout/_navigation.css';
+
+/* ================================
+   COMPONENTS LAYER
+   ================================ */
+
+/* Buttons - Japandi Button System */
+@import 'components/_buttons.css';
+
+/* Cards - Recipe, Vibe, Favorite Cards */
+@import 'components/_cards.css';
+
+/* Modals - Alert, Bottom Sheet, Overlays */
+@import 'components/_modals.css';
+
+/* Toggles - Recipe Toggle, Preference Toggle */
+@import 'components/_toggles.css';
+
+/* Ratings - Star Rating System */
+@import 'components/_ratings.css';
+
+/* Forms - Inputs, Textareas, Form Elements */
+@import 'components/_forms.css';
+
+/* Spinners - Loading, Skeleton Loaders */
+@import 'components/_spinners.css';
+
+/* ================================
+   SECTIONS LAYER
+   ================================ */
+
+/* Recipe Sections - Recipe List, Instructions, Ingredients */
+@import 'sections/_recipe.css';
+
+/* Favorites Sections - Favorites Screens and Grids */
+@import 'sections/_favorites.css';
+
+/* Preferences Sections - Preferences Screens and Options */
+@import 'sections/_preferences.css';
+
+/* Vibes Sections - Mobile Vibe Cards, Overlays, Summaries */
+@import 'sections/_vibes.css';
+
+/* ================================
+   UTILITIES LAYER
+   ================================ */
+
+/* Animations - Keyframes, Transitions, Motion Effects */
+@import 'utilities/_animations.css';
+
+/* Scrollbars - Custom Scrollbar Styling */
+@import 'utilities/_scrollbars.css';
+
+/* Responsive - Media Queries and Responsive Utilities */
+@import 'utilities/_responsive.css';
+
+/* Z-Index - Layering & Stacking Helpers */
+@import 'utilities/_z-index.css';
+
+/* ================================
+   THEME ENHANCEMENTS
+   ================================ */
+
+/* Additional theme-specific enhancements can be added here */
+
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+
+
+/* Enable smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hardware acceleration for better performance */
+.mobile-vibe-card,
+.mobile-recipe-card,
+.mobile-favorite-card,
+.favorite-bottom-sheet,
+.mobile-floating-back-btn {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --color-primary: #000000;
+        --color-accent: #0066cc;
+        --color-text: #000000;
+        --color-bg: #ffffff;
+    }
+}
+
+/* Focus visible for better accessibility */
+*:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .mobile-floating-back-btn,
+    .mobile-unified-dropdown,
+    .favorite-bottom-sheet,
+    .alert-modal {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}

@@ -1,0 +1,271 @@
+/* Forms - Inputs, Textareas, Form Elements */
+
+/* Ingredients Input (Desktop) */
+.ingredients-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(106, 78, 66, 0.25);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    font-size: 14px;
+    font-family: var(--font-primary);
+    color: #4a4a4a;
+    resize: none;
+    outline: none;
+    transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.ingredients-input:focus {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(106, 78, 66, 0.45);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.12);
+}
+
+.ingredients-input::placeholder {
+    color: #8a7a6a;
+}
+
+/* Alternative Ingredients Input (Desktop) */
+.ingredients-input-alt {
+    width: 100%;
+    padding: var(--space-lg);
+    border: 2px solid #e0e0e0;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    background: #faf8f3;
+    color: #2c3e50;
+    resize: vertical;
+    min-height: 80px;
+    max-height: 120px;
+    transition: all var(--transition-slow);
+    box-sizing: border-box;
+    margin-bottom: var(--space-lg);
+}
+
+.ingredients-input-alt:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    background: #ffffff;
+}
+
+.ingredients-input-alt::placeholder {
+    color: #bdc3c7;
+    font-style: italic;
+}
+
+/* Mobile Ingredients Input */
+.mobile-ingredients-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(106, 78, 66, 0.25);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    font-size: 14px;
+    font-family: var(--font-primary);
+    color: #4a4a4a;
+    resize: none;
+    outline: none;
+    transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.mobile-ingredients-input:focus {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(106, 78, 66, 0.45);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.12);
+}
+
+.mobile-ingredients-input::placeholder {
+    color: #8a7a6a;
+}
+
+/* Favorite Note Input */
+.favorite-note {
+    width: 100%;
+    min-height: 60px;
+    padding: var(--space-sm);
+    border: 1px solid #ddd;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: var(--space-sm);
+}
+
+.favorite-note:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(106, 78, 66, 0.2);
+}
+
+/* Form Container */
+.ingredients-container {
+    padding: var(--space-2xl);
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.ingredients-container h2 {
+    text-align: center;
+    margin-bottom: var(--space-sm);
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* Ingredients Actions */
+.ingredients-actions {
+    margin-bottom: var(--space-sm);
+}
+
+.ingredients-buttons {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: var(--space-xl);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-primary);
+    font-size: 14px;
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    background: white;
+    color: var(--color-text);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(106, 78, 66, 0.2);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Form Validation */
+.form-input.error {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 2px rgba(165, 85, 85, 0.2);
+}
+
+.form-error {
+    color: var(--color-danger);
+    font-size: 12px;
+    margin-top: var(--space-xs);
+    font-style: italic;
+}
+
+.form-success {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 2px rgba(21, 87, 36, 0.2);
+}
+
+/* Radio Buttons */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-base);
+}
+
+.radio-option:hover {
+    background-color: #f8f9fa;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: var(--space-lg);
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary);
+}
+
+.radio-option span {
+    font-size: 16px;
+    color: var(--color-text);
+}
+
+/* Checkboxes */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+    margin-right: var(--space-md);
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+}
+
+.checkbox-option label {
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+/* Mobile Form Adjustments */
+@media (max-width: 480px) {
+    .ingredients-container {
+        padding: var(--space-lg);
+    }
+    
+    .ingredients-input-alt {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding-right: 70px;
+    }
+    
+    .add-ingredients-btn {
+        right: 6px;
+        bottom: 6px;
+        padding: 6px var(--space-lg);
+        min-width: 50px;
+    }
+    
+    .btn-text {
+        display: none;
+    }
+    
+    .form-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}

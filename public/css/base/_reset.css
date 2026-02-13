@@ -1,0 +1,33 @@
+/* Reset & Global Box-Sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+    background: var(--color-bg);
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    height: 100%;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global overlay lock */
+.app--overlay-open {
+    overflow: hidden;
+}

@@ -122,6 +122,53 @@ globalStateManager.subscribe('currentVibeRound', (newValue) => {
 
 console.log('🚀 Recipe App loaded with working integrated architecture!');
 
+// Update round progress indicator
+function updateRoundProgress(currentRound, totalRounds = null) {
+  try {
+    const roundIndicator = document.querySelector('.round-indicator');
+    if (!roundIndicator) {
+      console.warn('Round indicator not found');
+      return;
+    }
+
+    // Get actual total vibes from vibe engine
+    const actualTotalRounds = totalRounds || vibeEngine.shuffledVibes.length + vibeEngine.usedVibes.size;
+    const remainingVibes = vibeEngine.shuffledVibes.length;
+    
+    // Calculate progress based on actual game state
+    const progressPercentage = actualTotalRounds > 0 ? ((actualTotalRounds - remainingVibes) / actualTotalRounds) * 100 : 0;
+    
+    // Update data attribute for CSS targeting
+    roundIndicator.setAttribute('data-round', currentRound.toString());
+    
+    // Update text to show actual progress
+    const roundText = roundIndicator.querySelector('.round-text');
+    if (roundText) {
+      roundText.textContent = `Round ${currentRound} of ${actualTotalRounds}`;
+    }
+    
+    // Update progress bar width
+    const progressBar = roundIndicator.querySelector('.round-progress');
+    if (progressBar) {
+      progressBar.style.width = `${progressPercentage}%`;
+    }
+    
+    // Update dots based on actual progress
+    const dots = roundIndicator.querySelectorAll('.round-dot');
+    dots.forEach((dot, index) => {
+      if (index < currentRound) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+    
+    console.log(`📊 Updated round progress: ${currentRound}/${actualTotalRounds} (${progressPercentage.toFixed(1)}%)`);
+  } catch (error) {
+    console.error('❌ Failed to update round progress:', error);
+  }
+}
+
 // Initialize application
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 DOM Content Loaded - Starting Recipe Swipe App...');
@@ -257,10 +304,14 @@ function handleSwipe(direction) {
   if (direction === 'right') {
     // Add to profile
     const currentProfile = globalStateManager.get('vibeProfile');
+    const updatedProfile = [...currentProfile, currentVibe];
     globalStateManager.setState({
-      vibeProfile: [...currentProfile, currentVibe]
+      vibeProfile: updatedProfile
     });
     console.log(`❤️ Added ${currentVibe.name} to profile`);
+    
+    // Update round progress indicator
+    updateRoundProgress(updatedProfile.length);
   }
   
   // Show next card
@@ -394,7 +445,10 @@ function showRecipeGeneration(container, profile) {
           <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
           <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
           <div class="ingredients-actions">
-              <button class="japandi-btn japandi-btn-subtle add-ingredients-btn" type="button">+ Add Ingredients</button>
+              <button class="add-ingredients-btn" type="button">
+    <span class="btn-icon"></span>
+    <span class="btn-text">Add Ingredients</span>
+</button>
           </div>
           <div class="ingredients-confirmation"></div>
       </div>
@@ -630,7 +684,18 @@ async function generateRecipe() {
       }
       
       recipeCard.innerHTML = `
-        <div class="mobile-recipe-loading-status">Generating your personalized recipe...</div>
+        <div class="mobile-recipe-loading-container">
+          <div class="loading-icon">🍳</div>
+          <div class="loading-title">Creating Your Recipe</div>
+          <div class="loading-subtitle">This may take 30+ seconds...</div>
+          <div class="loading-progress">
+            <div class="loading-dots">
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+              <span class="loading-dot"></span>
+            </div>
+          </div>
+        </div>
         <div class="mobile-recipe-skeleton">
           <div class="skeleton-line skeleton-title"></div>
           <div class="skeleton-line skeleton-subtitle"></div>
@@ -640,7 +705,6 @@ async function generateRecipe() {
           <div class="skeleton-line short"></div>
           <div class="skeleton-line"></div>
         </div>
-        <div class="mobile-recipe-loading-status">This may take 30+ seconds...</div>
       `;
     } else {
       // Web loading state
@@ -906,6 +970,10 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
     // Render layout
     // ----------------------------
     recipeCard.innerHTML = `
+      <div class="mobile-recipe-title">
+        <h2>${formattedRecipe.title}</h2>
+      </div>
+      
       ${hasIngredients && hasInstructions ? `
         <div class="mobile-recipe-toggle" role="tablist">
           <button 
