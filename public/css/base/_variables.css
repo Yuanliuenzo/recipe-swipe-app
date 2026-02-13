@@ -78,4 +78,16 @@
     --gradient-surface: linear-gradient(145deg, #f5f2ed, #eae6df);
     --gradient-vibe: linear-gradient(135deg, #8b7355, #6a4e42);
     --gradient-overlay: linear-gradient(to top, rgba(32, 28, 24, 0.72), rgba(32, 28, 24, 0.40), rgba(32, 28, 24, 0.10), rgba(32, 28, 24, 0.00));
+    
+    /* Progress Bar Colors */
+    --progress-bg: rgba(220, 185, 132, 0.2);
+    --progress-fill: linear-gradient(90deg, #dcb984, #c9a66b);
+    --progress-dot: rgba(106, 78, 66, 0.3);
+    --progress-dot-active: #fdfbf7;
+    
+    /* Soft Button Colors */
+    --btn-soft-bg: linear-gradient(135deg, #f8f6f2, #f0ebe2);
+    --btn-soft-hover: linear-gradient(135deg, #f0ebe2, #e6dcc2);
+    --btn-soft-border: rgba(220, 185, 132, 0.3);
+    --btn-soft-shadow: rgba(220, 185, 132, 0.15);
 }

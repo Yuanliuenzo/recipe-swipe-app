@@ -6,11 +6,12 @@ import { PromptBuilder } from '../shared/PromptBuilder.js';
 import { RecipeFormatter } from '../shared/RecipeFormatter.js';
 
 export class SwipeService {
-  constructor(stateManager, eventBus, vibeEngine, apiService) {
+  constructor(stateManager, eventBus, vibeEngine, apiService, uiService) {
     this.stateManager = stateManager;
     this.eventBus = eventBus;
     this.vibeEngine = vibeEngine;
     this.api = apiService;
+    this.uiService = uiService;
   }
   
   initialize() {
@@ -71,6 +72,9 @@ export class SwipeService {
       
       this.stateManager.setState({ vibeProfile: updatedProfile });
       console.log(`❤️ Added ${vibe.name} to profile (${updatedProfile.length}/${CONFIG.MAX_VIBE_ROUNDS})`);
+      
+      // Update round progress indicator
+      this.uiService.updateRoundProgress(updatedProfile.length, CONFIG.MAX_VIBE_ROUNDS);
       
       // Check if we've reached max rounds
       if (updatedProfile.length >= CONFIG.MAX_VIBE_ROUNDS) {

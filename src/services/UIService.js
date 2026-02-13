@@ -368,4 +368,45 @@ export class UIService {
       document.head.appendChild(style);
     }
   }
+
+  // Update round progress indicator
+  updateRoundProgress(currentRound, totalRounds = 5) {
+    try {
+      const roundIndicator = document.querySelector('.round-indicator');
+      if (!roundIndicator) {
+        console.warn('Round indicator not found');
+        return;
+      }
+
+      // Update data attribute for CSS targeting
+      roundIndicator.setAttribute('data-round', currentRound.toString());
+      
+      // Update text
+      const roundText = roundIndicator.querySelector('.round-text');
+      if (roundText) {
+        roundText.textContent = `Round ${currentRound} of ${totalRounds}`;
+      }
+      
+      // Update progress bar width
+      const progressBar = roundIndicator.querySelector('.round-progress');
+      if (progressBar) {
+        const progressPercentage = (currentRound / totalRounds) * 100;
+        progressBar.style.width = `${progressPercentage}%`;
+      }
+      
+      // Update dots
+      const dots = roundIndicator.querySelectorAll('.round-dot');
+      dots.forEach((dot, index) => {
+        if (index < currentRound) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+      
+      console.log(`📊 Updated round progress: ${currentRound}/${totalRounds}`);
+    } catch (error) {
+      console.error('❌ Failed to update round progress:', error);
+    }
+  }
 }
