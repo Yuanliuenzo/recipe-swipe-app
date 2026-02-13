@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Recipe Swipe - Mobile</title>
+    
+    <!-- Google Fonts for elegant Japandi style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+    <!-- App Root with Navigation Views -->
+    <div id="app-root">
+        <!-- Main View -->
+        <div id="view-main" class="app-view is-active">
+            <!-- Mobile swipe deck + main title -->
+            <div class="mobile-container">
+                <h1></h1>
+                <div class="mobile-card-container" id="card-container"></div>
+            </div>
+
+            <!-- Final result container (hidden initially) -->
+            <div class="mobile-result" id="mobile-result">
+                <div class="mobile-result-content">
+                    <div class="mobile-recipe-card" id="mobile-recipe-card">
+                        <!-- Content will be dynamically inserted -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites View -->
+        <div id="view-favorites" class="app-view"></div>
+
+        <!-- Preferences View -->
+        <div id="view-preferences" class="app-view"></div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-navigation">
+        <div class="mobile-fab">☰</div>
+        <div class="mobile-fab-menu">
+            <div class="fab-items">
+                <button class="fab-item" onclick="nav.go('favorites')">⭐ Favorites</button>
+                <button class="fab-item" onclick="nav.go('preferences')">⚙️ Preferences</button>
+                <button class="fab-item" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+        <div class="fab-overlay"></div>
+    </div>
+
+    <!-- Load clean working main version -->
+    <script type="module" src="../src/main.js"></script>
+</body>
+</html>

@@ -5,6 +5,14 @@
     "ingredientsAtHome": "",
     "favorites": [
       {
+        "id": "1770669093768",
+        "recipeText": " Roasted Leek and Eggplant Medley Salad\n===\n\nIngredients:\n• 2 medium leeks, sliced\n• 2 medium eggplants, diced\n• 4 large tomatoes, chopped\n• 1 red bell pepper, chopped\n• 1 cucumber, sliced\n• 1 cup fresh basil leaves, torn\n• 3 tablespoons olive oil\n• Salt and pepper to taste\n• Juice of 2 lemons\n• 1/4 cup feta cheese (optional)\n\nInstructions:\n1. Preheat the oven to 400°F (200°C). Spread diced eggplants on a baking sheet, drizzle with half of the olive oil and season with salt and pepper. Roast for 20-25 minutes or until tender.\n2. On another baking sheet, place sliced leeks and drizzle with the remaining olive oil. Season with salt and pepper, then roast for 10-15 minutes or until softened and slightly caramelized.\n3. In a large serving bowl, combine roasted eggplants, leeks, chopped tomatoes, red bell pepper, sliced cucumber, torn basil leaves, lemon juice, and feta cheese (if using). Mix gently to combine all ingredients.\n4. Season the salad with additional salt and pepper if needed. Serve immediately.",
+        "title": "Roasted Leek and Eggplant Medley Salad",
+        "rating": 4,
+        "note": null,
+        "createdAt": "2026-02-09T20:31:33.768Z"
+      },
+      {
         "id": "1770668906487",
         "recipeText": " **Recipe Name: Spicy Chicken Fajita Tacos**\n\nIngredients:\n• 4 chicken thighs\n• 1 bell pepper (preferably red or yellow, in season)\n• 1 large onion\n• 1 can of black beans (drained and rinsed)\n• 8 corn tortillas\n• 3 tablespoons olive oil\n• 2 tablespoons lime juice\n• 2 tablespoons chili powder\n• 1 teaspoon cumin\n• Salt to taste\n• 1 cup shredded cheese (optional, for garnish)\n\nInstructions:\n1. Season the chicken thighs with salt, chili powder, and cumin. Heat 1 tablespoon of olive oil in a large skillet over medium-high heat. Add the seasoned chicken thighs and cook until browned on both sides and cooked through, about 6-8 minutes per side. Remove from skillet and set aside.\n2. In the same skillet, add another tablespoon of olive oil. Slice the bell pepper and onion into thin strips, and sauté them in the skillet until tender, about 5 minutes.\n3. Add the drained black beans to the skillet and stir to combine with the peppers and onions. Squeeze lime juice over the mixture.\n4. Slice the cooked chicken thighs into thin strips. Return them to the skillet and toss everything together to combine. Cook for an additional 2 minutes to heat the chicken through.\n5. Warm the corn tortillas in a dry skillet or microwave. Serve the fajita mixture in the warm tortillas, garnished with shredded cheese if desired. Enjoy your spicy and adventurous Chicken Fajita Tacos!",
         "title": "Recipe Name: Spicy Chicken Fajita Tacos",
@@ -22,10 +30,10 @@
       }
     ],
     "createdAt": "2026-02-09T19:23:06.690Z",
-    "lastLogin": "2026-02-09T20:27:33.632Z",
+    "lastLogin": "2026-02-11T06:53:10.412Z",
     "preferences": {
-      "diet": "None",
-      "budget": "No",
+      "diet": "Vegetarian",
+      "budget": "Yes",
       "seasonalKing": "Yes"
     }
   },

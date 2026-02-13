@@ -18,14 +18,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// Detect mobile user agents
+// Detect mobile user agents (more comprehensive)
 function isMobile(req) {
     const userAgent = req.headers['user-agent'] || '';
-    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    console.log('🔍 User-Agent detection:', userAgent);
+    
+    // More comprehensive mobile detection
+    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 }
 
 // File-based user store
-const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+const USERS_FILE = path.join(__dirname, 'src', 'data', 'users.json');
 let users = new Map();
 
 // Load users from file on startup
@@ -109,8 +113,18 @@ app.use(async (req, res, next) => {
     console.log('DEBUG: Username from cookie:', username);
     
     if (username) {
-        req.user = getUser(username);
+        const userData = getUser(username);
+        req.user = userData;
         console.log('DEBUG: User found:', !!req.user);
+        console.log('DEBUG: User data:', JSON.stringify(req.user, null, 2));
+        
+        // Ensure preferences are immediately available
+        if (userData && userData.preferences) {
+            req.user.preferences = userData.preferences;
+            console.log('✅ Preferences set in middleware:', JSON.stringify(req.user.preferences, null, 2));
+        } else {
+            console.log('⚠️ userData.preferences not available in middleware');
+        }
     }
     next();
 });
@@ -129,14 +143,14 @@ app.get("/", (req, res) => {
         // User already selected a profile; serve the app
         if (isMobile(req)) {
             console.log("Serving mobile version");
-            res.sendFile(path.join(__dirname, 'mobile.html'));
+            res.sendFile(path.join(__dirname, 'public', 'mobile.html'));
         } else {
             console.log("Serving desktop version");
-            res.sendFile(path.join(__dirname, 'index.html'));
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
         }
     } else {
         // No profile cookie; show picker
-        res.sendFile(path.join(__dirname, 'profile-picker.html'));
+        res.sendFile(path.join(__dirname, 'public', 'profile-picker.html'));
     }
 });
 
@@ -266,12 +280,16 @@ app.get("/api/preferences", (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: "Not logged in" });
     }
-    res.json({ preferences: req.user.preferences || {
-        diet: 'None',
-        budget: 'No',
-        seasonalKing: 'No'
-    } });
+
+    const safePreferences = {
+        diet: req.user.preferences?.diet || 'None',
+        budget: req.user.preferences?.budget || 'No',
+        seasonalKing: req.user.preferences?.seasonalKing || 'No'
+    };
+
+    res.json({ preferences: safePreferences });
 });
+
 
 app.patch("/api/preferences", async (req, res) => {
     if (!req.user) {
@@ -295,8 +313,10 @@ app.patch("/api/preferences", async (req, res) => {
     res.json({ preferences: updatedPrefs });
 });
 
-// Serve static files from current directory (must be after / routing)
-app.use(express.static(path.join(__dirname)));
+// Serve static files from public directory (must be after / routing)
+app.use(express.static(path.join(__dirname, 'public')));
+// Serve source files for ES6 modules
+app.use('/src', express.static(path.join(__dirname, 'src')));
 
 app.post('/api/generateRecipe', async (req, res) => {
     console.log("POST /api/generateRecipe called with body:", req.body);

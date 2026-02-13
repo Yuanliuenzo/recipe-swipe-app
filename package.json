@@ -1,15 +1,16 @@
 {
-  "name": "first_website",
+  "name": "recipe-swipe-app",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "A beautiful recipe discovery app with AI-powered recipe generation and Tinder-like swipe interface",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["recipe", "swipe", "ai", "cooking", "food", "discovery"],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^5.1.1",
