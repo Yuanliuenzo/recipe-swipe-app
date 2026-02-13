@@ -78,22 +78,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 25px;
+    box-sizing: border-box;
 }
 
 /* ----------------- Mobile Vibe Cards ----------------- */
 
 .mobile-vibe-card {
-    position: absolute;
-    aspect-ratio: 3 / 4;
-    width: min(92vw, 420px);
-    height: min(78vh, 640px);
+    width: 100%;
+    max-width: 420px;
+    height: min(80vh, 640px);
     border-radius: 26px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
     overflow: hidden;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
+    box-sizing: border-box;
 }
 
 .mobile-vibe-card.dragging {
