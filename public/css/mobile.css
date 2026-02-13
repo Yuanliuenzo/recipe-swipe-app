@@ -1559,6 +1559,31 @@ body {
     background: #5a3e32;
 }
 
+.mobile-save-btn {
+    background: linear-gradient(145deg, #8b7355, #6a4e42);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(106, 78, 66, 0.2);
+}
+
+.mobile-save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(106, 78, 66, 0.3);
+    background: linear-gradient(145deg, #9b8365, #7a5e52);
+}
+
+.mobile-save-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(106, 78, 66, 0.2);
+}
+
 .mobile-empty-favorites, .mobile-error-favorites {
     text-align: center;
     color: #999;
