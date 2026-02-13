@@ -73,26 +73,27 @@ body {
 }
 
 .mobile-card-container {
-    position: relative;
-    width: 100%;
-    max-width: 350px;
-    height: 500px;
-    margin: 0 auto; /* center the card container */
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
 }
 
 /* ----------------- Mobile Vibe Cards ----------------- */
 
 .mobile-vibe-card {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    cursor: grab;
-    transition: transform 0.2s ease-out;
+    aspect-ratio: 3 / 4;
+    width: min(92vw, 420px);
+    height: min(78vh, 640px);
+    border-radius: 26px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
     overflow: hidden;
-    touch-action: none;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .mobile-vibe-card.dragging {
@@ -110,6 +111,26 @@ body {
     align-items: center;
     padding: 30px 20px;
     text-align: center;
+}
+
+/* Modern swipe card image behavior */
+.mobile-vibe-card[style*="background-image"] {
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Optional premium polish - soft inner gradient for readability */
+.mobile-vibe-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.35),
+        transparent 40%
+    );
+    pointer-events: none;
 }
 
 .mobile-vibe-emoji {
@@ -1279,16 +1300,16 @@ body {
 /* ----------------- Responsive Adjustments ----------------- */
 
 @media (max-height: 700px) {
-    .mobile-card-container {
-        height: 400px;
-    }
-
     .mobile-vibe-emoji {
         font-size: 50px;
     }
 
     .mobile-vibe-name {
         font-size: 24px;
+    }
+    
+    .mobile-vibe-card {
+        inset: 8px;
     }
 }
 
