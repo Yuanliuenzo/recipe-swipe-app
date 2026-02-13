@@ -111,6 +111,15 @@ export class FavoritesService {
   async showFavorites() {
     const favorites = await this.loadFavorites();
 
+    // Prevent duplicate screen
+    if (document.querySelector('.mobile-favorites-screen')) return;
+
+    // Close any existing overlay screens
+    const existingScreen = document.querySelector('.mobile-preferences-screen');
+    if (existingScreen) {
+      existingScreen.remove();
+    }
+
     document.body.classList.add('app--overlay-open');
 
     const screen = document.createElement('div');

@@ -138,13 +138,18 @@ export class UserPreferencesService {
     const preferences = this.getPreferences();
 
     // Prevent duplicate screen
-    if (document.querySelector('.mobile-preferences-fullscreen')) return;
+    if (document.querySelector('.mobile-preferences-screen')) return;
 
-    const container = document.querySelector('.mobile-container');
-    if (container) container.style.display = 'none';
+    // Close any existing overlay screens
+    const existingScreen = document.querySelector('.mobile-favorites-screen');
+    if (existingScreen) {
+      existingScreen.remove();
+    }
+
+    document.body.classList.add('app--overlay-open');
 
     const screen = document.createElement('div');
-    screen.className = 'mobile-preferences-fullscreen';
+    screen.className = 'mobile-preferences-screen';
 
     screen.innerHTML = this.renderPreferencesHTML(preferences);
 
@@ -155,15 +160,12 @@ export class UserPreferencesService {
 
   renderPreferencesHTML(preferences) {
     return `
-      <button class="mobile-floating-back-btn">
-        <span>←</span> Back
-      </button>
-
-      <div class="mobile-preferences-header">
+      <div class="mobile-favorites-header">
+        <button class="mobile-favorites-close">←</button>
         <h2>Preferences</h2>
       </div>
 
-      <div class="mobile-preferences-content">
+      <div class="mobile-favorites-list">
 
         ${this.renderRadioGroup(
         'Dietary Restrictions',
@@ -212,7 +214,7 @@ export class UserPreferencesService {
   }
 
   attachEvents(screen) {
-    screen.querySelector('.mobile-floating-back-btn')
+    screen.querySelector('.mobile-favorites-close')
         .addEventListener('click', () => this.closePreferences());
 
     screen.querySelector('.mobile-save-btn')
@@ -220,11 +222,10 @@ export class UserPreferencesService {
   }
 
   closePreferences() {
-    const screen = document.querySelector('.mobile-preferences-fullscreen');
+    const screen = document.querySelector('.mobile-preferences-screen');
     if (screen) screen.remove();
 
-    const container = document.querySelector('.mobile-container');
-    if (container) container.style.display = '';
+    document.body.classList.remove('app--overlay-open');
   }
 
   async saveFromModal(screen) {

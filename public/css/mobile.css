@@ -501,6 +501,16 @@ body {
     animation: fadeIn 0.2s ease;
 }
 
+.mobile-preferences-screen {
+    position: fixed;
+    inset: 0;
+    background: #fdfbf7;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1064,11 +1074,31 @@ body {
 
 .mobile-preferences-fullscreen .mobile-preferences-header {
     padding: 20px;
-    text-align: center;
-    position: relative;
+    border-bottom: 1px solid #ece7e2;
+    background: #fdfbf7;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-preferences-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6a4e42;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.mobile-preferences-close:hover {
+    background: rgba(106, 78, 66, 0.1);
 }
 
 .mobile-preferences-fullscreen .mobile-preferences-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
     color: #6a4e42;
     margin: 0;
 }
@@ -1125,43 +1155,6 @@ body {
 .mobile-preference-actions {
     padding: 20px;
     text-align: center;
-}
-
-.mobile-floating-back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 1001;
-    transition: all 0.2s ease;
-}
-
-.mobile-floating-back-btn:hover {
-    background: #f8f9fa;
-    transform: translateY(-1px);
-}
-
-.mobile-floating-back-btn:active {
-    transform: translateY(0);
-}
-
-.floating-back-icon {
-    font-size: 16px;
-    color: #6a4e42;
-}
-
-.floating-back-text {
-    font-size: 14px;
-    color: #6a4e42;
-    font-weight: 500;
 }
 
 /* Mobile Favorite Card Structure */
@@ -1557,11 +1550,31 @@ body {
 
 .mobile-preferences-fullscreen .mobile-preferences-header {
     padding: 20px;
-    text-align: center;
-    position: relative;
+    border-bottom: 1px solid #ece7e2;
+    background: #fdfbf7;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-preferences-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6a4e42;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.mobile-preferences-close:hover {
+    background: rgba(106, 78, 66, 0.1);
 }
 
 .mobile-preferences-fullscreen .mobile-preferences-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
     color: #6a4e42;
     margin: 0;
 }
@@ -1618,43 +1631,6 @@ body {
 .mobile-preference-actions {
     padding: 20px;
     text-align: center;
-}
-
-.mobile-floating-back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 1001;
-    transition: all 0.2s ease;
-}
-
-.mobile-floating-back-btn:hover {
-    background: #f8f9fa;
-    transform: translateY(-1px);
-}
-
-.mobile-floating-back-btn:active {
-    transform: translateY(0);
-}
-
-.floating-back-icon {
-    font-size: 16px;
-    color: #6a4e42;
-}
-
-.floating-back-text {
-    font-size: 14px;
-    color: #6a4e42;
-    font-weight: 500;
 }
 
 /* Mobile Favorite Card Structure */

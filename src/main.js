@@ -1181,14 +1181,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const fab = document.querySelector('.mobile-fab');
   const fabMenu = document.querySelector('.mobile-fab-menu');
   const fabOverlay = document.querySelector('.fab-overlay');
+  const fabItems = document.querySelectorAll('.fab-item');
   
   if (fab && fabMenu && fabOverlay) {
+    const closeMenu = () => {
+      fabMenu.classList.remove('show');
+      fabOverlay.classList.remove('show');
+    };
+    
     fab.addEventListener('click', () => {
       const isOpen = fabMenu.classList.contains('show');
       
       if (isOpen) {
-        fabMenu.classList.remove('show');
-        fabOverlay.classList.remove('show');
+        closeMenu();
       } else {
         fabMenu.classList.add('show');
         fabOverlay.classList.add('show');
@@ -1196,9 +1201,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Close menu when clicking overlay
-    fabOverlay.addEventListener('click', () => {
-      fabMenu.classList.remove('show');
-      fabOverlay.classList.remove('show');
+    fabOverlay.addEventListener('click', closeMenu);
+    
+    // Close menu when clicking any menu item
+    fabItems.forEach(item => {
+      item.addEventListener('click', closeMenu);
     });
   }
 });
