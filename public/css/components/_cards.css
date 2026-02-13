@@ -200,6 +200,10 @@
     position: relative;
     overflow: hidden;
     transition: all var(--transition-smooth);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mobile-recipe-actions .japandi-btn::before {
@@ -219,6 +223,58 @@
 
 .mobile-recipe-actions .japandi-btn:active {
     transform: scale(0.98);
+}
+
+/* Mobile Recipe Title - Elegant Japandi Style */
+.mobile-recipe-title {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-surface), rgba(253, 251, 247, 0.8));
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(220, 185, 132, 0.2);
+    box-shadow: 0 2px 8px rgba(220, 185, 132, 0.1);
+    flex-shrink: 0;
+}
+
+.mobile-recipe-title h2 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+    line-height: 1.3;
+    letter-spacing: 0.3px;
+    position: relative;
+    display: inline-block;
+}
+
+.mobile-recipe-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 1px;
+}
+
+/* Add subtle animation */
+.mobile-recipe-title {
+    animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Favorite Cards (Desktop) */

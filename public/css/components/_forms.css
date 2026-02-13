@@ -116,7 +116,7 @@
 
 /* Ingredients Actions */
 .ingredients-actions {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-sm);
 }
 
 .ingredients-buttons {

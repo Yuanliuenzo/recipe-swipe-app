@@ -970,6 +970,10 @@ function displayRecipe(container, formattedRecipe, rawRecipe) {
     // Render layout
     // ----------------------------
     recipeCard.innerHTML = `
+      <div class="mobile-recipe-title">
+        <h2>${formattedRecipe.title}</h2>
+      </div>
+      
       ${hasIngredients && hasInstructions ? `
         <div class="mobile-recipe-toggle" role="tablist">
           <button 
