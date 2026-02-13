@@ -12,7 +12,7 @@ html {
 
 body {
     font-family: 'Noto Sans', sans-serif;
-    background: #f0f2f5;
+    background: var(--color-bg);
     min-height: 100vh;
     overflow: hidden;
     touch-action: none;

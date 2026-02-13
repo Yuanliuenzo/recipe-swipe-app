@@ -122,7 +122,7 @@
 .app-view {
     position: fixed;
     inset: 0;
-    background: #fdfbf7;
+    background: var(--color-surface);
 
     opacity: 0;
     transform: translateX(30px);

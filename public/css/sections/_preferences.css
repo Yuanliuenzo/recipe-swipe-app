@@ -17,18 +17,18 @@
 .mobile-preferences-screen {
     position: fixed;
     inset: 0;
-    background: #fdfbf7;
+    background: var(--color-surface);
     z-index: var(--z-modal);
     display: flex;
     flex-direction: column;
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn 02s ease;
 }
 
 /* Mobile Preferences Header */
 .mobile-preferences-fullscreen .mobile-preferences-header {
     padding: var(--space-xl);
     border-bottom: 1px solid var(--color-border);
-    background: #fdfbf7;
+    background: var(--color-surface);
     display: flex;
     align-items: center;
     gap: var(--space-lg);

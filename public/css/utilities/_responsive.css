@@ -322,31 +322,8 @@
     }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-bg: #1a1a1a;
-        --color-card: #2d2d2d;
-        --color-surface: #242424;
-        --color-text: #e0e0e0;
-        --color-text-light: #a0a0a0;
-        --color-border: #404040;
-        --color-border-light: #333333;
-    }
-}
-
-/* Light Mode Support (Explicit) */
-@media (prefers-color-scheme: light) {
-    :root {
-        --color-bg: #f0f2f5;
-        --color-card: #ffffff;
-        --color-surface: #fdfbf7;
-        --color-text: #34495e;
-        --color-text-light: #7f8c8d;
-        --color-border: #ece7e2;
-        --color-border-light: #e0e0e0;
-    }
-}
+/* Note: Dark mode support removed to maintain consistent Japandi light theme
+   If dark mode is needed in the future, implement as a separate theme system */
 
 /* Print Styles */
 @media print {
