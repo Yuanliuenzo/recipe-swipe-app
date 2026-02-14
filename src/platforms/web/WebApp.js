@@ -296,22 +296,10 @@ export class WebApp {
   
   // Create vibe summary HTML
   createVibeSummary(vibeProfile) {
-    if (vibeProfile.length === 0) {
-      return `
-        <div class="vibe-summary">
-          <h2>🍳 Ready to Cook!</h2>
-          <p>Let's find you a delicious recipe!</p>
-        </div>
-      `;
-    }
-    
     return `
       <div class="vibe-summary">
-        <h2>🎯 Your Vibe Profile</h2>
-        <div class="selected-vibes">
-          ${vibeProfile.map(vibe => `<span class="vibe-tag">${vibe.emoji} ${vibe.name}</span>`).join('')}
-        </div>
-        <p class="vibe-description">Ready for your personalized recipe?</p>
+        <h2>🍳 Ready to Cook!</h2>
+        <p>Let's find you a delicious recipe!</p>
       </div>
     `;
   }

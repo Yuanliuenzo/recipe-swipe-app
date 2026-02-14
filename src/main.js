@@ -424,19 +424,10 @@ function showRecipeGeneration(container, profile) {
     const finalRecipeCard = document.getElementById('mobile-recipe-card');
     console.log('📱 Using recipe card:', finalRecipeCard);
     
-    // Create vibe summary using your beautiful old structure
-    const vibeSummary = profile.length > 0 
-      ? `<div class="mobile-vibe-summary">
-          <h2>🎯 Your Vibe Profile</h2>
-          <div class="mobile-selected-vibes">
-              ${profile.map(vibe => `<span class="mobile-vibe-tag">${vibe.emoji} ${vibe.name}</span>`).join('')}
-          </div>
-          <p style="color: #666; margin-top: 10px;">Ready for your personalized recipe?</p>
-         </div>`
-      : `<div class="mobile-vibe-summary">
-          <h2>🍳 Ready to Cook!</h2>
-          <p style="color: #666;">Let's find you a delicious recipe!</p>
-         </div>`;
+    const vibeSummary = `<div class="mobile-vibe-summary">
+        <h2>🍳 Ready to Cook!</h2>
+        <p style="color: #666;">Let's find you a delicious recipe!</p>
+       </div>`;
     
     finalRecipeCard.innerHTML = `
       ${vibeSummary}
@@ -514,11 +505,8 @@ function showRecipeGeneration(container, profile) {
         margin: 0 auto;
         max-width: 400px;
       ">
-        <h2 style="font-size: 28px; margin-bottom: 15px;">🎉 Your Vibe Profile</h2>
-        <div style="margin-bottom: 20px;">
-          ${profile.map(vibe => `<span style="margin: 5px; font-size: 24px;">${vibe.emoji}</span>`).join('')}
-        </div>
-        <p style="font-size: 16px; margin-bottom: 25px;">Ready for your personalized recipe!</p>
+        <h2 style="font-size: 28px; margin-bottom: 15px;">🍳 Ready to Cook!</h2>
+        <p style="font-size: 16px; margin-bottom: 25px;">Let's find you a delicious recipe!</p>
         
         <div style="margin-bottom: 20px; text-align: left;">
           <label style="display: block; margin-bottom: 10px; font-size: 14px;">What do you have at home? (optional)</label>
