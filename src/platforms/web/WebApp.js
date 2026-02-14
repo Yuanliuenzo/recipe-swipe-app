@@ -6,6 +6,7 @@ import { DomUtils } from '../../utils/DomUtils.js';
 import { VibeEngine } from '../../shared/VibeEngine.js';
 import { RecipeFormatter } from '../../shared/RecipeFormatter.js';
 import { PromptBuilder } from '../../shared/PromptBuilder.js';
+import { RecipeSuggestionService } from '../../services/RecipeSuggestionService.js';
 
 // Import web-specific components
 import { Component } from '../../components/Component.js';
@@ -24,6 +25,7 @@ export class WebApp {
     this.vibeEngine = new VibeEngine();
     this.currentCard = null;
     this.currentSwipeEngine = null;
+    this.recipeSuggestionService = new RecipeSuggestionService(globalStateManager);
     
     // Web-specific containers
     this.containers = {
@@ -360,55 +362,128 @@ export class WebApp {
     });
   }
   
-  // Generate recipe
+  // Generate recipe suggestions
   async generateRecipe(backElement) {
     const button = backElement.querySelector('.generate-btn');
     const container = backElement.querySelector('.ingredients-container');
     
     // Show loading
-    button.innerHTML = '<span class="loading-spinner"></span> Generating... (this may take 30+ seconds)';
+    button.innerHTML = '<span class="loading-spinner"></span> Generating suggestions... (this may take 30+ seconds)';
     button.disabled = true;
     
     try {
-      const prompt = PromptBuilder.generatePersonalizedPrompt(
-        globalStateManager.get('vibeProfile'),
-        globalStateManager.get('preferences'),
-        globalStateManager.get('ingredientsAtHome')
-      );
+      // Generate 5 recipe suggestions
+      const suggestions = await this.recipeSuggestionService.generateSuggestions();
       
-      const recipeText = await apiService.generateRecipe(prompt);
-      const formattedRecipe = RecipeFormatter.format(recipeText);
+      // Update container with suggestions grid
+      container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
       
-      // Update container with recipe
+      // Setup suggestion interactions
+      this.setupSuggestionInteractions(container);
+      
+    } catch (error) {
+      console.error('Failed to generate recipe suggestions:', error);
+      button.textContent = 'Try Again';
+      button.disabled = false;
+    }
+  }
+  
+  // Setup interactions for recipe suggestions
+  setupSuggestionInteractions(container) {
+    // Handle recipe selection
+    container.querySelectorAll('.select-recipe-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const suggestionId = btn.dataset.suggestionId;
+        const suggestion = this.recipeSuggestionService.selectSuggestion(suggestionId);
+        
+        if (suggestion) {
+          await this.showSelectedRecipe(container, suggestion);
+        }
+      });
+    });
+    
+    // Handle regenerate button
+    const regenerateBtn = container.querySelector('.regenerate-btn');
+    if (regenerateBtn) {
+      regenerateBtn.addEventListener('click', async () => {
+        await this.regenerateSuggestions(container);
+      });
+    }
+  }
+  
+  // Show selected recipe in full detail
+  async showSelectedRecipe(container, suggestion) {
+    // Show loading state
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <div class="loading-spinner"></div>
+        <p>Generating full recipe...</p>
+      </div>
+    `;
+    
+    try {
+      // Stage 2: Generate the full recipe for this suggestion
+      const fullRecipe = await this.recipeSuggestionService.generateFullRecipe(suggestion.id);
+      
       container.innerHTML = `
         <h2>🍳 Your Personalized Recipe</h2>
-        <div class="recipe-content">${formattedRecipe.html}</div>
+        <div class="recipe-content">${fullRecipe.formatted.html}</div>
         <div class="recipe-action-bar">
           <button class="action-btn primary save-favorite-btn" type="button">
             <span class="action-icon">⭐</span>
             <span class="action-text">Save to Favorites</span>
           </button>
-          <button class="action-btn secondary back-to-swipe-btn" type="button">
+          <button class="action-btn secondary back-to-suggestions-btn" type="button">
             <span class="action-icon">🔄</span>
-            <span class="action-text">Back to Swiping</span>
+            <span class="action-text">Back to Suggestions</span>
           </button>
         </div>
       `;
       
       // Setup action buttons
-      this.setupRecipeActions(container, recipeText, formattedRecipe.title);
+      this.setupRecipeActions(container, fullRecipe.recipeText, fullRecipe.title);
       
     } catch (error) {
-      console.error('Failed to generate recipe:', error);
-      button.textContent = 'Try Again';
-      button.disabled = false;
+      console.error('Failed to generate full recipe:', error);
+      container.innerHTML = `
+        <div class="suggestions-loading">
+          <p>❌ Failed to generate recipe</p>
+          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+        </div>
+      `;
+    }
+  }
+  
+  // Regenerate new suggestions
+  async regenerateSuggestions(container) {
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <div class="loading-spinner"></div>
+        <p>Generating new suggestions...</p>
+        <p class="loading-subtitle">Finding fresh recipe ideas for you</p>
+      </div>
+    `;
+    
+    try {
+      const suggestions = await this.recipeSuggestionService.generateSuggestions();
+      container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+      this.setupSuggestionInteractions(container);
+    } catch (error) {
+      console.error('Failed to regenerate suggestions:', error);
+      container.innerHTML = `
+        <div class="suggestions-loading">
+          <p>❌ Failed to generate suggestions</p>
+          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+        </div>
+      `;
     }
   }
   
   // Setup recipe action buttons
   setupRecipeActions(container, recipeText, title) {
     const saveBtn = container.querySelector('.save-favorite-btn');
-    const backBtn = container.querySelector('.back-to-swipe-btn');
+    const backBtn = container.querySelector('.back-to-suggestions-btn');
     
     // Save favorite
     saveBtn.addEventListener('click', async () => {
@@ -436,9 +511,9 @@ export class WebApp {
       }
     });
     
-    // Back to swiping
-    backBtn.addEventListener('click', () => {
-      location.reload();
+    // Back to suggestions
+    backBtn.addEventListener('click', async () => {
+      await this.regenerateSuggestions(container);
     });
   }
   
