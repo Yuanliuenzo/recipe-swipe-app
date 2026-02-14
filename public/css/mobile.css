@@ -824,24 +824,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* Subtle destructive button */
-
-.favorite-delete-btn {
-    background: none;
-    border: none;
-    color: #a55;
-    font-size: 14px;
-    opacity: 0.6;
-    display: block;
-    margin: 0 auto;
-    transition: opacity 0.2s;
-}
-
-.favorite-delete-btn:hover {
-    opacity: 1;
-}
-
-
 /* =====================================================
    SCROLLBAR (Subtle)
 ===================================================== */

@@ -197,7 +197,7 @@ export class FavoritesService {
 
       <div class="favorite-sheet-footer">
         <div class="favorite-footer-content">
-          <button class="favorite-delete-btn">Remove</button>
+          <button class="japandi-btn japandi-btn-subtle favorite-delete-btn">🗑️ Remove</button>
           
           <div class="favorite-rating">
             ${[1,2,3,4,5].map(i => `
@@ -278,6 +278,8 @@ export class FavoritesService {
       await this.removeFavorite(favorite.id);
       close();
       this.showAlert('Removed from favorites');
+      // Refresh the favorites list to show the updated items
+      this.showFavorites();
     });
 }
 

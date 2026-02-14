@@ -314,22 +314,10 @@ export class MobileApp {
   
   // Create mobile vibe summary
   createMobileVibeSummary(vibeProfile) {
-    if (vibeProfile.length === 0) {
-      return `
-        <div class="mobile-vibe-summary">
-          <h2>🍳 Ready to Cook!</h2>
-          <p style="color: #666;">Let's find you a delicious recipe!</p>
-        </div>
-      `;
-    }
-    
     return `
       <div class="mobile-vibe-summary">
-        <h2>🎯 Your Vibe Profile</h2>
-        <div class="mobile-selected-vibes">
-          ${vibeProfile.map(vibe => `<span class="mobile-vibe-tag">${vibe.emoji} ${vibe.name}</span>`).join('')}
-        </div>
-        <p style="color: #666; margin-top: 10px;">Ready for your personalized recipe?</p>
+        <h2>🍳 Ready to Cook!</h2>
+        <p style="color: #666;">Let's find you a delicious recipe!</p>
       </div>
     `;
   }
