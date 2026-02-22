@@ -6,6 +6,7 @@ import { DomUtils } from '../../utils/DomUtils.js';
 import { VibeEngine } from '../../shared/VibeEngine.js';
 import { RecipeFormatter } from '../../shared/RecipeFormatter.js';
 import { PromptBuilder } from '../../shared/PromptBuilder.js';
+import { RecipeSuggestionService } from '../../services/RecipeSuggestionService.js';
 
 // Import mobile-specific components
 import { Component } from '../../components/Component.js';
@@ -24,6 +25,7 @@ export class MobileApp {
     this.vibeEngine = new VibeEngine();
     this.currentCard = null;
     this.currentSwipeEngine = null;
+    this.recipeSuggestionService = new RecipeSuggestionService(globalStateManager);
     
     // Mobile-specific containers
     this.containers = {
@@ -84,9 +86,16 @@ export class MobileApp {
   
   // Setup DOM containers
   setupContainers() {
-    this.containers.cardContainer = DomUtils.find('mobile-card-container');
-    this.containers.resultContainer = DomUtils.find('mobile-result');
+    console.log('🔍 Setting up containers...');
+    this.containers.cardContainer = DomUtils.find('.mobile-card-container');
+    this.containers.resultContainer = DomUtils.find('#mobile-result');
     this.containers.headerContainer = DomUtils.find('.mobile-header');
+    
+    console.log('🔍 Container setup results:', {
+      cardContainer: !!this.containers.cardContainer,
+      resultContainer: !!this.containers.resultContainer,
+      headerContainer: !!this.containers.headerContainer
+    });
     
     if (!this.containers.cardContainer) {
       throw new Error('Mobile card container not found');
@@ -112,12 +121,14 @@ export class MobileApp {
     
     // Setup round counter
     this.elements.roundCounter = {
-      current: DomUtils.find('.current-round'),
-      total: DomUtils.find('.total-rounds')
+      current: DomUtils.find('.round-text'),
+      total: null // Using round-text which shows "Round X of Y" format
     };
     
-    if (this.elements.roundCounter.total) {
-      this.elements.roundCounter.total.textContent = this.vibeEngine.getMaxRounds();
+    if (this.elements.roundCounter.current) {
+      const currentRound = this.vibeEngine.getCurrentRound();
+      const maxRounds = this.vibeEngine.getMaxRounds();
+      this.elements.roundCounter.current.textContent = `Round ${currentRound} of ${maxRounds}`;
     }
   }
   
@@ -285,12 +296,22 @@ export class MobileApp {
   
   // Show result screen
   async showResult() {
+    // Ensure containers are setup
+    if (!this.containers.resultContainer) {
+      this.setupContainers();
+    }
+    
     // Hide main container
     DomUtils.hide(document.querySelector('.mobile-container'));
     
     // Show result container
-    DomUtils.show(this.containers.resultContainer);
-    this.containers.resultContainer.classList.add('show');
+    if (this.containers.resultContainer) {
+      DomUtils.show(this.containers.resultContainer);
+      this.containers.resultContainer.classList.add('show');
+    } else {
+      console.error('Result container still not found after setup');
+      return;
+    }
     
     // Create result content
     await this.createResultContent();
@@ -374,53 +395,141 @@ export class MobileApp {
     });
   }
   
-  // Generate mobile recipe
+  // Generate mobile recipe suggestions
   async generateMobileRecipe(recipeCard) {
+    // If no recipeCard provided, find it in the result container
+    if (!recipeCard) {
+      recipeCard = this.containers.resultContainer.querySelector('.mobile-recipe-card');
+    }
+    
+    if (!recipeCard) {
+      console.error('Recipe card element not found');
+      return;
+    }
+    
     const button = recipeCard.querySelector('.mobile-generate-btn');
     
+    if (!button) {
+      console.error('Generate button not found in recipe card');
+      return;
+    }
+    
     // Show loading
-    button.innerHTML = '<span class="mobile-loading-spinner"></span> Generating... (this may take 30+ seconds)';
+    button.innerHTML = '<span class="mobile-loading-spinner"></span> Generating suggestions... (this may take 30+ seconds)';
     button.disabled = true;
     
     try {
-      const prompt = PromptBuilder.generatePersonalizedPrompt(
-        globalStateManager.get('vibeProfile'),
-        globalStateManager.get('preferences'),
-        globalStateManager.get('ingredientsAtHome')
-      );
+      // Generate 5 recipe suggestions
+      const suggestions = await this.recipeSuggestionService.generateSuggestions();
       
-      const recipeText = await apiService.generateRecipe(prompt);
-      const formattedRecipe = RecipeFormatter.format(recipeText);
+      // Clear the recipe card and show suggestions
+      recipeCard.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
       
-      // Update card with recipe
-      const showToggle = formattedRecipe.hasIngredients && formattedRecipe.hasInstructions;
+      // Setup suggestion interactions
+      this.setupSuggestionInteractions(recipeCard);
       
-      recipeCard.innerHTML = `
+    } catch (error) {
+      console.error('Failed to generate recipe suggestions:', error);
+      button.textContent = 'Try Again';
+      button.disabled = false;
+    }
+  }
+  
+  // Setup interactions for recipe suggestions
+  setupSuggestionInteractions(container) {
+    // Handle recipe selection
+    container.querySelectorAll('.select-recipe-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const suggestionId = btn.dataset.suggestionId;
+        const suggestion = this.recipeSuggestionService.selectSuggestion(suggestionId);
+        
+        if (suggestion) {
+          await this.showSelectedRecipe(container, suggestion);
+        }
+      });
+    });
+    
+    // Handle regenerate button
+    const regenerateBtn = container.querySelector('.regenerate-btn');
+    if (regenerateBtn) {
+      regenerateBtn.addEventListener('click', async () => {
+        await this.regenerateSuggestions(container);
+      });
+    }
+  }
+  
+  // Show selected recipe in full detail
+  async showSelectedRecipe(container, suggestion) {
+    // Show loading state
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <div class="loading-spinner"></div>
+        <p>Generating full recipe...</p>
+      </div>
+    `;
+    
+    try {
+      // Stage 2: Generate the full recipe for this suggestion
+      const fullRecipe = await this.recipeSuggestionService.generateFullRecipe(suggestion.id);
+      
+      const showToggle = fullRecipe.formatted.hasIngredients && fullRecipe.formatted.hasInstructions;
+      
+      container.innerHTML = `
         ${showToggle ? `
           <div class="recipe-toggle" role="tablist" aria-label="Recipe sections">
             <button type="button" class="recipe-toggle-btn active" data-target="ingredients">Ingredients</button>
             <button type="button" class="recipe-toggle-btn" data-target="instructions">Instructions</button>
           </div>
         ` : ''}
-        <div class="mobile-recipe-content">${formattedRecipe.html}</div>
+        <div class="mobile-recipe-content">${fullRecipe.formatted.html}</div>
         <div class="recipe-actions">
           <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
-          <button class="japandi-btn japandi-btn-primary mobile-reset-btn" type="button">🔄 Start Over</button>
+          <button class="japandi-btn japandi-btn-primary mobile-reset-btn" type="button">🔄 Back to Suggestions</button>
         </div>
       `;
       
       // Setup toggle functionality
       if (showToggle) {
-        this.setupMobileRecipeToggle(recipeCard);
+        this.setupMobileRecipeToggle(container);
       }
       
       // Setup action buttons
-      this.setupMobileRecipeActions(recipeCard, recipeText, formattedRecipe.title);
+      this.setupMobileRecipeActions(container, fullRecipe.recipeText, fullRecipe.title);
       
     } catch (error) {
-      console.error('Failed to generate recipe:', error);
-      button.textContent = 'Try Again';
-      button.disabled = false;
+      console.error('Failed to generate full recipe:', error);
+      container.innerHTML = `
+        <div class="suggestions-loading">
+          <p>❌ Failed to generate recipe</p>
+          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+        </div>
+      `;
+    }
+  }
+  
+  // Regenerate new suggestions
+  async regenerateSuggestions(container) {
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <div class="loading-spinner"></div>
+        <p>Generating new suggestions...</p>
+        <p class="loading-subtitle">Finding fresh recipe ideas for you</p>
+      </div>
+    `;
+    
+    try {
+      const suggestions = await this.recipeSuggestionService.generateSuggestions();
+      container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+      this.setupSuggestionInteractions(container);
+    } catch (error) {
+      console.error('Failed to regenerate suggestions:', error);
+      container.innerHTML = `
+        <div class="suggestions-loading">
+          <p>❌ Failed to generate suggestions</p>
+          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+        </div>
+      `;
     }
   }
   
@@ -484,9 +593,9 @@ export class MobileApp {
       }
     });
     
-    // Reset button
-    resetBtn.addEventListener('click', () => {
-      location.reload();
+    // Back to suggestions button
+    resetBtn.addEventListener('click', async () => {
+      await this.regenerateSuggestions(recipeCard);
     });
   }
   

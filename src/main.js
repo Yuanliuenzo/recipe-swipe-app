@@ -21,6 +21,8 @@ import { VibeCard } from './components/Card/VibeCard.js';
 import { FavoritesService } from './services/FavoritesService.js';
 import { UserPreferencesService } from './services/UserPreferencesService.js';
 import { NavigationService } from './services/NavigationService.js';
+import { MobileApp } from './platforms/mobile/MobileApp.js';
+import { WebApp } from './platforms/web/WebApp.js';
 
 // Platform detection
 const isMobile = () => {
@@ -372,12 +374,255 @@ function showResult() {
   }
 }
 
+function createMobileIngredientsInput() {
+  return `
+    <div class="ingredients-container">
+      <h2>🍳 Ready to Cook!</h2>
+      <p style="color: #666;">Let's find you a delicious recipe!</p>
+      <h3>🏡 What do you have at home?</h3>
+      <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
+      <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
+      <div class="ingredients-actions">
+        <button class="japandi-btn japandi-btn-subtle add-ingredients-btn" type="button">+ Add Ingredients</button>
+      </div>
+      <div class="ingredients-confirmation"></div>
+      <button class="japandi-btn japandi-btn-primary mobile-generate-btn" type="button">💡 Get Recipe Suggestions</button>
+    </div>
+  `;
+}
+
+function setupMobileIngredientsActions(recipeCard) {
+  const addBtn = recipeCard.querySelector('.add-ingredients-btn');
+  const ingredientsInput = recipeCard.querySelector('.ingredients-input');
+  const confirmation = recipeCard.querySelector('.ingredients-confirmation');
+  const generateBtn = recipeCard.querySelector('.mobile-generate-btn');
+  
+  // Add ingredients button
+  addBtn.addEventListener('click', () => {
+    const rawValue = ingredientsInput.value.trim();
+    if (rawValue) {
+      const newItems = rawValue.split(',').map(item => item.trim().toLowerCase()).filter(item => item.length > 0);
+      const existingItems = globalStateManager.get('ingredientsAtHome')?.split(',').map(item => item.trim().toLowerCase()) || [];
+      const combined = [...existingItems, ...newItems];
+      const uniqueItems = [...new Set(combined)];
+      
+      globalStateManager.setState({ ingredientsAtHome: uniqueItems.join(', ') });
+      ingredientsInput.value = '';
+      
+      confirmation.textContent = `✅ Added: ${newItems.join(', ')}`;
+      confirmation.style.color = '#4CAF50';
+      confirmation.classList.add('show');
+      
+      setTimeout(() => confirmation.classList.remove('show'), 3000);
+    }
+  });
+  
+  // Generate button - show suggestions
+  generateBtn.addEventListener('click', async () => {
+    generateBtn.innerHTML = '<span class="mobile-loading-spinner"></span> Getting suggestions... (this may take 30+ seconds)';
+    generateBtn.disabled = true;
+    
+    try {
+      // Import and use RecipeSuggestionService
+      const { RecipeSuggestionService } = await import('./services/RecipeSuggestionService.js');
+      const suggestionService = new RecipeSuggestionService(globalStateManager);
+      
+      const suggestions = await suggestionService.generateSuggestions();
+      recipeCard.innerHTML = suggestionService.createSuggestionsGrid(suggestions);
+      recipeCard.classList.add('suggestions-mode'); // Allow full height for suggestions
+      
+      // Setup suggestion interactions
+      setupSuggestionInteractions(recipeCard, suggestionService);
+      
+    } catch (error) {
+      console.error('Failed to generate suggestions:', error);
+      generateBtn.textContent = 'Try Again';
+      generateBtn.disabled = false;
+    }
+  });
+}
+
+function setupSuggestionInteractions(container, suggestionService) {
+  // Handle recipe selection with premium interactions
+  container.querySelectorAll('.select-recipe-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      
+      // Add haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([10, 50, 10]);
+      }
+      
+      // Add loading state to button
+      const originalText = btn.textContent;
+      btn.innerHTML = '<span class="mobile-loading-spinner"></span> Generating...';
+      btn.disabled = true;
+      
+      const suggestionId = btn.dataset.suggestionId;
+      const suggestion = suggestionService.selectSuggestion(suggestionId);
+      
+      if (suggestion) {
+        await showSelectedRecipe(container, suggestion, suggestionService);
+      }
+      
+      // Reset button if user goes back
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 1000);
+    });
+    
+    // Add hover effect with sound
+    btn.addEventListener('mouseenter', () => {
+      if (navigator.vibrate) {
+        navigator.vibrate(5);
+      }
+    });
+  });
+  
+  // Handle regenerate button
+  const regenerateBtn = container.querySelector('.regenerate-btn');
+  if (regenerateBtn) {
+    regenerateBtn.addEventListener('click', async () => {
+      // Add haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([10, 30, 10]);
+      }
+      
+      await regenerateSuggestions(container, suggestionService);
+    });
+  }
+}
+
+async function showSelectedRecipe(container, suggestion, suggestionService) {
+  container.innerHTML = `
+    <div class="suggestions-loading">
+      <div class="loading-spinner"></div>
+      <p>Generating full recipe...</p>
+    </div>
+  `;
+  
+  try {
+    const fullRecipe = await suggestionService.generateFullRecipe(suggestion.id);
+    
+    container.innerHTML = `
+      <div class="mobile-recipe-content">${fullRecipe.formatted.html}</div>
+      <div class="recipe-actions">
+        <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
+        <button class="japandi-btn japandi-btn-primary mobile-reset-btn" type="button">🔄 Back to Suggestions</button>
+      </div>
+    `;
+    
+    // Setup action buttons
+    setupRecipeActions(container, fullRecipe);
+    
+  } catch (error) {
+    console.error('Failed to generate full recipe:', error);
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <p>❌ Failed to generate recipe</p>
+        <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+      </div>
+    `;
+  }
+}
+
+async function regenerateSuggestions(container, suggestionService) {
+  container.innerHTML = `
+    <div class="suggestions-loading">
+      <div class="loading-spinner"></div>
+      <p>Finding fresh recipe ideas for you...</p>
+      <p class="loading-subtitle">This may take 30+ seconds</p>
+    </div>
+  `;
+  
+  try {
+    const suggestions = await suggestionService.generateSuggestions();
+    container.innerHTML = suggestionService.createSuggestionsGrid(suggestions);
+    container.classList.add('suggestions-mode'); // Allow full height for suggestions
+    setupSuggestionInteractions(container, suggestionService);
+  } catch (error) {
+    console.error('Failed to regenerate suggestions:', error);
+    container.innerHTML = `
+      <div class="suggestions-loading">
+        <p>❌ Failed to generate suggestions</p>
+        <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+      </div>
+    `;
+  }
+}
+
+function setupRecipeActions(container, fullRecipe) {
+  const saveBtn = container.querySelector('.save-favorite-btn');
+  const resetBtn = container.querySelector('.mobile-reset-btn');
+  
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+      try {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        
+        const { apiService } = await import('./core/ApiService.js');
+        await apiService.saveFavorite({
+          recipeText: fullRecipe.recipeText,
+          title: fullRecipe.title || 'Untitled Recipe',
+          rating: null,
+          note: null
+        });
+        
+        saveBtn.textContent = '✅ Saved';
+        
+        setTimeout(() => {
+          saveBtn.textContent = '⭐ Save';
+          saveBtn.disabled = false;
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Failed to save favorite:', error);
+        saveBtn.textContent = '⭐ Save';
+        saveBtn.disabled = false;
+      }
+    });
+  }
+  
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      // Go back to suggestions
+      const { RecipeSuggestionService } = await import('./services/RecipeSuggestionService.js');
+      const suggestionService = new RecipeSuggestionService(globalStateManager);
+      await regenerateSuggestions(container, suggestionService);
+    });
+  }
+}
+
 function showRecipeGeneration(container, profile) {
   console.log('🎯 showRecipeGeneration called with profile:', profile);
   console.log('🔍 Platform detection:', isMobile() ? 'Mobile' : 'Web');
   
   if (isMobile()) {
-    // Mobile-specific handling
+    // For mobile, show the ingredients input and generate button
+    const resultContainer = document.querySelector('#mobile-result');
+    const mobileContainer = document.querySelector('.mobile-container');
+    
+    // Hide main container and show result container
+    if (mobileContainer) {
+      mobileContainer.style.display = 'none';
+    }
+    
+    if (resultContainer) {
+      resultContainer.style.display = 'block';
+      resultContainer.classList.add('show');
+      
+      // Create ingredients input HTML
+      const recipeCard = resultContainer.querySelector('.mobile-recipe-card');
+      if (recipeCard) {
+        recipeCard.innerHTML = createMobileIngredientsInput();
+        recipeCard.classList.add('suggestions-mode'); // Allow full height for suggestions
+        setupMobileIngredientsActions(recipeCard);
+      }
+    }
+    
+  } else {
     console.log('🔍 DOM elements check:');
     console.log('- mobileContainer:', document.querySelector('.mobile-container'));
     console.log('- resultContainer:', document.querySelector('.mobile-result'));
@@ -492,74 +737,6 @@ function showRecipeGeneration(container, profile) {
     });
     
     console.log('✅ Recipe generation UI rendered with beautiful styling');
-  } else {
-    // Web-specific handling (original working version)
-    container.innerHTML = `
-      <div style="
-        text-align: center; 
-        padding: 40px; 
-        color: white;
-        font-family: 'Noto Sans', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        margin: 0 auto;
-        max-width: 400px;
-      ">
-        <h2 style="font-size: 28px; margin-bottom: 15px;">🍳 Ready to Cook!</h2>
-        <p style="font-size: 16px; margin-bottom: 25px;">Let's find you a delicious recipe!</p>
-        
-        <div style="margin-bottom: 20px; text-align: left;">
-          <label style="display: block; margin-bottom: 10px; font-size: 14px;">What do you have at home? (optional)</label>
-          <textarea id="ingredients-input" placeholder="chicken, rice, garlic, spinach..." style="
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            resize: vertical;
-            min-height: 60px;
-            font-family: inherit;
-            margin-bottom: 10px;
-          "></textarea>
-          <button id="add-ingredients-btn" onclick="addIngredients()" style="
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 16px;
-            border-radius: 15px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-bottom: 15px;
-          ">+ Add Ingredients</button>
-          <div id="ingredients-confirmation" style="font-size: 12px; margin-top: 5px; min-height: 16px;"></div>
-        </div>
-        
-        <button onclick="generateRecipe()" style="
-          background: white;
-          color: #667eea;
-          border: none;
-          padding: 15px 30px;
-          border-radius: 25px;
-          font-size: 18px;
-          font-weight: bold;
-          cursor: pointer;
-          margin-top: 15px;
-          transition: all 0.3s ease;
-        ">🍳 Generate My Recipe</button>
-        
-        <button onclick="location.reload()" style="
-          background: transparent;
-          color: white;
-          border: 2px solid white;
-          padding: 10px 20px;
-          border-radius: 20px;
-          font-size: 14px;
-          cursor: pointer;
-          margin-left: 10px;
-        ">Start Over</button>
-      </div>
-    `;
-    
-    console.log('✅ Recipe generation UI rendered for web');
   }
 }
 
