@@ -169,20 +169,20 @@ export class FavoritesService {
 
   /* =====================================================
      BOTTOM SHEET MODAL (STATE OF THE ART)
-     ===================================================== */
+  ===================================================== */
 
   openFavoriteModal(favorite) {
-    console.log("Opening favorite modal for:", favorite);
-    
-    // For favorites, the recipeText is already formatted, so just display it as-is
-    const formatted = RecipeFormatter.format(favorite.recipeText)
+    console.log("Original Input", favorite)
+  const formatted = this.recipeFormatter ? 
+    this.recipeFormatter.format(favorite.recipeText || favorite.description || '') :
+    favorite.recipeText || favorite.description || '';
 
-    console.log("Recipe after Formatting", formatted)
+    console.log("Formatted Recipe", formatted)
 
-    const modal = document.createElement('div');
-    modal.className = 'favorite-bottom-sheet';
+  const modal = document.createElement('div');
+  modal.className = 'favorite-bottom-sheet';
 
-    modal.innerHTML = `
+  modal.innerHTML = `
     <div class="favorite-sheet-overlay"></div>
     <div class="favorite-sheet-container">
 

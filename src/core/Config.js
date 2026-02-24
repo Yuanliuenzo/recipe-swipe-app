@@ -1,7 +1,7 @@
 // Centralized configuration and constants
 export const CONFIG = {
   // App settings
-  MAX_VIBE_ROUNDS: 5,
+  MAX_VIBE_ROUNDS: 2,
   API_TIMEOUT: 5000, // 5 seconds for regular API calls
   
   // Swipe thresholds

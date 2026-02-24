@@ -100,8 +100,6 @@
     box-sizing: border-box;
 }
 
-
-
 /* Enable smooth scrolling for better UX */
 html {
     scroll-behavior: smooth;
@@ -130,20 +128,143 @@ html {
     }
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    :root {
-        --color-primary: #000000;
-        --color-accent: #0066cc;
-        --color-text: #000000;
-        --color-bg: #ffffff;
-    }
-}
-
 /* Focus visible for better accessibility */
 *:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+}
+
+/* ================================
+   RESPONSIVE ENHANCEMENTS - FULL SCREEN
+   ================================ */
+
+/* Base full-screen layout for all devices */
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+#app-root {
+    min-height: 100vh;
+    width: 100%;
+}
+
+.app-view {
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Mobile-first base styles (default) */
+.mobile-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+.mobile-card-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) {
+    .mobile-card-container {
+        padding: 40px;
+    }
+    
+    .mobile-header {
+        position: relative;
+        z-index: 1;
+        padding: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+    .mobile-card-container {
+        padding: 60px;
+    }
+    
+    .mobile-header {
+        max-width: 450px;
+        padding: 30px;
+    }
+    
+    h1 {
+        font-size: 42px;
+    }
+    
+    .headline {
+        font-size: 56px;
+    }
+}
+
+/* Large desktop optimizations */
+@media (min-width: 1440px) {
+    .mobile-card-container {
+        padding: 80px;
+    }
+}
+
+/* Desktop-specific hover effects */
+@media (hover: hover) {
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .mobile-recipe-card:hover {
+        transform: scale(1.02);
+    }
+    
+    .generate-btn:hover:not(:disabled) {
+        transform: translateY(-2px) scale(1.05);
+    }
+}
+
+/* Desktop animations and transitions */
+@media (prefers-reduced-motion: no-preference) {
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .mobile-recipe-card {
+        transition: transform 0.8s ease;
+    }
+    
+    .badge {
+        transition: all 0.2s ease;
+    }
+}
+
+/* Desktop typography adjustments */
+@media (min-width: 1024px) {
+    h1 {
+        font-size: 42px;
+    }
+    
+    .headline {
+        font-size: 56px;
+    }
+}
+
+/* Desktop performance optimizations */
+@media (min-width: 768px) {
+    .card,
+    .mobile-recipe-card,
+    .sparkle {
+        will-change: transform;
+    }
 }
 
 /* Print styles */

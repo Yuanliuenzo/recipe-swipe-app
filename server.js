@@ -18,16 +18,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Detect mobile user agents (more comprehensive)
-function isMobile(req) {
-    const userAgent = req.headers['user-agent'] || '';
-    console.log('🔍 User-Agent detection:', userAgent);
-    
-    // More comprehensive mobile detection
-    return /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
-           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-}
-
 // File-based user store
 const USERS_FILE = path.join(__dirname, 'src', 'data', 'users.json');
 let users = new Map();
@@ -129,25 +119,13 @@ app.use(async (req, res, next) => {
     next();
 });
 
-app.get('/debug/ua', (req, res) => {
-    res.json({
-        userAgent: req.headers['user-agent'] || '',
-        isMobile: isMobile(req)
-    });
-});
-
 app.get("/", (req, res) => {
     console.log("GET / called from:", req.headers['user-agent']);
     
     if (req.user) {
-        // User already selected a profile; serve the app
-        if (isMobile(req)) {
-            console.log("Serving mobile version");
-            res.sendFile(path.join(__dirname, 'public', 'mobile.html'));
-        } else {
-            console.log("Serving desktop version");
-            res.sendFile(path.join(__dirname, 'public', 'index.html'));
-        }
+        // User already selected a profile; serve the unified app
+        console.log("Serving unified app");
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     } else {
         // No profile cookie; show picker
         res.sendFile(path.join(__dirname, 'public', 'profile-picker.html'));

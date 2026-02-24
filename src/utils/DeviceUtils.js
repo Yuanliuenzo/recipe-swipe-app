@@ -50,4 +50,25 @@ export class DeviceUtils {
   static getPixelRatio() {
     return window.devicePixelRatio || 1;
   }
+  
+  // Get comprehensive device info
+  static getDeviceInfo() {
+    return {
+      deviceType: this.getDeviceType(),
+      isMobile: this.isMobile(),
+      isTouchDevice: this.isTouchDevice(),
+      supportsVibration: this.supportsVibration(),
+      isLandscape: this.isLandscape(),
+      viewport: this.getViewportSize(),
+      pixelRatio: this.getPixelRatio(),
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      onLine: navigator.onLine,
+      cookieEnabled: navigator.cookieEnabled,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      deviceMemory: navigator.deviceMemory,
+      maxTouchPoints: navigator.maxTouchPoints
+    };
+  }
 }
