@@ -323,13 +323,16 @@ export class UnifiedApp {
   }
 
   showSuggestionsView(container) {
-    this.recipeSuggestionsView = new RecipeSuggestionsView(container, {
-      serviceRegistry: this.serviceRegistry
-    });
-    
-    this.recipeSuggestionsView.on('recipeSelected', (e) => {
-      this.handleRecipeSelected(e.detail.suggestion);
-    });
+    // Reuse existing view if available, otherwise create new one
+    if (!this.recipeSuggestionsView) {
+      this.recipeSuggestionsView = new RecipeSuggestionsView(container, {
+        serviceRegistry: this.serviceRegistry
+      });
+      
+      this.recipeSuggestionsView.on('recipeSelected', (e) => {
+        this.handleRecipeSelected(e.detail.suggestion);
+      });
+    }
     
     this.currentView = this.recipeSuggestionsView;
     this.recipeSuggestionsView.render();
