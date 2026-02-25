@@ -81,7 +81,7 @@ export class RecipeSuggestionService {
 
       // Parse and format recipe
       const recipeText = response.recipeText || response.text || response;
-      const formatted = RecipeFormatter.format(recipeText);
+      const formatted = RecipeFormatter.format(recipeText.recipe);
 
       suggestion.fullRecipe = {
         recipeText,
@@ -115,7 +115,7 @@ export class RecipeSuggestionService {
     prompt += `Seasonal King: ${preferences.seasonalKing || 'No'}\n`;
 
     if (ingredients.trim()) {
-      prompt += `Available Ingredients: ${ingredients}\n`;
+      prompt += `Preferably try to include one or more of these ingredients: ${ingredients}\n`;
     }
 
     prompt += `
@@ -123,7 +123,8 @@ Please respond with exactly 5 suggestions in JSON format:
 {
   "suggestions": [
     { "title": "Recipe Title 1", "description": "Brief explanation" },
-    { "title": "Recipe Title 2", "description": "Brief explanation" }
+    { "title": "Recipe Title 2", "description": "Brief explanation" },
+    ...
   ]
 }
 
@@ -195,14 +196,6 @@ Do not omit headers. Keep concise but complete.
       { title: 'Fresh Garden Salad', description: 'Light, healthy salad with seasonal vegetables' },
       { title: 'Comforting Vegetable Soup', description: 'Warm, hearty soup for cozy nights' }
     ];
-  }
-
-  getCurrentSuggestions() {
-    return this.currentSuggestions;
-  }
-
-  clearSuggestions() {
-    this.currentSuggestions = [];
   }
 
   selectSuggestion(suggestionId) {

@@ -17,6 +17,8 @@ import { NavigationService } from '../../services/NavigationService.js';
 import { apiService } from '../ApiService.js';
 import { RecipeFormatter } from '../../shared/RecipeFormatter.js';
 import { PromptBuilder } from '../../shared/PromptBuilder.js';
+import { RecipeDetailView } from '../../components/views/RecipeDetailView.js';
+import { RecipeSuggestionsView } from '../../components/views/RecipeSuggestionsView.js';
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -47,6 +49,11 @@ export class UnifiedApp {
     // UI state
     this.containers = {};
     this.deviceInfo = DeviceUtils.getDeviceInfo();
+    
+    // Views
+    this.currentView = null;
+    this.recipeDetailView = null;
+    this.recipeSuggestionsView = null;
   }
 
   async initialize() {
@@ -306,10 +313,7 @@ export class UnifiedApp {
       generateBtn.disabled = true;
 
       try {
-        const suggestions = await this.recipeSuggestionService.generateSuggestions();
-        recipeCard.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
-        recipeCard.classList.add('suggestions-mode');
-        this.setupSuggestionInteractions(recipeCard);
+        this.showSuggestionsView(recipeCard);
       } catch (error) {
         console.error('Failed to generate suggestions:', error);
         generateBtn.textContent = 'Try Again';
@@ -318,139 +322,38 @@ export class UnifiedApp {
     });
   }
 
-  setupSuggestionInteractions(container) {
-    container.querySelectorAll('.select-recipe-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-
-        if (navigator.vibrate) {
-          navigator.vibrate([10, 50, 10]);
-        }
-
-        const originalText = btn.textContent;
-        btn.innerHTML = '<span class="mobile-loading-spinner"></span> Generating...';
-        btn.disabled = true;
-
-        const suggestionId = btn.dataset.suggestionId;
-        const suggestion = this.recipeSuggestionService.selectSuggestion(suggestionId);
-
-        if (suggestion) {
-          await this.showSelectedRecipe(container, suggestion);
-        }
-
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 1000);
-      });
+  showSuggestionsView(container) {
+    this.recipeSuggestionsView = new RecipeSuggestionsView(container, {
+      serviceRegistry: this.serviceRegistry
     });
-
-    const regenerateBtn = container.querySelector('.regenerate-btn');
-    if (regenerateBtn) {
-      regenerateBtn.addEventListener('click', async () => {
-        if (navigator.vibrate) {
-          navigator.vibrate([10, 30, 10]);
-        }
-        await this.regenerateSuggestions(container);
-      });
-    }
+    
+    this.recipeSuggestionsView.on('recipeSelected', (e) => {
+      this.handleRecipeSelected(e.detail.suggestion);
+    });
+    
+    this.currentView = this.recipeSuggestionsView;
+    this.recipeSuggestionsView.render();
   }
 
-  async showSelectedRecipe(container, suggestion) {
-    container.innerHTML = `
-      <div class="suggestions-loading">
-        <div class="loading-spinner"></div>
-        <p>Generating full recipe...</p>
-      </div>
-    `;
-
-    try {
-      const fullRecipe = await this.recipeSuggestionService.generateFullRecipe(suggestion.id);
-      
-      container.innerHTML = `
-        <div class="mobile-recipe-content">${fullRecipe.formatted.html}</div>
-        <div class="recipe-actions">
-          <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
-          <button class="japandi-btn japandi-btn-primary mobile-reset-btn" type="button">🔄 Back to Suggestions</button>
-        </div>
-      `;
-      
-      this.setupRecipeActions(container, fullRecipe);
-    } catch (error) {
-      console.error('Failed to generate full recipe:', error);
-      container.innerHTML = `
-        <div class="suggestions-loading">
-          <p>❌ Failed to generate recipe</p>
-          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
-        </div>
-      `;
-    }
+  handleRecipeSelected(suggestion) {
+    this.showRecipeDetailView(this.containers.resultContainer.querySelector('.mobile-recipe-card'), suggestion);
   }
 
-  async regenerateSuggestions(container) {
-    container.innerHTML = `
-      <div class="suggestions-loading">
-        <div class="loading-spinner"></div>
-        <p>Finding fresh recipe ideas for you...</p>
-        <p class="loading-subtitle">This may take 30+ seconds</p>
-      </div>
-    `;
-
-    try {
-      const suggestions = await this.recipeSuggestionService.generateSuggestions();
-      container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
-      container.classList.add('suggestions-mode');
-      this.setupSuggestionInteractions(container);
-    } catch (error) {
-      console.error('Failed to regenerate suggestions:', error);
-      container.innerHTML = `
-        <div class="suggestions-loading">
-          <p>❌ Failed to generate suggestions</p>
-          <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
-        </div>
-      `;
-    }
+  showRecipeDetailView(container, suggestion) {
+    this.recipeDetailView = new RecipeDetailView(container, {
+      serviceRegistry: this.serviceRegistry
+    });
+    
+    this.recipeDetailView.on('backToSuggestions', () => {
+      this.showSuggestionsView(container);
+    });
+    
+    this.currentView = this.recipeDetailView;
+    this.recipeDetailView.render(suggestion);
   }
 
-  setupRecipeActions(container, fullRecipe) {
-    const saveBtn = container.querySelector('.save-favorite-btn');
-    const resetBtn = container.querySelector('.mobile-reset-btn');
 
-    if (saveBtn) {
-      saveBtn.addEventListener('click', async () => {
-        try {
-          saveBtn.disabled = true;
-          saveBtn.textContent = 'Saving...';
 
-          const apiService = this.serviceRegistry.get('api');
-          await apiService.saveFavorite({
-            recipeText: fullRecipe.recipeText,
-            title: fullRecipe.title || 'Untitled Recipe',
-            rating: null,
-            note: null
-          });
-
-          saveBtn.textContent = '✅ Saved';
-
-          setTimeout(() => {
-            saveBtn.textContent = '⭐ Save';
-            saveBtn.disabled = false;
-          }, 2000);
-
-        } catch (error) {
-          console.error('Failed to save favorite:', error);
-          saveBtn.textContent = '⭐ Save';
-          saveBtn.disabled = false;
-        }
-      });
-    }
-
-    if (resetBtn) {
-      resetBtn.addEventListener('click', async () => {
-        await this.regenerateSuggestions(container);
-      });
-    }
-  }
 
   showSimpleResult() {
     const container = this.containers.cardContainer;

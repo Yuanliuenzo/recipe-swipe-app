@@ -172,12 +172,9 @@ export class FavoritesService {
      ===================================================== */
 
   openFavoriteModal(favorite) {
-    console.log("Opening favorite modal for:", favorite);
-    
     // For favorites, the recipeText is already formatted, so just display it as-is
-    const formatted = RecipeFormatter.format(favorite.recipeText)
+    const formatted = RecipeFormatter.format(favorite.recipeText.recipe)
 
-    console.log("Recipe after Formatting", formatted)
 
     const modal = document.createElement('div');
     modal.className = 'favorite-bottom-sheet';
