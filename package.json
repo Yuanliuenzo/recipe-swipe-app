@@ -13,6 +13,12 @@
     "knip:fix": "knip --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
   "keywords": [
     "recipe",
     "swipe",
@@ -38,6 +44,7 @@
     "globals": "^15.0.0",
     "husky": "^9.1.7",
     "knip": "^5.0.0",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.1"
   }
 }
