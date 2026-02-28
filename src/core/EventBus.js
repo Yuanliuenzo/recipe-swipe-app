@@ -1,5 +1,5 @@
 // Simple event bus for component communication
-export class EventBus {
+class EventBus {
   constructor() {
     this.events = new Map();
   }

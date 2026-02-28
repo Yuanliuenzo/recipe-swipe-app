@@ -2,7 +2,7 @@ import { globalEventBus } from "./EventBus.js";
 import { DEFAULT_PREFERENCES } from "./Config.js";
 
 // Centralized state management with reactive updates
-export class StateManager {
+class StateManager {
   constructor() {
     this.state = {
       // User state

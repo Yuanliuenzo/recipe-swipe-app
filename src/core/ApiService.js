@@ -1,7 +1,7 @@
 import { CONFIG } from "./Config.js";
 import { globalEventBus } from "./EventBus.js";
 
-export class ApiService {
+class ApiService {
   constructor(baseUrl = "") {
     this.baseUrl = baseUrl;
     this.defaultHeaders = { "Content-Type": "application/json" };

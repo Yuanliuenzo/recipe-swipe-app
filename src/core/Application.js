@@ -14,7 +14,7 @@ import { ComponentRegistry } from "./components/ComponentRegistry.js";
 // Unified app controller
 import { UnifiedApp } from "./controllers/UnifiedApp.js";
 
-export class Application {
+class Application {
   constructor() {
     this.isInitialized = false;
     this.unifiedApp = null;
@@ -242,9 +242,5 @@ export async function initializeApplication() {
   globalApplication = new Application();
   await globalApplication.initialize();
 
-  return globalApplication;
-}
-
-export function getApplication() {
   return globalApplication;
 }
