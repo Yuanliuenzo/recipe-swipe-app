@@ -6,49 +6,96 @@
 import { initializeApplication } from "./core/Application.js";
 import { globalStateManager } from "./core/StateManager.js";
 import { globalEventBus } from "./core/EventBus.js";
-import { VIBES, CONFIG, DEFAULT_PREFERENCES } from "./core/Config.js";
+import { VIBES, CONFIG } from "./core/Config.js";
+import { setupGlobalErrorBoundary } from "./components/ErrorBoundary.js";
 
-// Expose core systems globally for backward compatibility
+// Expose minimal, controlled global API
 window.recipeApp = {
+  // Core systems
   stateManager: globalStateManager,
   eventBus: globalEventBus,
+
+  // App configuration
   vibes: VIBES,
   maxVibeRounds: CONFIG.MAX_VIBE_ROUNDS,
-  preferences: { ...DEFAULT_PREFERENCES },
-  services: {} // Will be populated after app initialization
+
+  // Getters for backward compatibility (read-only access)
+  get vibeProfile() {
+    return globalStateManager.get("vibeProfile");
+  },
+  get ingredientsAtHome() {
+    return globalStateManager.get("ingredientsAtHome");
+  },
+  get favorites() {
+    return globalStateManager.get("favorites");
+  },
+  get currentUsername() {
+    return globalStateManager.get("currentUsername");
+  },
+  get preferences() {
+    return globalStateManager.get("preferences");
+  },
+  get currentVibeRound() {
+    return globalStateManager.get("currentVibeRound");
+  },
+
+  // Services will be populated after app initialization
+  services: {}
 };
 
-// Expose state variables that existing code expects
-window.vibeProfile = [];
-window.ingredientsAtHome = "";
-window.favorites = [];
-window.currentUsername = "";
-window.preferences = { ...DEFAULT_PREFERENCES };
-window.currentVibeRound = 0;
-
-// Sync state manager with global variables
-globalStateManager.subscribe("vibeProfile", newValue => {
-  window.vibeProfile = newValue;
+// These are kept for backward compatibility but now point to the state manager
+Object.defineProperty(window, "vibeProfile", {
+  get() {
+    return globalStateManager.get("vibeProfile");
+  },
+  set(value) {
+    globalStateManager.setState({ vibeProfile: value });
+  }
 });
 
-globalStateManager.subscribe("ingredientsAtHome", newValue => {
-  window.ingredientsAtHome = newValue;
+Object.defineProperty(window, "ingredientsAtHome", {
+  get() {
+    return globalStateManager.get("ingredientsAtHome");
+  },
+  set(value) {
+    globalStateManager.setState({ ingredientsAtHome: value });
+  }
 });
 
-globalStateManager.subscribe("favorites", newValue => {
-  window.favorites = newValue;
+Object.defineProperty(window, "favorites", {
+  get() {
+    return globalStateManager.get("favorites");
+  },
+  set(value) {
+    globalStateManager.setState({ favorites: value });
+  }
 });
 
-globalStateManager.subscribe("currentUsername", newValue => {
-  window.currentUsername = newValue;
+Object.defineProperty(window, "currentUsername", {
+  get() {
+    return globalStateManager.get("currentUsername");
+  },
+  set(value) {
+    globalStateManager.setState({ currentUsername: value });
+  }
 });
 
-globalStateManager.subscribe("preferences", newValue => {
-  window.preferences = newValue;
+Object.defineProperty(window, "preferences", {
+  get() {
+    return globalStateManager.get("preferences");
+  },
+  set(value) {
+    globalStateManager.setState({ preferences: value });
+  }
 });
 
-globalStateManager.subscribe("currentVibeRound", newValue => {
-  window.currentVibeRound = newValue;
+Object.defineProperty(window, "currentVibeRound", {
+  get() {
+    return globalStateManager.get("currentVibeRound");
+  },
+  set(value) {
+    globalStateManager.setState({ currentVibeRound: value });
+  }
 });
 
 // Initialize application when DOM is ready
@@ -56,6 +103,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 DOM Content Loaded - Starting Recipe Swipe App...");
 
   try {
+    // Setup global error boundary first
+    setupGlobalErrorBoundary();
+
     // Initialize the unified application
     const app = await initializeApplication();
 
