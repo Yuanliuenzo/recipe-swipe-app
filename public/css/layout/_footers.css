@@ -2,109 +2,109 @@
 
 /* Mobile Floating Back Button */
 .mobile-floating-back-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--gradient-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-full);
-    padding: 14px 18px;
-    font-family: var(--font-primary);
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all var(--transition-smooth);
-    box-shadow: 0 6px 20px rgba(106, 78, 66, 0.4);
-    z-index: 1002;
-    opacity: 0;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 14px 18px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  box-shadow: 0 6px 20px rgba(106, 78, 66, 0.4);
+  z-index: 1002;
+  opacity: 0;
 }
 
 .mobile-floating-back-btn:hover {
-    background: var(--gradient-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(106, 78, 66, 0.5);
+  background: var(--gradient-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(106, 78, 66, 0.5);
 }
 
 /* State-of-the-Art Back Button (FAB style) */
 .mobile-fab-back-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    padding: var(--space-lg) var(--space-xl);
-    font-family: var(--font-primary);
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all var(--transition-smooth);
-    backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: var(--space-lg) var(--space-xl);
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  backdrop-filter: blur(10px);
 }
 
 .mobile-fab-back-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .mobile-fab-back-btn:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .back-icon {
-    font-size: 18px;
-    font-weight: bold;
-    transition: transform var(--transition-base);
+  font-size: 18px;
+  font-weight: bold;
+  transition: transform var(--transition-base);
 }
 
 .mobile-fab-back-btn:hover .back-icon {
-    transform: translateX(-2px);
+  transform: translateX(-2px);
 }
 
 .back-text {
-    letter-spacing: 0.3px;
+  letter-spacing: 0.3px;
 }
 
 /* Sheet footers */
 .favorite-sheet-footer {
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-lg);
-    margin-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .favorite-footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-lg);
 }
 
 /* Recipe action bar (desktop) */
 .recipe-action-bar {
-    display: flex;
-    gap: var(--space-lg);
-    margin-top: var(--space-2xl);
-    padding: var(--space-lg);
-    background: #f8f9fa;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xs);
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg);
+  background: #f8f9fa;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
 }
 
 /* Recipe actions (mobile) */
 .recipe-actions {
-    display: flex;
-    gap: var(--space-lg);
-    margin-top: var(--space-2xl);
-    width: 100%;
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+  width: 100%;
 }
 
 .save-favorite-btn {
-    flex: 1;
+  flex: 1;
 }

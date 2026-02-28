@@ -2,466 +2,481 @@
 
 /* Vibe Cards (Desktop) */
 .vibe-card {
-    background-color: #f8f9fa;
-    border: 2px solid #dee2e6;
-    box-shadow: var(--shadow-md);
+  background-color: #f8f9fa;
+  border: 2px solid #dee2e6;
+  box-shadow: var(--shadow-md);
 }
 
 .vibe-overlay {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    text-align: center;
-    padding: 18px 20px 22px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    height: 100%;
-    background: var(--gradient-overlay);
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+  padding: 18px 20px 22px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  height: 100%;
+  background: var(--gradient-overlay);
 }
 
 .vibe-emoji {
-    font-size: 48px;
-    margin-bottom: var(--space-md);
+  font-size: 48px;
+  margin-bottom: var(--space-md);
 }
 
 /* Mobile Vibe Cards */
 .mobile-vibe-card {
-    width: 100%;
-    max-width: 420px;
-    height: min(80vh, 640px);
-    border-radius: var(--radius-5xl);
-    overflow: hidden;
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  height: min(80vh, 640px);
+  border-radius: var(--radius-5xl);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .mobile-vibe-card.dragging {
-    cursor: grabbing;
-    transition: none;
+  cursor: grabbing;
+  transition: none;
 }
 
 .mobile-vibe-card-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(32, 28, 24, 0.10), rgba(32, 28, 24, 0.72));
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 30px 20px;
-    text-align: center;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(32, 28, 24, 0.1),
+    rgba(32, 28, 24, 0.72)
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 30px 20px;
+  text-align: center;
 }
 
 /* Modern swipe card image behavior */
 .mobile-vibe-card[style*="background-image"] {
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
 /* Optional premium polish - soft inner gradient for readability */
 .mobile-vibe-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to top,
-        rgba(0,0,0,0.35),
-        transparent 40%
-    );
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 40%);
+  pointer-events: none;
 }
 
 .mobile-vibe-emoji {
-    font-size: 60px;
-    margin-bottom: var(--space-md);
+  font-size: 60px;
+  margin-bottom: var(--space-md);
 }
 
 /* Recipe Cards (Desktop Flip Cards) */
 .recipe-card-wrapper {
-    width: 350px;
-    height: 450px;
-    perspective: 1000px;
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-    transform-style: preserve-3d;
-    transition: transform 0.8s;
+  width: 350px;
+  height: 450px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
 }
 
 .recipe-card-wrapper.flipped {
-    transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
 
 .card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
 }
 
 .front img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .back {
-    background: var(--gradient-surface);
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    transform: rotateY(180deg);
-    padding: 25px;
-    text-align: left;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    font-family: var(--font-primary);
-    gap: var(--space-lg);
-    overflow-y: auto;
+  background: var(--gradient-surface);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  transform: rotateY(180deg);
+  padding: 25px;
+  text-align: left;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  font-family: var(--font-primary);
+  gap: var(--space-lg);
+  overflow-y: auto;
 }
 
 .back h2 {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--color-primary);
-    margin: 0 0 var(--space-sm) 0;
-    text-align: center;
-    width: 100%;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-sm) 0;
+  text-align: center;
+  width: 100%;
 }
 
 /* Mobile Recipe Cards */
 .mobile-recipe-card {
-    background: white;
-    border-radius: 20px;
-    padding: var(--space-2xl);
-    box-shadow: var(--shadow-2xl);
-    text-align: center;
-    width: 90vw;
-    max-width: 400px;
-    margin: 0 auto;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-2xl);
+  text-align: center;
+  width: 90vw;
+  max-width: 400px;
+  margin: 0 auto;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
 /* Special state for suggestions - make container scrollable */
 .mobile-recipe-card.suggestions-mode {
-    max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .mobile-recipe-content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: var(--space-sm);
-    margin: calc(-1 * var(--space-sm));
-    
-    /* Custom scrollbar for recipe content */
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-accent) transparent;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-sm);
+  margin: calc(-1 * var(--space-sm));
+
+  /* Custom scrollbar for recipe content */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) transparent;
 }
 
 /* Override scrollbar for suggestions - hide it to let container handle scrolling */
 .mobile-recipe-card.suggestions-mode .mobile-recipe-content {
-    overflow: visible;
-    scrollbar-width: none;
+  overflow: visible;
+  scrollbar-width: none;
 }
 
 .mobile-recipe-content::-webkit-scrollbar {
-    width: 4px;
+  width: 4px;
 }
 
 .mobile-recipe-content::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .mobile-recipe-content::-webkit-scrollbar-thumb {
-    background: var(--color-accent);
-    border-radius: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
 }
 
 .mobile-recipe-content::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent-dark);
+  background: var(--color-accent-dark);
 }
 
 /* Mobile Recipe Actions - Fixed at Bottom */
 .mobile-recipe-actions {
-    display: flex;
-    gap: var(--space-md);
-    margin-top: var(--space-lg);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--color-border);
-    flex-shrink: 0;
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
 }
 
 .mobile-recipe-actions .japandi-btn {
-    flex: 1;
-    padding: var(--space-lg) var(--space-xl);
-    border-radius: var(--radius-md);
-    position: relative;
-    overflow: hidden;
-    transition: all var(--transition-smooth);
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  flex: 1;
+  padding: var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-smooth);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mobile-recipe-actions .japandi-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
 .mobile-recipe-actions .japandi-btn:hover::before {
-    left: 100%;
+  left: 100%;
 }
 
 .mobile-recipe-actions .japandi-btn:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 /* Mobile Recipe Title - Elegant Japandi Style */
 .mobile-recipe-title {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-    padding: var(--space-lg) var(--space-xl);
-    background: linear-gradient(135deg, var(--color-surface), rgba(253, 251, 247, 0.8));
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(220, 185, 132, 0.2);
-    box-shadow: 0 2px 8px rgba(220, 185, 132, 0.1);
-    flex-shrink: 0;
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
+  background: linear-gradient(
+    135deg,
+    var(--color-surface),
+    rgba(253, 251, 247, 0.8)
+  );
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(220, 185, 132, 0.2);
+  box-shadow: 0 2px 8px rgba(220, 185, 132, 0.1);
+  flex-shrink: 0;
 }
 
 .mobile-recipe-title h2 {
-    font-family: var(--font-heading);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0;
-    line-height: 1.3;
-    letter-spacing: 0.3px;
-    position: relative;
-    display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: 0.3px;
+  position: relative;
+  display: inline-block;
 }
 
 .mobile-recipe-title h2::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 2px;
-    background: var(--gradient-primary);
-    border-radius: 1px;
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 1px;
 }
 
 /* Add subtle animation */
 .mobile-recipe-title {
-    animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Favorite Cards (Desktop) */
 .favorite-card {
-    background: #fff;
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow var(--transition-base);
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base);
 }
 
 .favorite-card:hover {
-    box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .favorite-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
 }
 
 .favorite-title {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--color-primary);
-    margin: 0;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--color-primary);
+  margin: 0;
 }
 
 .favorite-body {
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: var(--space-lg);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
 }
 
 .favorite-footer {
-    border-top: 1px solid var(--color-border-light);
-    padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--space-lg);
 }
 
 /* Mobile Favorite Cards */
 .mobile-favorite-card {
-    background: #ffffff;
-    border-radius: var(--radius-2xl);
-    padding: 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-    cursor: pointer;
+  background: #ffffff;
+  border-radius: var(--radius-2xl);
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  cursor: pointer;
 }
 
 .mobile-favorite-card:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 .mobile-favorite-card:hover {
-    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
 .mobile-favorite-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .mobile-favorite-title {
-    font-family: var(--font-heading);
-    font-size: 18px;
-    color: var(--color-primary);
-    margin: 0;
-    line-height: 1.3;
-    flex: 1;
-    padding-right: var(--space-lg);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--color-primary);
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
+  padding-right: var(--space-lg);
 }
 
 .mobile-favorite-preview {
-    padding: var(--space-lg) 0;
+  padding: var(--space-lg) 0;
 }
 
 .mobile-star-display {
-    font-size: 16px;
-    margin-right: var(--space-sm);
+  font-size: 16px;
+  margin-right: var(--space-sm);
 }
 
 .mobile-star-display.active {
-    color: #fbbf24;
+  color: #fbbf24;
 }
 
 .mobile-favorite-note-preview {
-    font-size: 13px;
-    color: #666;
-    font-style: italic;
-    margin-top: var(--space-sm);
-    line-height: 1.4;
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  margin-top: var(--space-sm);
+  line-height: 1.4;
 }
 
 .mobile-favorite-details {
-    padding-top: var(--space-lg);
-    margin-top: 0;
+  padding-top: var(--space-lg);
+  margin-top: 0;
 }
 
 /* Old Card Swipe (Legacy) */
 .card {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--radius-xl);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    background-size: cover;
-    background-position: center;
-    cursor: grab;
-    user-select: none;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    transition: transform var(--transition-base), top var(--transition-base);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  background-size: cover;
+  background-position: center;
+  cursor: grab;
+  user-select: none;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition:
+    transform var(--transition-base),
+    top var(--transition-base);
 }
 
 .card .overlay {
-    width: 100%;
-    padding: var(--space-xl);
-    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-xl);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* Badge for swipe cards */
 .badge {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 12px 20px;
-    font-size: 24px;
-    font-weight: bold;
-    border-radius: var(--radius-lg);
-    background-color: rgba(255,255,255,0.95);
-    color: #333;
-    opacity: 0;
-    transform: rotate(-15deg) scale(0.8);
-    pointer-events: none;
-    transition: all var(--transition-base);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    border: 3px solid transparent;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 12px 20px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  opacity: 0;
+  transform: rotate(-15deg) scale(0.8);
+  pointer-events: none;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 3px solid transparent;
 }
 
 .badge.right {
-    left: auto;
-    right: 20px;
-    transform: rotate(15deg) scale(0.8);
-    background-color: rgba(76, 217, 100, 0.95);
-    color: white;
-    border-color: rgba(76, 217, 100, 0.3);
+  left: auto;
+  right: 20px;
+  transform: rotate(15deg) scale(0.8);
+  background-color: rgba(76, 217, 100, 0.95);
+  color: white;
+  border-color: rgba(76, 217, 100, 0.3);
 }
 
 .badge:not(.right) {
-    background-color: rgba(255, 59, 48, 0.95);
-    color: white;
-    border-color: rgba(255, 59, 48, 0.3);
+  background-color: rgba(255, 59, 48, 0.95);
+  color: white;
+  border-color: rgba(255, 59, 48, 0.3);
 }
 
 /* Winner card glow effect */
 #winner-card {
-    box-shadow: var(--shadow-glow);
-    animation: glowPulse 2s infinite alternate, scaleIn 0.6s ease-out;
+  box-shadow: var(--shadow-glow);
+  animation:
+    glowPulse 2s infinite alternate,
+    scaleIn 0.6s ease-out;
 }
 
 #result .back h2,
 #result .recipe-content,
 #result .recipe-content * {
-    text-shadow: none !important;
+  text-shadow: none !important;
 }
 
 /* =====================================================
@@ -487,7 +502,11 @@
   color: var(--color-primary);
   margin: 0 0 12px 0;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-accent)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -513,7 +532,7 @@
   background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -525,13 +544,18 @@
 }
 
 .recipe-suggestion-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 160, 23, 0.1),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 
@@ -541,7 +565,7 @@
 
 .recipe-suggestion-card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(106, 78, 66, 0.15),
     0 8px 20px rgba(0, 0, 0, 0.08);
   border-color: rgba(212, 160, 23, 0.2);
@@ -562,7 +586,11 @@
 .suggestion-number {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-accent)
+  );
   color: white;
   border-radius: 50%;
   display: flex;
@@ -577,13 +605,17 @@
 }
 
 .suggestion-number::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -642,7 +674,11 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-accent)
+  );
   border: none;
   color: white;
   cursor: pointer;
@@ -652,13 +688,18 @@
 }
 
 .suggestion-actions .select-recipe-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 
@@ -669,7 +710,11 @@
 .suggestion-actions .select-recipe-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(139, 115, 85, 0.4);
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-accent-light));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-dark),
+    var(--color-accent-light)
+  );
 }
 
 .suggestion-actions .select-recipe-btn:active {
@@ -750,7 +795,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0;
     transform: scale(0.8);
   }
@@ -761,8 +807,18 @@
 }
 
 /* Staggered animations for cards */
-.recipe-suggestion-card:nth-child(1) { animation-delay: 0.1s; }
-.recipe-suggestion-card:nth-child(2) { animation-delay: 0.2s; }
-.recipe-suggestion-card:nth-child(3) { animation-delay: 0.3s; }
-.recipe-suggestion-card:nth-child(4) { animation-delay: 0.4s; }
-.recipe-suggestion-card:nth-child(5) { animation-delay: 0.5s; }
+.recipe-suggestion-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.recipe-suggestion-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.recipe-suggestion-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.recipe-suggestion-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.recipe-suggestion-card:nth-child(5) {
+  animation-delay: 0.5s;
+}

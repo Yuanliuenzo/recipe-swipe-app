@@ -3,10 +3,15 @@
  * Centralized component management and factory
  */
 
-import { Component } from '../../components/Component.js';
-import { VibeCard } from '../../components/Card/VibeCard.js';
-import { RecipeCard } from '../../components/Card/RecipeCard.js';
-import { Modal, AlertModal, ConfirmModal, FullscreenModal } from '../../components/UI/Modal.js';
+import { Component } from "../../components/Component.js";
+import { VibeCard } from "../../components/Card/VibeCard.js";
+import { RecipeCard } from "../../components/Card/RecipeCard.js";
+import {
+  Modal,
+  AlertModal,
+  ConfirmModal,
+  FullscreenModal
+} from "../../components/UI/Modal.js";
 
 export class ComponentRegistry {
   constructor() {
@@ -17,27 +22,26 @@ export class ComponentRegistry {
 
   async initialize() {
     if (this.isInitialized) {
-      console.warn('ComponentRegistry already initialized');
+      console.warn("ComponentRegistry already initialized");
       return;
     }
 
     try {
-      console.log('🧩 Initializing Component Registry...');
+      console.log("🧩 Initializing Component Registry...");
 
       // Register component classes
-      this.registerClass('Component', Component);
-      this.registerClass('VibeCard', VibeCard);
-      this.registerClass('RecipeCard', RecipeCard);
-      this.registerClass('Modal', Modal);
-      this.registerClass('AlertModal', AlertModal);
-      this.registerClass('ConfirmModal', ConfirmModal);
-      this.registerClass('FullscreenModal', FullscreenModal);
+      this.registerClass("Component", Component);
+      this.registerClass("VibeCard", VibeCard);
+      this.registerClass("RecipeCard", RecipeCard);
+      this.registerClass("Modal", Modal);
+      this.registerClass("AlertModal", AlertModal);
+      this.registerClass("ConfirmModal", ConfirmModal);
+      this.registerClass("FullscreenModal", FullscreenModal);
 
       this.isInitialized = true;
-      console.log('✅ Component Registry initialized successfully');
-
+      console.log("✅ Component Registry initialized successfully");
     } catch (error) {
-      console.error('❌ Failed to initialize Component Registry:', error);
+      console.error("❌ Failed to initialize Component Registry:", error);
       throw error;
     }
   }
@@ -105,7 +109,7 @@ export class ComponentRegistry {
     const component = this.components.get(name);
     if (component) {
       // Destroy component if it has destroy method
-      if (typeof component.destroy === 'function') {
+      if (typeof component.destroy === "function") {
         component.destroy();
       }
       this.components.delete(name);
@@ -124,13 +128,13 @@ export class ComponentRegistry {
   clear() {
     // Destroy all components before clearing
     Array.from(this.components.values()).forEach(component => {
-      if (typeof component.destroy === 'function') {
+      if (typeof component.destroy === "function") {
         component.destroy();
       }
     });
-    
+
     this.components.clear();
-    console.log('🗑️ Cleared all components');
+    console.log("🗑️ Cleared all components");
   }
 
   // Find components by type or selector
@@ -147,7 +151,11 @@ export class ComponentRegistry {
   findBySelector(selector) {
     const results = [];
     this.components.forEach((component, name) => {
-      if (component.container && component.container.matches && component.container.matches(selector)) {
+      if (
+        component.container &&
+        component.container.matches &&
+        component.container.matches(selector)
+      ) {
         results.push({ name, component });
       }
     });
@@ -157,6 +165,6 @@ export class ComponentRegistry {
   // Destroy all components
   destroyAll() {
     this.clear();
-    console.log('🗑️ All components destroyed');
+    console.log("🗑️ All components destroyed");
   }
 }

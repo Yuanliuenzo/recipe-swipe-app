@@ -1,16 +1,16 @@
 // Simple event bus for component communication
-export class EventBus {
+class EventBus {
   constructor() {
     this.events = new Map();
   }
-  
+
   // Subscribe to an event
   on(event, callback) {
     if (!this.events.has(event)) {
       this.events.set(event, new Set());
     }
     this.events.get(event).add(callback);
-    
+
     // Return unsubscribe function
     return () => {
       const callbacks = this.events.get(event);
@@ -22,7 +22,7 @@ export class EventBus {
       }
     };
   }
-  
+
   // Emit an event with data
   emit(event, data = null) {
     const callbacks = this.events.get(event);
@@ -36,17 +36,17 @@ export class EventBus {
       });
     }
   }
-  
+
   // Remove all listeners for an event
   off(event) {
     this.events.delete(event);
   }
-  
+
   // Remove all listeners
   clear() {
     this.events.clear();
   }
-  
+
   // Get number of listeners for an event
   listenerCount(event) {
     return this.events.get(event)?.size || 0;

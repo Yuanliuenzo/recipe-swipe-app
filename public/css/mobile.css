@@ -5,89 +5,89 @@
    ================================ */
 
 /* Reset & Global Box-Sizing */
-@import 'base/_reset.css';
+@import "base/_reset.css";
 
 /* Design Tokens & Variables */
-@import 'base/_variables.css';
+@import "base/_variables.css";
 
 /* Typography System */
-@import 'base/_typography.css';
+@import "base/_typography.css";
 
 /* Utility Classes */
-@import 'base/_helpers.css';
+@import "base/_helpers.css";
 
 /* ================================
    LAYOUT LAYER
    ================================ */
 
 /* Mobile Container & App Layout */
-@import 'layout/_mobile-container.css';
+@import "layout/_mobile-container.css";
 
 /* Headers */
-@import 'layout/_headers.css';
+@import "layout/_headers.css";
 
 /* Footers & Floating Action Buttons */
-@import 'layout/_footers.css';
+@import "layout/_footers.css";
 
 /* Navigation - FAB, Bottom Sheet, Dropdown */
-@import 'layout/_navigation.css';
+@import "layout/_navigation.css";
 
 /* ================================
    COMPONENTS LAYER
    ================================ */
 
 /* Buttons - Japandi Button System */
-@import 'components/_buttons.css';
+@import "components/_buttons.css";
 
 /* Cards - Recipe, Vibe, Favorite Cards */
-@import 'components/_cards.css';
+@import "components/_cards.css";
 
 /* Modals - Alert, Bottom Sheet, Overlays */
-@import 'components/_modals.css';
+@import "components/_modals.css";
 
 /* Toggles - Recipe Toggle, Preference Toggle */
-@import 'components/_toggles.css';
+@import "components/_toggles.css";
 
 /* Ratings - Star Rating System */
-@import 'components/_ratings.css';
+@import "components/_ratings.css";
 
 /* Forms - Inputs, Textareas, Form Elements */
-@import 'components/_forms.css';
+@import "components/_forms.css";
 
 /* Spinners - Loading, Skeleton Loaders */
-@import 'components/_spinners.css';
+@import "components/_spinners.css";
 
 /* ================================
    SECTIONS LAYER
    ================================ */
 
 /* Recipe Sections - Recipe List, Instructions, Ingredients */
-@import 'sections/_recipe.css';
+@import "sections/_recipe.css";
 
 /* Favorites Sections - Favorites Screens and Grids */
-@import 'sections/_favorites.css';
+@import "sections/_favorites.css";
 
 /* Preferences Sections - Preferences Screens and Options */
-@import 'sections/_preferences.css';
+@import "sections/_preferences.css";
 
 /* Vibes Sections - Mobile Vibe Cards, Overlays, Summaries */
-@import 'sections/_vibes.css';
+@import "sections/_vibes.css";
 
 /* ================================
    UTILITIES LAYER
    ================================ */
 
 /* Animations - Keyframes, Transitions, Motion Effects */
-@import 'utilities/_animations.css';
+@import "utilities/_animations.css";
 
 /* Scrollbars - Custom Scrollbar Styling */
-@import 'utilities/_scrollbars.css';
+@import "utilities/_scrollbars.css";
 
 /* Responsive - Media Queries and Responsive Utilities */
-@import 'utilities/_responsive.css';
+@import "utilities/_responsive.css";
 
 /* Z-Index - Layering & Stacking Helpers */
-@import 'utilities/_z-index.css';
+@import "utilities/_z-index.css";
 
 /* ================================
    THEME ENHANCEMENTS
@@ -97,12 +97,12 @@
 
 /* Performance optimizations */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /* Enable smooth scrolling for better UX */
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 /* Hardware acceleration for better performance */
@@ -111,27 +111,27 @@ html {
 .mobile-favorite-card,
 .favorite-bottom-sheet,
 .mobile-floating-back-btn {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Focus visible for better accessibility */
 *:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* ================================
@@ -140,144 +140,146 @@ html {
 
 /* Base full-screen layout for all devices */
 body {
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 #app-root {
-    min-height: 100vh;
-    width: 100%;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .app-view {
-    min-height: 100vh;
-    width: 100%;
+  min-height: 100vh;
+  width: 100%;
 }
 
 /* Mobile-first base styles (default) */
 .mobile-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
 }
 
 .mobile-card-container {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 25px;
-    box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  box-sizing: border-box;
 }
 
 /* Tablet adjustments */
 @media (min-width: 768px) {
-    .mobile-card-container {
-        padding: 40px;
-    }
-    
-    .mobile-header {
-        position: relative;
-        z-index: 1;
-        padding: 20px;
-        max-width: 400px;
-        margin: 0 auto;
-    }
+  .mobile-card-container {
+    padding: 40px;
+  }
+
+  .mobile-header {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
 }
 
 /* Desktop adjustments */
 @media (min-width: 1024px) {
-    .mobile-card-container {
-        padding: 60px;
-    }
-    
-    .mobile-header {
-        max-width: 450px;
-        padding: 30px;
-    }
-    
-    h1 {
-        font-size: 42px;
-    }
-    
-    .headline {
-        font-size: 56px;
-    }
+  .mobile-card-container {
+    padding: 60px;
+  }
+
+  .mobile-header {
+    max-width: 450px;
+    padding: 30px;
+  }
+
+  h1 {
+    font-size: 42px;
+  }
+
+  .headline {
+    font-size: 56px;
+  }
 }
 
 /* Large desktop optimizations */
 @media (min-width: 1440px) {
-    .mobile-card-container {
-        padding: 80px;
-    }
+  .mobile-card-container {
+    padding: 80px;
+  }
 }
 
 /* Desktop-specific hover effects */
 @media (hover: hover) {
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    }
-    
-    .mobile-recipe-card:hover {
-        transform: scale(1.02);
-    }
-    
-    .generate-btn:hover:not(:disabled) {
-        transform: translateY(-2px) scale(1.05);
-    }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-recipe-card:hover {
+    transform: scale(1.02);
+  }
+
+  .generate-btn:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+  }
 }
 
 /* Desktop animations and transitions */
 @media (prefers-reduced-motion: no-preference) {
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .mobile-recipe-card {
-        transition: transform 0.8s ease;
-    }
-    
-    .badge {
-        transition: all 0.2s ease;
-    }
+  .card {
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .mobile-recipe-card {
+    transition: transform 0.8s ease;
+  }
+
+  .badge {
+    transition: all 0.2s ease;
+  }
 }
 
 /* Desktop typography adjustments */
 @media (min-width: 1024px) {
-    h1 {
-        font-size: 42px;
-    }
-    
-    .headline {
-        font-size: 56px;
-    }
+  h1 {
+    font-size: 42px;
+  }
+
+  .headline {
+    font-size: 56px;
+  }
 }
 
 /* Desktop performance optimizations */
 @media (min-width: 768px) {
-    .card,
-    .mobile-recipe-card,
-    .sparkle {
-        will-change: transform;
-    }
+  .card,
+  .mobile-recipe-card,
+  .sparkle {
+    will-change: transform;
+  }
 }
 
 /* Print styles */
 @media print {
-    .mobile-floating-back-btn,
-    .mobile-unified-dropdown,
-    .favorite-bottom-sheet,
-    .alert-modal {
-        display: none !important;
-    }
-    
-    body {
-        background: white !important;
-        color: black !important;
-    }
+  .mobile-floating-back-btn,
+  .mobile-unified-dropdown,
+  .favorite-bottom-sheet,
+  .alert-modal {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }

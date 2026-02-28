@@ -2,329 +2,451 @@
 
 /* Z-Index Scale */
 :root {
-    /* Base layering */
-    --z-behind: -1;
-    --z-base: 1;
-    --z-raised: 10;
-    --z-dropdown: 100;
-    --z-sticky: 200;
-    --z-fixed: 300;
-    --z-modal-backdrop: 400;
-    --z-modal: 500;
-    --z-popover: 600;
-    --z-tooltip: 700;
-    --z-toast: 800;
-    --z-notification: 900;
-    --z-debug: 9999;
+  /* Base layering */
+  --z-behind: -1;
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-notification: 900;
+  --z-debug: 9999;
 }
 
 /* Base Z-Index Classes */
-.z-behind { z-index: var(--z-behind); }
-.z-base { z-index: var(--z-base); }
-.z-raised { z-index: var(--z-raised); }
-.z-dropdown { z-index: var(--z-dropdown); }
-.z-sticky { z-index: var(--z-sticky); }
-.z-fixed { z-index: var(--z-fixed); }
-.z-modal-backdrop { z-index: var(--z-modal-backdrop); }
-.z-modal { z-index: var(--z-modal); }
-.z-popover { z-index: var(--z-popover); }
-.z-tooltip { z-index: var(--z-tooltip); }
-.z-toast { z-index: var(--z-toast); }
-.z-notification { z-index: var(--z-notification); }
-.z-debug { z-index: var(--z-debug); }
+.z-behind {
+  z-index: var(--z-behind);
+}
+.z-base {
+  z-index: var(--z-base);
+}
+.z-raised {
+  z-index: var(--z-raised);
+}
+.z-dropdown {
+  z-index: var(--z-dropdown);
+}
+.z-sticky {
+  z-index: var(--z-sticky);
+}
+.z-fixed {
+  z-index: var(--z-fixed);
+}
+.z-modal-backdrop {
+  z-index: var(--z-modal-backdrop);
+}
+.z-modal {
+  z-index: var(--z-modal);
+}
+.z-popover {
+  z-index: var(--z-popover);
+}
+.z-tooltip {
+  z-index: var(--z-tooltip);
+}
+.z-toast {
+  z-index: var(--z-toast);
+}
+.z-notification {
+  z-index: var(--z-notification);
+}
+.z-debug {
+  z-index: var(--z-debug);
+}
 
 /* Numeric Z-Index Classes for Fine Control */
-.z-0 { z-index: 0; }
-.z-1 { z-index: 1; }
-.z-2 { z-index: 2; }
-.z-3 { z-index: 3; }
-.z-4 { z-index: 4; }
-.z-5 { z-index: 5; }
-.z-10 { z-index: 10; }
-.z-20 { z-index: 20; }
-.z-30 { z-index: 30; }
-.z-40 { z-index: 40; }
-.z-50 { z-index: 50; }
-.z-100 { z-index: 100; }
-.z-200 { z-index: 200; }
-.z-300 { z-index: 300; }
-.z-400 { z-index: 400; }
-.z-500 { z-index: 500; }
-.z-600 { z-index: 600; }
-.z-700 { z-index: 700; }
-.z-800 { z-index: 800; }
-.z-900 { z-index: 900; }
-.z-1000 { z-index: 1000; }
-.z-2000 { z-index: 2000; }
-.z-3000 { z-index: 3000; }
-.z-4000 { z-index: 4000; }
-.z-5000 { z-index: 5000; }
-.z-9999 { z-index: 9999; }
+.z-0 {
+  z-index: 0;
+}
+.z-1 {
+  z-index: 1;
+}
+.z-2 {
+  z-index: 2;
+}
+.z-3 {
+  z-index: 3;
+}
+.z-4 {
+  z-index: 4;
+}
+.z-5 {
+  z-index: 5;
+}
+.z-10 {
+  z-index: 10;
+}
+.z-20 {
+  z-index: 20;
+}
+.z-30 {
+  z-index: 30;
+}
+.z-40 {
+  z-index: 40;
+}
+.z-50 {
+  z-index: 50;
+}
+.z-100 {
+  z-index: 100;
+}
+.z-200 {
+  z-index: 200;
+}
+.z-300 {
+  z-index: 300;
+}
+.z-400 {
+  z-index: 400;
+}
+.z-500 {
+  z-index: 500;
+}
+.z-600 {
+  z-index: 600;
+}
+.z-700 {
+  z-index: 700;
+}
+.z-800 {
+  z-index: 800;
+}
+.z-900 {
+  z-index: 900;
+}
+.z-1000 {
+  z-index: 1000;
+}
+.z-2000 {
+  z-index: 2000;
+}
+.z-3000 {
+  z-index: 3000;
+}
+.z-4000 {
+  z-index: 4000;
+}
+.z-5000 {
+  z-index: 5000;
+}
+.z-9999 {
+  z-index: 9999;
+}
 
 /* Component-Specific Z-Index */
 
 /* Sparkles and Background Elements */
 #sparkle-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: var(--z-behind);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: var(--z-behind);
 }
 
 .sparkle {
-    position: absolute;
-    background: gold;
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0.9;
-    box-shadow: 0 0 12px 6px rgba(255,215,0,0.9);
-    animation: sparkleTwinkle 2s infinite;
-    z-index: var(--z-behind);
+  position: absolute;
+  background: gold;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.9;
+  box-shadow: 0 0 12px 6px rgba(255, 215, 0, 0.9);
+  animation: sparkleTwinkle 2s infinite;
+  z-index: var(--z-behind);
 }
 
 /* Cards and Interactive Elements */
 .recipe-card-wrapper {
-    position: relative;
-    z-index: var(--z-base);
-    transform-style: preserve-3d;
-    transition: transform 0.8s;
+  position: relative;
+  z-index: var(--z-base);
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
 }
 
 .card {
-    position: absolute;
-    z-index: var(--z-base);
+  position: absolute;
+  z-index: var(--z-base);
 }
 
 .card-face {
-    position: absolute;
-    z-index: var(--z-base);
+  position: absolute;
+  z-index: var(--z-base);
 }
 
 /* Swipe Indicators */
 .mobile-swipe-indicator {
-    position: absolute;
-    z-index: var(--z-raised);
+  position: absolute;
+  z-index: var(--z-raised);
 }
 
 /* Badges and Overlays */
 .badge {
-    position: absolute;
-    z-index: var(--z-raised);
+  position: absolute;
+  z-index: var(--z-raised);
 }
 
 .vibe-overlay {
-    position: absolute;
-    z-index: var(--z-raised);
+  position: absolute;
+  z-index: var(--z-raised);
 }
 
 .mobile-vibe-card-overlay {
-    position: absolute;
-    z-index: var(--z-raised);
+  position: absolute;
+  z-index: var(--z-raised);
 }
 
 /* Dropdowns and Navigation */
 .unified-dropdown {
-    position: relative;
-    z-index: var(--z-dropdown);
+  position: relative;
+  z-index: var(--z-dropdown);
 }
 
 .unified-dropdown-content {
-    position: absolute;
-    z-index: var(--z-dropdown);
+  position: absolute;
+  z-index: var(--z-dropdown);
 }
 
 .mobile-unified-dropdown {
-    position: fixed;
-    z-index: 9999;
+  position: fixed;
+  z-index: 9999;
 }
 
 .mobile-unified-dropdown-content {
-    position: absolute;
-    z-index: 10000;
+  position: absolute;
+  z-index: 10000;
 }
 
 /* Sticky Elements */
 .mobile-header {
-    position: relative;
-    z-index: var(--z-sticky);
+  position: relative;
+  z-index: var(--z-sticky);
 }
 
 /* Fixed Elements */
 .mobile-floating-back-btn {
-    position: fixed;
-    z-index: 1002;
+  position: fixed;
+  z-index: 1002;
 }
 
 /* Mobile App Views */
 .app-view {
-    position: fixed;
-    z-index: var(--z-fixed);
+  position: fixed;
+  z-index: var(--z-fixed);
 }
 
 /* Subtle depth layering */
-#view-main { z-index: var(--z-base); }
-#view-favorites { z-index: 2; }
-#view-preferences { z-index: 3; }
+#view-main {
+  z-index: var(--z-base);
+}
+#view-favorites {
+  z-index: 2;
+}
+#view-preferences {
+  z-index: 3;
+}
 
 /* Modals and Overlays */
 .mobile-result {
-    position: fixed;
-    z-index: var(--z-modal-backdrop);
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
 }
 
 .favorites-fullscreen {
-    position: fixed;
-    z-index: var(--z-modal-backdrop);
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
 }
 
 .mobile-favorites-fullscreen {
-    position: fixed;
-    z-index: var(--z-modal-backdrop);
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
 }
 
 .mobile-preferences-fullscreen {
-    position: fixed;
-    z-index: var(--z-modal-backdrop);
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
 }
 
 .favorite-bottom-sheet {
-    position: fixed;
-    z-index: var(--z-modal);
+  position: fixed;
+  z-index: var(--z-modal);
 }
 
 .mobile-favorites-screen {
-    position: fixed;
-    z-index: var(--z-modal);
+  position: fixed;
+  z-index: var(--z-modal);
 }
 
 .mobile-preferences-screen {
-    position: fixed;
-    z-index: var(--z-modal);
+  position: fixed;
+  z-index: var(--z-modal);
 }
 
 .alert-modal {
-    position: fixed;
-    z-index: var(--z-toast);
+  position: fixed;
+  z-index: var(--z-toast);
 }
 
 /* Glow Effects */
 .swipe-glow {
-    position: fixed;
-    z-index: 1000;
+  position: fixed;
+  z-index: 1000;
 }
 
 /* Debug Elements */
 .debug-info {
-    z-index: var(--z-base);
+  z-index: var(--z-base);
 }
 
 /* Stacking Context Management */
 .stack-context {
-    position: relative;
-    z-index: 0;
+  position: relative;
+  z-index: 0;
 }
 
 .stack-isolate {
-    isolation: isolate;
+  isolation: isolate;
 }
 
 /* Z-Index Utilities for Complex Layouts */
-.z-auto { z-index: auto; }
-.z-initial { z-index: initial; }
-.z-inherit { z-index: inherit; }
+.z-auto {
+  z-index: auto;
+}
+.z-initial {
+  z-index: initial;
+}
+.z-inherit {
+  z-index: inherit;
+}
 
 /* Negative Z-Index for Background Elements */
-.z-negative-1 { z-index: -1; }
-.z-negative-2 { z-index: -2; }
+.z-negative-1 {
+  z-index: -1;
+}
+.z-negative-2 {
+  z-index: -2;
+}
 
 /* High Z-Index for Critical UI Elements */
-.z-critical { z-index: 99999; }
-.z-maximum { z-index: 2147483647; }
+.z-critical {
+  z-index: 99999;
+}
+.z-maximum {
+  z-index: 2147483647;
+}
 
 /* Responsive Z-Index */
 @media (max-width: 768px) {
-    .mobile-z-boost {
-        z-index: calc(var(--z-modal) + 100);
-    }
+  .mobile-z-boost {
+    z-index: calc(var(--z-modal) + 100);
+  }
 }
 
 /* Print Z-Index */
 @media print {
-    .z-print-hidden {
-        z-index: -9999 !important;
-        visibility: hidden !important;
-    }
-    
-    .z-print-top {
-        z-index: 99999 !important;
-    }
+  .z-print-hidden {
+    z-index: -9999 !important;
+    visibility: hidden !important;
+  }
+
+  .z-print-top {
+    z-index: 99999 !important;
+  }
 }
 
 /* Accessibility Z-Index */
 @media (prefers-reduced-motion: reduce) {
-    .z-accessible {
-        z-index: var(--z-modal) !important;
-    }
+  .z-accessible {
+    z-index: var(--z-modal) !important;
+  }
 }
 
 /* Z-Index State Classes */
-.z-active { z-index: var(--z-modal); }
-.z-inactive { z-index: var(--z-base); }
-.z-hover:hover { z-index: var(--z-raised); }
-.z-focus:focus { z-index: var(--z-raised); }
+.z-active {
+  z-index: var(--z-modal);
+}
+.z-inactive {
+  z-index: var(--z-base);
+}
+.z-hover:hover {
+  z-index: var(--z-raised);
+}
+.z-focus:focus {
+  z-index: var(--z-raised);
+}
 
 /* Z-Index Animation Support */
 .z-animate {
-    transition: z-index var(--transition-fast);
+  transition: z-index var(--transition-fast);
 }
 
 /* Component Stacking Order */
-.z-layer-background { z-index: 1; }
-.z-layer-content { z-index: 2; }
-.z-layer-sidebar { z-index: 3; }
-.z-layer-header { z-index: 4; }
-.z-layer-dropdown { z-index: 5; }
-.z-layer-modal { z-index: 6; }
-.z-layer-tooltip { z-index: 7; }
-.z-layer-notification { z-index: 8; }
+.z-layer-background {
+  z-index: 1;
+}
+.z-layer-content {
+  z-index: 2;
+}
+.z-layer-sidebar {
+  z-index: 3;
+}
+.z-layer-header {
+  z-index: 4;
+}
+.z-layer-dropdown {
+  z-index: 5;
+}
+.z-layer-modal {
+  z-index: 6;
+}
+.z-layer-tooltip {
+  z-index: 7;
+}
+.z-layer-notification {
+  z-index: 8;
+}
 
 /* Mobile-Specific Stacking */
 @media (max-width: 480px) {
-    .z-mobile-boost {
-        z-index: calc(var(--z-modal) + 50);
-    }
+  .z-mobile-boost {
+    z-index: calc(var(--z-modal) + 50);
+  }
 }
 
 /* Development Helpers */
 .z-debug-outline {
-    z-index: 99999;
-    outline: 2px solid red;
+  z-index: 99999;
+  outline: 2px solid red;
 }
 
 .z-debug-label::before {
-    content: attr(data-z-index);
-    position: absolute;
-    top: -20px;
-    left: 0;
-    background: red;
-    color: white;
-    font-size: 10px;
-    padding: 2px 4px;
-    z-index: 100000;
+  content: attr(data-z-index);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  z-index: 100000;
 }
 
 /* Performance Considerations */
 .z-will-change {
-    will-change: transform, opacity;
-    z-index: var(--z-raised);
+  will-change: transform, opacity;
+  z-index: var(--z-raised);
 }
 
 /* GPU Acceleration for High Z-Index Elements */
 .z-gpu {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    z-index: var(--z-raised);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  z-index: var(--z-raised);
 }

@@ -3,38 +3,40 @@
  * Handles rendering and interactions for a single recipe
  */
 
-import { RecipeDisplayComponent } from '../RecipeDisplayComponent.js';
+import { RecipeDisplayComponent } from "../RecipeDisplayComponent.js";
 
 export class RecipeDetailView {
   constructor(container, { serviceRegistry }) {
     this.container = container;
     this.serviceRegistry = serviceRegistry;
-    this.apiService = serviceRegistry.get('api');
+    this.apiService = serviceRegistry.get("api");
   }
 
   async render(suggestion) {
     this.showLoading();
 
     try {
-      const recipeSuggestionService = this.serviceRegistry.get('recipeSuggestion');
-      const fullRecipe = await recipeSuggestionService.generateFullRecipe(suggestion.id);
+      const recipeSuggestionService =
+        this.serviceRegistry.get("recipeSuggestion");
+      const fullRecipe = await recipeSuggestionService.generateFullRecipe(
+        suggestion.id
+      );
 
       // Use RecipeDisplayComponent for consistent display
       const customActions = `
         <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
         <button class="japandi-btn japandi-btn-primary back-to-suggestions-btn" type="button">🔄 Back to Suggestions</button>
       `;
-      
-      RecipeDisplayComponent.render(
-        this.container, 
-        fullRecipe, 
-        { title: fullRecipe.title, customActions }
-      );
-      
+
+      RecipeDisplayComponent.render(this.container, fullRecipe, {
+        title: fullRecipe.title,
+        customActions
+      });
+
       this.setupActions(fullRecipe);
     } catch (error) {
-      console.error('Failed to generate full recipe:', error);
-      this.showError('Failed to generate recipe');
+      console.error("Failed to generate full recipe:", error);
+      this.showError("Failed to generate recipe");
     }
   }
 
@@ -56,43 +58,41 @@ export class RecipeDetailView {
     `;
   }
 
-
   setupActions(fullRecipe) {
-    const saveBtn = this.container.querySelector('.save-favorite-btn');
-    const backBtn = this.container.querySelector('.back-to-suggestions-btn');
+    const saveBtn = this.container.querySelector(".save-favorite-btn");
+    const backBtn = this.container.querySelector(".back-to-suggestions-btn");
 
     if (saveBtn) {
-      saveBtn.addEventListener('click', async () => {
+      saveBtn.addEventListener("click", async () => {
         try {
           saveBtn.disabled = true;
-          saveBtn.textContent = 'Saving...';
+          saveBtn.textContent = "Saving...";
 
           await this.apiService.saveFavorite({
             recipeText: fullRecipe.recipeText,
-            title: fullRecipe.title || 'Untitled Recipe',
+            title: fullRecipe.title || "Untitled Recipe",
             rating: null,
             note: null
           });
 
-          saveBtn.textContent = '✅ Saved';
+          saveBtn.textContent = "✅ Saved";
 
           setTimeout(() => {
-            saveBtn.textContent = '⭐ Save';
+            saveBtn.textContent = "⭐ Save";
             saveBtn.disabled = false;
           }, 2000);
-
         } catch (error) {
-          console.error('Failed to save favorite:', error);
-          saveBtn.textContent = '⭐ Save';
+          console.error("Failed to save favorite:", error);
+          saveBtn.textContent = "⭐ Save";
           saveBtn.disabled = false;
         }
       });
     }
 
     if (backBtn) {
-      backBtn.addEventListener('click', () => {
+      backBtn.addEventListener("click", () => {
         // Emit event to go back to suggestions
-        this.container.dispatchEvent(new CustomEvent('backToSuggestions'));
+        this.container.dispatchEvent(new CustomEvent("backToSuggestions"));
       });
     }
   }
@@ -108,7 +108,7 @@ export class RecipeDetailView {
   destroy() {
     // Cleanup event listeners and DOM
     if (this.container) {
-      this.container.innerHTML = '';
+      this.container.innerHTML = "";
     }
   }
 }

@@ -2,195 +2,201 @@
 
 /* Main mobile container */
 .mobile-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
 }
 
 /* Mobile app area */
 .mobile-app {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: var(--space-xl);
-    position: relative;
-    min-height: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+  position: relative;
+  min-height: 0;
 }
 
 /* Mobile card container for swipe cards */
 .mobile-card-container {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 25px;
-    box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  box-sizing: border-box;
 }
 
 /* Desktop container (from original style.css) */
 .swipe-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .card-container {
-    position: relative;
-    width: 320px;
-    height: 450px;
-    margin: 0 auto;
+  position: relative;
+  width: 320px;
+  height: 450px;
+  margin: 0 auto;
 }
 
 /* Full-screen containers */
 .mobile-result {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--color-bg);
-    display: none;
-    z-index: var(--z-modal-backdrop);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-bg);
+  display: none;
+  z-index: var(--z-modal-backdrop);
 }
 
 .mobile-result.show {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: var(--space-lg);
 }
 
 .mobile-result-content {
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
 }
 
 /* Full-screen favorites container */
 .favorites-fullscreen,
 .mobile-favorites-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--color-bg);
-    z-index: var(--z-modal-backdrop);
-    overflow-y: auto;
-    padding-top: 80px; /* Account for header */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  z-index: var(--z-modal-backdrop);
+  overflow-y: auto;
+  padding-top: 80px; /* Account for header */
 }
 
 .favorites-fullscreen .favorites-header {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--space-xl);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .favorites-fullscreen .favorites-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-xl);
-    padding: 0 var(--space-xl) 40px;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-xl);
+  padding: 0 var(--space-xl) 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Full-screen preferences container */
 .mobile-preferences-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--color-bg);
-    z-index: var(--z-modal-backdrop);
-    overflow-y: auto;
-    padding-top: 80px; /* Account for header */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  z-index: var(--z-modal-backdrop);
+  overflow-y: auto;
+  padding-top: 80px; /* Account for header */
 }
 
 .mobile-preferences-fullscreen .mobile-preferences-content {
-    padding: 0 var(--space-xl) 40px;
+  padding: 0 var(--space-xl) 40px;
 }
 
 /* State-of-the-art navigation system */
 .app-view {
-    position: fixed;
-    inset: 0;
-    background: var(--color-surface);
+  position: fixed;
+  inset: 0;
+  background: var(--color-surface);
 
-    opacity: 0;
-    transform: translateX(30px);
-    pointer-events: none;
+  opacity: 0;
+  transform: translateX(30px);
+  pointer-events: none;
 
-    transition:
-        transform 280ms cubic-bezier(.22,.61,.36,1),
-        opacity 220ms ease;
+  transition:
+    transform 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 220ms ease;
 
-    will-change: transform, opacity;
+  will-change: transform, opacity;
 }
 
 .app-view.is-active {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 /* Subtle depth layering */
-#view-main { z-index: var(--z-base); }
-#view-favorites { z-index: 2; }
-#view-preferences { z-index: 3; }
+#view-main {
+  z-index: var(--z-base);
+}
+#view-favorites {
+  z-index: 2;
+}
+#view-preferences {
+  z-index: 3;
+}
 
 /* Full-screen screens */
 .mobile-favorites-screen,
 .mobile-preferences-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--color-surface);
-    z-index: var(--z-modal);
-    display: flex;
-    flex-direction: column;
-    animation: fadeIn 0.2s ease;
+  position: fixed;
+  inset: 0;
+  background: var(--color-surface);
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
 }
 
 /* Desktop result layout */
 .result {
-    margin-top: 40px;
-    text-align: center;
-    position: relative;
-    display: none;
-    flex-direction: column;
-    align-items: center;
+  margin-top: 40px;
+  text-align: center;
+  position: relative;
+  display: none;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Debug info styling */
 .debug-info {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px;
-    font-size: 18px;
-    color: #666;
-    background: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .mobile-favorites-fullscreen .debug-info {
-    text-align: center;
-    padding: 40px 20px;
-    font-size: 18px;
-    color: #666;
-    background: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    margin: 0 var(--space-xl);
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 18px;
+  color: #666;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin: 0 var(--space-xl);
 }

@@ -1,212 +1,218 @@
 /* Typography System - Japandi Elegance */
 
 /* Font Imports */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 
 /* Base Typography */
 body {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
 }
 
 /* Headings */
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    line-height: 1.2;
-    margin-bottom: var(--space-lg);
-    color: var(--color-primary);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--space-lg);
+  color: var(--color-primary);
 }
 
 h1 {
-    font-size: 36px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: var(--space-xl);
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: var(--space-xl);
 }
 
 h2 {
-    font-size: 28px;
-    font-weight: 700;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 h3 {
-    font-size: 18px;
-    font-weight: 600;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 /* Mobile-specific heading sizes */
 .mobile-header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: var(--space-sm);
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: var(--space-sm);
 }
 
 .mobile-favorites-header h2,
 .mobile-preferences-fullscreen .mobile-preferences-header h2 {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--color-primary);
-    margin: 0;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--color-primary);
+  margin: 0;
 }
 
 .favorite-sheet-header h2 {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    color: var(--color-primary);
-    margin: 0;
-    font-weight: 500;
-    letter-spacing: -0.3px;
-    line-height: 1.2;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--color-primary);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
 }
 
 /* Text Elements */
 p {
-    margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-lg);
 }
 
 a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color var(--transition-base);
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-base);
 }
 
 a:hover {
-    color: var(--color-primary-dark);
+  color: var(--color-primary-dark);
 }
 
 /* Specialized text styles */
 .vibe-name {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ffffff;
-    margin-bottom: var(--space-sm);
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: var(--space-sm);
 }
 
 .mobile-vibe-name {
-    font-size: 28px;
-    font-weight: 700;
-    color: white;
-    margin-bottom: var(--space-sm);
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: var(--space-sm);
 }
 
 .vibe-description {
-    font-size: 14px;
-    color: #ffffff;
-    line-height: 1.4;
-    max-width: 260px;
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 1.4;
+  max-width: 260px;
 }
 
 .mobile-vibe-description {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.4;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
 }
 
 .recipe-title {
-    font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--color-primary);
-    text-align: center;
-    margin: 0 0 var(--space-xl) 0;
-    line-height: 1.2;
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 0 0 var(--space-xl) 0;
+  line-height: 1.2;
 }
 
 .mobile-recipe-title {
-    font-family: var(--font-heading);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--color-primary);
-    text-align: center;
-    margin: 0 0 var(--space-xl) 0;
-    line-height: 1.2;
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 0 0 var(--space-xl) 0;
+  line-height: 1.2;
 }
 
 /* Labels and metadata */
 .ingredients-subtitle {
-    font-size: 14px;
-    color: var(--color-primary);
-    text-align: center;
-    margin: 0 0 var(--space-lg) 0;
-    line-height: 1.4;
+  font-size: 14px;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 0 0 var(--space-lg) 0;
+  line-height: 1.4;
 }
 
 .favorite-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    font-size: 14px;
-    color: #999;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  font-size: 14px;
+  color: #999;
 }
 
 /* Status and helper text */
 .ingredients-confirmation {
-    font-size: 13px;
-    font-weight: 600;
-    min-height: 18px;
-    transition: opacity var(--transition-slow);
-    text-align: center;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.1);
-    margin-bottom: var(--space-lg);
-    opacity: 0;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 18px;
+  transition: opacity var(--transition-slow);
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--space-lg);
+  opacity: 0;
 }
 
 .ingredients-confirmation.show {
-    opacity: 1;
+  opacity: 1;
 }
 
 .mobile-ingredients-confirmation {
-    margin-top: var(--space-sm);
-    font-size: 13px;
-    font-weight: 600;
-    min-height: 18px;
-    transition: opacity var(--transition-slow);
-    text-align: center;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.1);
-    margin-bottom: var(--space-lg);
-    opacity: 0;
+  margin-top: var(--space-sm);
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 18px;
+  transition: opacity var(--transition-slow);
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--space-lg);
+  opacity: 0;
 }
 
 .mobile-ingredients-confirmation.show {
-    opacity: 1;
+  opacity: 1;
 }
 
 /* Loading and status text */
 .recipe-loading-status,
 .mobile-recipe-loading-status {
-    text-align: center;
-    color: var(--color-primary);
-    font-size: 14px;
-    margin-bottom: var(--space-lg);
-    font-style: italic;
+  text-align: center;
+  color: var(--color-primary);
+  font-size: 14px;
+  margin-bottom: var(--space-lg);
+  font-style: italic;
 }
 
 /* Empty states */
-.empty-favorites, .error-favorites,
+.empty-favorites,
+.error-favorites,
 .mobile-empty-favorites {
-    text-align: center;
-    color: #aaa;
-    font-style: italic;
-    margin-top: 60px;
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+  margin-top: 60px;
 }
 
 /* Text truncation helpers */
 .text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .text-truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
