@@ -4,7 +4,7 @@
    ====================================================== */
 
 export class NavigationService {
-  constructor() {
+  constructor(favoritesService = null, userPreferencesService = null) {
     this.views = {
       main: document.getElementById('view-main'),
       favorites: document.getElementById('view-favorites'),
@@ -13,6 +13,10 @@ export class NavigationService {
 
     this.current = 'main';
     this.isTransitioning = false;
+    
+    // Injected services
+    this.favoritesService = favoritesService;
+    this.userPreferencesService = userPreferencesService;
 
     // Initialize
     console.log('🧭 Navigation Service initialized');
@@ -29,10 +33,10 @@ export class NavigationService {
     const to = this.views[view];
 
     // Call the appropriate service to render content
-    if (view === 'favorites') {
-      await window.recipeApp.services.favorites.showFavorites();
-    } else if (view === 'preferences') {
-      await window.recipeApp.services.userPreferences.showPreferences();
+    if (view === 'favorites' && this.favoritesService) {
+      await this.favoritesService.showFavorites();
+    } else if (view === 'preferences' && this.userPreferencesService) {
+      await this.userPreferencesService.showPreferences();
     }
 
     // Transition

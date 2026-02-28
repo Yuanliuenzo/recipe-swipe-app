@@ -5,8 +5,30 @@
     "ingredientsAtHome": "",
     "favorites": [
       {
+        "id": "1771993280983",
+        "recipeText": {
+          "recipe": " Romantic Caprese Pasta with Pommegranate Balsamic Drizzle\n===\n\nIngredients:\n• 4 servings of pasta (fettuccine or linguine work well)\n• 6-8 large ripe tomatoes, sliced\n• 1 ball of fresh mozzarella, sliced\n• Fresh rucola (arugula) for garnish\n• 1 cup pommegranate seeds\n• 1/2 cup balsamic vinegar\n• Salt and pepper to taste\n• Olive oil\n\nInstructions:\n1. Cook pasta according to package instructions until al dente. Drain and set aside, reserving some of the pasta water.\n2. In a small saucepan over medium heat, reduce balsamic vinegar by half to create a syrup-like consistency. Remove from heat and stir in pommegranate seeds. Season with salt and pepper if needed.\n3. On individual serving plates, layer cooked pasta, sliced tomatoes, fresh mozzarella, and rucola. Drizzle the pommegranate balsamic reduction over each plate.\n4. Drizzle a small amount of olive oil over each dish for added richness. Season with salt and pepper to taste. Serve immediately and enjoy your romantic caprese pasta!"
+        },
+        "title": "Romantic Caprese Pasta with Pommegranate Balsamic Drizzle",
+        "rating": null,
+        "note": null,
+        "createdAt": "2026-02-25T04:21:20.983Z"
+      },
+      {
+        "id": "1771991999542",
+        "recipeText": {
+          "recipe": " Quinoa Salad with Spinach & Sun-Dried Tomatoes\n===\n\nIngredients:\n• 1 cup quinoa, rinsed\n• 2 cups water\n• Salt, to taste\n• 5 cups fresh spinach\n• 1 cup sun-dried tomatoes (packed in oil)\n• 1/4 cup olive oil\n• 3 tbsp lemon juice\n• 1 tsp garlic powder\n• Black pepper, to taste\n\nInstructions:\n1. In a saucepan, bring quinoa and water to a boil. Reduce heat to low, cover, and simmer for 15 minutes or until quinoa is tender. Season with salt.\n2. Drain the sun-dried tomatoes from oil and roughly chop them.\n3. In a large bowl, combine cooked quinoa, chopped sun-dried tomatoes, spinach leaves, olive oil, lemon juice, garlic powder, and black pepper. Toss until evenly coated.\n4. Serve immediately or chill in the refrigerator for at least 30 minutes before serving. Enjoy!"
+        },
+        "title": "Quinoa Salad with Spinach & Sun-Dried Tomatoes",
+        "rating": null,
+        "note": null,
+        "createdAt": "2026-02-25T03:59:59.542Z"
+      },
+      {
         "id": "1770669093768",
-        "recipeText": " Roasted Leek and Eggplant Medley Salad\n===\n\nIngredients:\n• 2 medium leeks, sliced\n• 2 medium eggplants, diced\n• 4 large tomatoes, chopped\n• 1 red bell pepper, chopped\n• 1 cucumber, sliced\n• 1 cup fresh basil leaves, torn\n• 3 tablespoons olive oil\n• Salt and pepper to taste\n• Juice of 2 lemons\n• 1/4 cup feta cheese (optional)\n\nInstructions:\n1. Preheat the oven to 400°F (200°C). Spread diced eggplants on a baking sheet, drizzle with half of the olive oil and season with salt and pepper. Roast for 20-25 minutes or until tender.\n2. On another baking sheet, place sliced leeks and drizzle with the remaining olive oil. Season with salt and pepper, then roast for 10-15 minutes or until softened and slightly caramelized.\n3. In a large serving bowl, combine roasted eggplants, leeks, chopped tomatoes, red bell pepper, sliced cucumber, torn basil leaves, lemon juice, and feta cheese (if using). Mix gently to combine all ingredients.\n4. Season the salad with additional salt and pepper if needed. Serve immediately.",
+        "recipeText": {
+          "recipe": " Roasted Leek and Eggplant Medley Salad\n===\n\nIngredients:\n• 2 medium leeks, sliced\n• 2 medium eggplants, diced\n• 4 large tomatoes, chopped\n• 1 red bell pepper, chopped\n• 1 cucumber, sliced\n• 1 cup fresh basil leaves, torn\n• 3 tablespoons olive oil\n• Salt and pepper to taste\n• Juice of 2 lemons\n• 1/4 cup feta cheese (optional)\n\nInstructions:\n1. Preheat the oven to 400°F (200°C). Spread diced eggplants on a baking sheet, drizzle with half of the olive oil and season with salt and pepper. Roast for 20-25 minutes or until tender.\n2. On another baking sheet, place sliced leeks and drizzle with the remaining olive oil. Season with salt and pepper, then roast for 10-15 minutes or until softened and slightly caramelized.\n3. In a large serving bowl, combine roasted eggplants, leeks, chopped tomatoes, red bell pepper, sliced cucumber, torn basil leaves, lemon juice, and feta cheese (if using). Mix gently to combine all ingredients.\n4. Season the salad with additional salt and pepper if needed. Serve immediately."
+        },
         "title": "Roasted Leek and Eggplant Medley Salad",
         "rating": 4,
         "note": null,
@@ -14,7 +36,9 @@
       },
       {
         "id": "1770665083041",
-        "recipeText": " Recipe Name: Apple, Kale, and Walnut Salad\n\nIngredients:\n• 5 cups kale, chopped\n• 1 medium apple, sliced\n• 1/2 cup walnuts, chopped\n\nInstructions:\n1. Wash the kale thoroughly and chop into bite-sized pieces. Place in a large salad bowl.\n2. Core and slice the apple, add it to the bowl with the kale.\n3. Sprinkle the chopped walnuts over the top of the salad.\n4. Dress the salad with your choice of light vinaigrette or lemon juice and olive oil, toss to combine.\n5. Serve immediately, enjoy your healthy, fresh, and satisfying Apple, Kale, and Walnut Salad!",
+        "recipeText": {
+          "recipe": " Recipe Name: Apple, Kale, and Walnut Salad\n\nIngredients:\n• 5 cups kale, chopped\n• 1 medium apple, sliced\n• 1/2 cup walnuts, chopped\n\nInstructions:\n1. Wash the kale thoroughly and chop into bite-sized pieces. Place in a large salad bowl.\n2. Core and slice the apple, add it to the bowl with the kale.\n3. Sprinkle the chopped walnuts over the top of the salad.\n4. Dress the salad with your choice of light vinaigrette or lemon juice and olive oil, toss to combine.\n5. Serve immediately, enjoy your healthy, fresh, and satisfying Apple, Kale, and Walnut Salad!"
+        },
         "title": "Apple, Kale, and Walnut Salad",
         "rating": null,
         "note": null,
@@ -22,7 +46,7 @@
       }
     ],
     "createdAt": "2026-02-09T19:23:06.690Z",
-    "lastLogin": "2026-02-11T06:53:10.412Z",
+    "lastLogin": "2026-02-28T00:52:52.246Z",
     "preferences": {
       "diet": "Vegetarian",
       "budget": "Yes",

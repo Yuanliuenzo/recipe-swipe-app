@@ -1,6 +1,8 @@
 export class UserPreferencesService {
-  constructor(stateManager) {
+  constructor(stateManager, apiService, navigationService = null) {
     this.stateManager = stateManager;
+    this.api = apiService;
+    this.navigationService = navigationService;
     this.initialized = false;
     this.loadingPromise = null; // prevents race conditions
   }
@@ -146,11 +148,15 @@ export class UserPreferencesService {
     // Add close handler
     screen.querySelector('.mobile-favorites-close')
       .addEventListener('click', () => {
-        window.recipeApp.services.navigation.go('main');
+        if (this.navigationService) {
+          this.navigationService.go('main');
+        }
       });
 
     // Render into the preferences view
-    window.recipeApp.services.navigation.renderPreferences(screen);
+    if (this.navigationService) {
+      this.navigationService.renderPreferences(screen);
+    }
     console.log('✅ Preferences screen rendered');
   }
 

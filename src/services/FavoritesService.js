@@ -1,10 +1,14 @@
 // Favorites Service
 // Clean, modern, maintainable implementation
 
+import { RecipeDisplayComponent } from '../components/RecipeDisplayComponent.js';
+
 export class FavoritesService {
-  constructor(stateManager, apiService) {
+  constructor(stateManager, apiService, navigationService = null, recipeFormatter = null) {
     this.stateManager = stateManager;
     this.api = apiService;
+    this.navigationService = navigationService;
+    this.recipeFormatter = recipeFormatter;
     this.initialized = false;
   }
 
@@ -128,7 +132,9 @@ export class FavoritesService {
     // Add close handler
     screen.querySelector('.mobile-favorites-close')
       .addEventListener('click', () => {
-        window.recipeApp.services.navigation.go('main');
+        if (this.navigationService) {
+          this.navigationService.go('main');
+        }
       });
 
     const list = screen.querySelector('.mobile-favorites-list');
@@ -150,7 +156,9 @@ export class FavoritesService {
     }
 
     // Render into the favorites view
-    window.recipeApp.services.navigation.renderFavorites(screen);
+    if (this.navigationService) {
+      this.navigationService.renderFavorites(screen);
+    }
     console.log('✅ Favorites screen rendered');
   }
 
@@ -161,101 +169,56 @@ export class FavoritesService {
 
   /* =====================================================
      BOTTOM SHEET MODAL (STATE OF THE ART)
-  ===================================================== */
+     ===================================================== */
 
   openFavoriteModal(favorite) {
-  const formatted = window.recipeApp.RecipeFormatter.format(
-    favorite.recipeText || favorite.description || ''
-  );
+    const modal = document.createElement('div');
+    modal.className = 'favorite-bottom-sheet';
 
-  const modal = document.createElement('div');
-  modal.className = 'favorite-bottom-sheet';
-
-  modal.innerHTML = `
-    <div class="favorite-sheet-overlay"></div>
-    <div class="favorite-sheet-container">
-
-      <div class="favorite-sheet-header">
-        <h2>${formatted.title}</h2>
-        <button class="favorite-sheet-close">×</button>
-      </div>
-
-      ${formatted.hasIngredients && formatted.hasInstructions ? `
-        <div class="mobile-recipe-toggle">
-          <button class="mobile-recipe-toggle-btn active" data-target="ingredients">
-            Ingredients
-          </button>
-          <button class="mobile-recipe-toggle-btn" data-target="instructions">
-            Instructions
-          </button>
-        </div>
-      ` : ''}
-
-      <div class="mobile-recipe-content">
-        ${formatted.html}
-      </div>
-
-      <div class="favorite-sheet-footer">
-        <div class="favorite-footer-content">
-          <button class="japandi-btn japandi-btn-subtle favorite-delete-btn">🗑️ Remove</button>
-          
-          <div class="favorite-rating">
-            ${[1,2,3,4,5].map(i => `
-              <button class="star ${i <= (favorite.rating || 0) ? 'active' : ''}" data-rating="${i}">
-                ★
-              </button>
-            `).join('')}
-          </div>
+    // Create custom footer for modal
+    const customFooter = `
+      <div class="favorite-footer-content">
+        <button class="japandi-btn japandi-btn-subtle favorite-delete-btn">🗑️ Remove</button>
+        
+        <div class="favorite-rating">
+          ${[1,2,3,4,5].map(i => `
+            <button class="star ${i <= (favorite.rating || 0) ? 'active' : ''}" data-rating="${i}">
+              ★
+            </button>
+          `).join('')}
         </div>
       </div>
+    `;
 
-    </div>
-  `;
+    // Generate modal HTML using RecipeDisplayComponent
+    const { html, setupToggleLogic } = RecipeDisplayComponent.generateModalHTML(
+      favorite, 
+      { customFooter }
+    );
 
-  document.body.appendChild(modal);
-  document.body.classList.add('app--overlay-open');
+    modal.innerHTML = `
+      <div class="favorite-sheet-overlay"></div>
+      ${html}
+    `;
 
-  // Close handlers
-  const close = () => {
-    modal.remove();
-    document.body.classList.remove('app--overlay-open');
-  };
+    document.body.appendChild(modal);
+    document.body.classList.add('app--overlay-open');
 
-  modal.querySelector('.favorite-sheet-close')
-    .addEventListener('click', close);
+    // Setup toggle logic
+    const container = modal.querySelector('.favorite-sheet-container');
+    setupToggleLogic(container);
 
-  modal.querySelector('.favorite-sheet-overlay')
-    .addEventListener('click', close);
+    // Close handlers
+    const close = () => {
+      modal.remove();
+      document.body.classList.remove('app--overlay-open');
+    };
 
-  // Toggle logic (same as main recipe)
-  if (formatted.hasIngredients && formatted.hasInstructions) {
-    const content = modal.querySelector('.mobile-recipe-content');
-    const buttons = modal.querySelectorAll('.mobile-recipe-toggle-btn');
+    modal.querySelector('.favorite-sheet-close')
+      .addEventListener('click', close);
 
-    // Initially hide instructions, show ingredients
-    content.querySelectorAll('[data-recipe-section]').forEach(section => {
-      const isActive = section.dataset.recipeSection === 'ingredients';
-      section.classList.toggle('is-active', isActive);
-    });
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-
-        buttons.forEach(b =>
-          b.classList.toggle('active', b.dataset.target === target)
-        );
-
-        content.querySelectorAll('[data-recipe-section]').forEach(section => {
-          const isActive = section.dataset.recipeSection === target;
-          section.classList.toggle('is-active', isActive);
-        });
-
-        // Scroll to top when toggling
-        content.scrollTop = 0;
-      });
-    });
-  }
+    modal.querySelector('.favorite-sheet-overlay')
+      .addEventListener('click', close);
 
   // Rating functionality
   modal.querySelectorAll('.star').forEach(btn => {

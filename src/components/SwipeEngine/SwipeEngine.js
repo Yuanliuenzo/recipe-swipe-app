@@ -1,6 +1,7 @@
 import { DeviceUtils } from '../../utils/DeviceUtils.js';
 import { CONFIG } from '../../core/Config.js';
 import { globalEventBus } from '../../core/EventBus.js';
+import { debug } from '../../utils/DebugUtil.js';
 
 // Main SwipeEngine class that delegates to platform-specific handlers
 export class SwipeEngine {
@@ -29,7 +30,7 @@ export class SwipeEngine {
       onSwipeLeft: null,
       onSwipeRight: null,
       onSwipeCancel: null,
-      ...options.callbacks
+      ...options
     };
     
     // Create platform-specific handler
@@ -155,9 +156,13 @@ class BaseSwipeHandler {
   
   // Emit callback events
   emit(eventName, data) {
-    const callback = this.callbacks[`on${eventName.charAt(0).toUpperCase() + eventName.slice(1)}`];
+    const callbackName = `on${eventName.charAt(0).toUpperCase() + eventName.slice(1)}`;
+    const callback = this.callbacks[callbackName];
+
     if (callback) {
       callback(data);
+    } else {
+      debug.warn(`No callback found for: ${callbackName}`);
     }
     
     // Also emit to global event bus
@@ -220,7 +225,9 @@ class MouseSwipeHandler extends BaseSwipeHandler {
     
     if (swipe.isSwipe) {
       this.animateOut(swipe.direction, swipe.direction === 'right' ? 500 : -500);
-      this.emit(swipe.direction === 'right' ? 'swipeRight' : 'swipeLeft', swipe);
+      
+      const eventName = swipe.direction === 'right' ? 'swipeRight' : 'swipeLeft';
+      this.emit(eventName, swipe);
     } else {
       this.resetTransform();
       this.emit('swipeCancel', swipe);
@@ -300,15 +307,18 @@ class TouchSwipeHandler extends BaseSwipeHandler {
   handleTouchEnd(e) {
     if (!this.isDragging) return;
     
+    debug.touch('Touch END - Final position:', e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     this.isDragging = false;
     this.element.style.transition = 'transform 0.3s ease-out';
     
     const timeDelta = Date.now() - this.startTime;
     const swipe = this.calculateSwipe(this.currentX, this.currentY, timeDelta);
-    
+
     if (swipe.isSwipe) {
       this.animateOut(swipe.direction, swipe.direction === 'right' ? 500 : -500);
-      this.emit(swipe.direction === 'right' ? 'swipeRight' : 'swipeLeft', swipe);
+      
+      const eventName = swipe.direction === 'right' ? 'swipeRight' : 'swipeLeft';
+      this.emit(eventName, swipe);
     } else {
       this.resetTransform();
       this.emit('swipeCancel', swipe);
