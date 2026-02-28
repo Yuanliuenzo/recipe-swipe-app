@@ -1,11 +1,11 @@
 // eslint.config.js
 
-const js = require("@eslint/js");
-const globals = require("globals");
-const prettier = require("eslint-config-prettier");
-const unusedImports = require("eslint-plugin-unused-imports");
+import js from "@eslint/js";
+import globals from "globals";
+import prettier from "eslint-config-prettier";
+import unusedImports from "eslint-plugin-unused-imports";
 
-module.exports = [
+export default [
   // Base ESLint recommended rules
   js.configs.recommended,
 
