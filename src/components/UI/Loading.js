@@ -1,50 +1,50 @@
-import { Component } from '../Component.js';
+import { Component } from "../Component.js";
 
 // Loading component with different styles
 export class Loading extends Component {
   constructor(container, props = {}) {
     super(container, {
-      type: 'spinner', // 'spinner', 'skeleton', 'dots'
-      message: 'Loading...',
-      size: 'medium', // 'small', 'medium', 'large'
+      type: "spinner", // 'spinner', 'skeleton', 'dots'
+      message: "Loading...",
+      size: "medium", // 'small', 'medium', 'large'
       overlay: false,
       ...props
     });
   }
-  
+
   render() {
     const { type, message, size, overlay } = this.props;
-    
-    const overlayClass = overlay ? 'loading-overlay' : '';
+
+    const overlayClass = overlay ? "loading-overlay" : "";
     const sizeClass = `loading-${size}`;
-    
+
     return `
       <div class="loading-container ${overlayClass} ${sizeClass}" data-component-id="${this.id}">
         ${this.renderLoadingContent()}
-        ${message ? `<div class="loading-message">${message}</div>` : ''}
+        ${message ? `<div class="loading-message">${message}</div>` : ""}
       </div>
     `;
   }
-  
+
   renderLoadingContent() {
     const { type } = this.props;
-    
+
     switch (type) {
-      case 'spinner':
+      case "spinner":
         return this.renderSpinner();
-      case 'skeleton':
+      case "skeleton":
         return this.renderSkeleton();
-      case 'dots':
+      case "dots":
         return this.renderDots();
       default:
         return this.renderSpinner();
     }
   }
-  
+
   renderSpinner() {
     return '<div class="loading-spinner"></div>';
   }
-  
+
   renderSkeleton() {
     return `
       <div class="skeleton-loader">
@@ -56,7 +56,7 @@ export class Loading extends Component {
       </div>
     `;
   }
-  
+
   renderDots() {
     return `
       <div class="loading-dots">
@@ -66,22 +66,22 @@ export class Loading extends Component {
       </div>
     `;
   }
-  
+
   // Update loading message
   updateMessage(newMessage) {
     this.props.message = newMessage;
-    const messageElement = this.find('.loading-message');
+    const messageElement = this.find(".loading-message");
     if (messageElement) {
       messageElement.textContent = newMessage;
     }
   }
-  
+
   // Change loading type
   updateType(newType) {
     this.props.type = newType;
     this.forceUpdate();
   }
-  
+
   // Show/hide overlay
   setOverlay(show) {
     this.props.overlay = show;
@@ -93,13 +93,13 @@ export class Loading extends Component {
 export class RecipeLoading extends Loading {
   constructor(container, props = {}) {
     super(container, {
-      type: 'skeleton',
-      message: 'Generating your recipe...',
+      type: "skeleton",
+      message: "Generating your recipe...",
       overlay: true,
       ...props
     });
   }
-  
+
   render() {
     return `
       <div class="recipe-loading" data-component-id="${this.id}">
@@ -114,13 +114,13 @@ export class RecipeLoading extends Loading {
 export class MobileLoading extends Loading {
   constructor(container, props = {}) {
     super(container, {
-      type: 'spinner',
-      message: 'Loading...',
-      size: 'small',
+      type: "spinner",
+      message: "Loading...",
+      size: "small",
       ...props
     });
   }
-  
+
   render() {
     return `
       <div class="mobile-loading" data-component-id="${this.id}">

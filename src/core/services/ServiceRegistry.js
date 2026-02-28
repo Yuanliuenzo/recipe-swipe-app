@@ -4,7 +4,7 @@
  * Works with existing state-of-the-art services
  */
 
-import { apiService } from '../ApiService.js';
+import { apiService } from "../ApiService.js";
 
 export class ServiceRegistry {
   constructor() {
@@ -14,21 +14,20 @@ export class ServiceRegistry {
 
   async initialize() {
     if (this.isInitialized) {
-      console.warn('ServiceRegistry already initialized');
+      console.warn("ServiceRegistry already initialized");
       return;
     }
 
     try {
-      console.log('🔧 Initializing Service Registry...');
+      console.log("🔧 Initializing Service Registry...");
 
       // Register core API service
-      this.register('api', apiService);
+      this.register("api", apiService);
 
       this.isInitialized = true;
-      console.log('✅ Service Registry initialized successfully');
-
+      console.log("✅ Service Registry initialized successfully");
     } catch (error) {
-      console.error('❌ Failed to initialize Service Registry:', error);
+      console.error("❌ Failed to initialize Service Registry:", error);
       throw error;
     }
   }
@@ -69,26 +68,26 @@ export class ServiceRegistry {
 
   clear() {
     this.services.clear();
-    console.log('🗑️ Cleared all services');
+    console.log("🗑️ Cleared all services");
   }
 
   // Initialize all services
   async initializeAll() {
     const initPromises = Array.from(this.services.values()).map(service => {
-      if (service && typeof service.initialize === 'function') {
+      if (service && typeof service.initialize === "function") {
         return service.initialize();
       }
       return Promise.resolve();
     });
 
     await Promise.all(initPromises);
-    console.log('✅ All services initialized');
+    console.log("✅ All services initialized");
   }
 
   // Destroy all services
   async destroyAll() {
     const destroyPromises = Array.from(this.services.values()).map(service => {
-      if (service && typeof service.destroy === 'function') {
+      if (service && typeof service.destroy === "function") {
         return service.destroy();
       }
       return Promise.resolve();
@@ -96,6 +95,6 @@ export class ServiceRegistry {
 
     await Promise.all(destroyPromises);
     this.clear();
-    console.log('🗑️ All services destroyed');
+    console.log("🗑️ All services destroyed");
   }
 }

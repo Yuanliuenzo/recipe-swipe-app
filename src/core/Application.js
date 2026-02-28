@@ -3,16 +3,16 @@
  * Single codebase for all devices - mobile, tablet, and desktop
  */
 
-import { DeviceUtils } from '../utils/DeviceUtils.js';
-import { globalEventBus } from './EventBus.js';
-import { globalStateManager } from './StateManager.js';
+import { DeviceUtils } from "../utils/DeviceUtils.js";
+import { globalEventBus } from "./EventBus.js";
+import { globalStateManager } from "./StateManager.js";
 
 // Core services
-import { ServiceRegistry } from './services/ServiceRegistry.js';
-import { ComponentRegistry } from './components/ComponentRegistry.js';
+import { ServiceRegistry } from "./services/ServiceRegistry.js";
+import { ComponentRegistry } from "./components/ComponentRegistry.js";
 
 // Unified app controller
-import { UnifiedApp } from './controllers/UnifiedApp.js';
+import { UnifiedApp } from "./controllers/UnifiedApp.js";
 
 export class Application {
   constructor() {
@@ -24,92 +24,98 @@ export class Application {
 
   async initialize() {
     if (this.isInitialized) {
-      console.warn('Application already initialized');
+      console.warn("Application already initialized");
       return;
     }
 
     try {
-      console.log('🚀 Initializing Unified Recipe Swipe Application...');
-      
+      console.log("🚀 Initializing Unified Recipe Swipe Application...");
+
       // 1. Setup error handling
       this.setupErrorBoundary();
-      
+
       // 2. Initialize core services
       await this.serviceRegistry.initialize();
       await this.componentRegistry.initialize();
-      
+
       // 3. Create unified app controller
-      this.unifiedApp = new UnifiedApp(this.serviceRegistry, this.componentRegistry);
-      
+      this.unifiedApp = new UnifiedApp(
+        this.serviceRegistry,
+        this.componentRegistry
+      );
+
       // 4. Initialize unified app
       await this.unifiedApp.initialize();
-      
+
       // 5. Setup global error handling
       this.setupGlobalErrorHandling();
-      
+
       // 6. Setup performance monitoring
       this.setupPerformanceMonitoring();
-      
+
       this.isInitialized = true;
-      
-      console.log('✅ Unified Application initialized successfully!');
-      globalEventBus.emit('app:ready', { 
+
+      console.log("✅ Unified Application initialized successfully!");
+      globalEventBus.emit("app:ready", {
         app: this.unifiedApp,
         deviceInfo: DeviceUtils.getDeviceInfo()
       });
-      
     } catch (error) {
-      console.error('❌ Failed to initialize application:', error);
+      console.error("❌ Failed to initialize application:", error);
       this.handleCriticalError(error);
     }
   }
 
   setupErrorBoundary() {
-    window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled promise rejection:', event.reason);
-      this.handleError(event.reason, 'UnhandledPromiseRejection');
+    window.addEventListener("unhandledrejection", event => {
+      console.error("Unhandled promise rejection:", event.reason);
+      this.handleError(event.reason, "UnhandledPromiseRejection");
     });
 
-    window.addEventListener('error', (event) => {
-      console.error('Uncaught error:', event.error);
-      this.handleError(event.error, 'UncaughtError');
+    window.addEventListener("error", event => {
+      console.error("Uncaught error:", event.error);
+      this.handleError(event.error, "UncaughtError");
     });
   }
 
   setupGlobalErrorHandling() {
-    globalEventBus.on('app:error', (error) => {
-      this.handleError(error.error, error.context || 'App');
+    globalEventBus.on("app:error", error => {
+      this.handleError(error.error, error.context || "App");
     });
 
-    globalEventBus.on('component:error', (error) => {
+    globalEventBus.on("component:error", error => {
       this.handleError(error.error, `Component:${error.componentId}`);
     });
   }
 
-  handleError(error, context = 'Unknown') {
+  handleError(error, context = "Unknown") {
     console.error(`Error in ${context}:`, error);
-    
+
     try {
       this.showUserError(error, context);
     } catch (fallbackError) {
-      console.error('Failed to show error UI:', fallbackError);
+      console.error("Failed to show error UI:", fallbackError);
       alert(`An error occurred: ${error.message}`);
     }
   }
 
   showUserError(error, context) {
     const userFriendlyMessages = {
-      'NetworkError': 'Unable to connect. Please check your internet connection.',
-      'ValidationError': 'Invalid information provided. Please try again.',
-      'AuthenticationError': 'Please log in again to continue.',
-      'RecipeGenerationError': 'Unable to generate recipe right now. Please try again.',
-      'UnhandledPromiseRejection': 'Something unexpected happened. Please refresh the page.',
-      'UncaughtError': 'An unexpected error occurred. Please refresh the page.',
-      'Component': 'A component failed to load. Please refresh the page.'
+      NetworkError: "Unable to connect. Please check your internet connection.",
+      ValidationError: "Invalid information provided. Please try again.",
+      AuthenticationError: "Please log in again to continue.",
+      RecipeGenerationError:
+        "Unable to generate recipe right now. Please try again.",
+      UnhandledPromiseRejection:
+        "Something unexpected happened. Please refresh the page.",
+      UncaughtError: "An unexpected error occurred. Please refresh the page.",
+      Component: "A component failed to load. Please refresh the page."
     };
-    
-    const message = userFriendlyMessages[context] || 'An unexpected error occurred. Please try again.';
-    
+
+    const message =
+      userFriendlyMessages[context] ||
+      "An unexpected error occurred. Please try again.";
+
     // Use unified app's error handling
     if (this.unifiedApp && this.unifiedApp.showError) {
       this.unifiedApp.showError(message);
@@ -119,8 +125,8 @@ export class Application {
   }
 
   handleCriticalError(error) {
-    console.error('Critical application error:', error);
-    
+    console.error("Critical application error:", error);
+
     document.body.innerHTML = `
       <div style="
         display: flex;
@@ -163,12 +169,14 @@ export class Application {
   }
 
   setupPerformanceMonitoring() {
-    if ('performance' in window) {
+    if ("performance" in window) {
       setTimeout(() => {
-        const perfData = performance.getEntriesByType('navigation')[0];
+        const perfData = performance.getEntriesByType("navigation")[0];
         if (perfData) {
-          console.log('📊 Performance Metrics:', {
-            domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+          console.log("📊 Performance Metrics:", {
+            domContentLoaded:
+              perfData.domContentLoadedEventEnd -
+              perfData.domContentLoadedEventStart,
             loadComplete: perfData.loadEventEnd - perfData.loadEventStart,
             deviceInfo: DeviceUtils.getDeviceInfo()
           });
@@ -176,13 +184,13 @@ export class Application {
       }, 2000);
     }
 
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       setInterval(() => {
         const memory = performance.memory;
         if (memory.usedJSHeapSize > 50 * 1024 * 1024) {
-          console.warn('⚠️ High memory usage detected:', {
-            used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + 'MB',
-            total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + 'MB'
+          console.warn("⚠️ High memory usage detected:", {
+            used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + "MB",
+            total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + "MB"
           });
         }
       }, 10000);
@@ -203,12 +211,12 @@ export class Application {
   }
 
   async restart() {
-    console.log('🔄 Restarting application...');
-    
+    console.log("🔄 Restarting application...");
+
     if (this.unifiedApp && this.unifiedApp.destroy) {
       this.unifiedApp.destroy();
     }
-    
+
     globalStateManager.reset();
     await this.initialize();
   }
@@ -217,7 +225,7 @@ export class Application {
     return {
       ...DeviceUtils.getDeviceInfo(),
       isInitialized: this.isInitialized,
-      version: '2.0.0'
+      version: "2.0.0"
     };
   }
 }
@@ -227,13 +235,13 @@ let globalApplication = null;
 
 export async function initializeApplication() {
   if (globalApplication) {
-    console.warn('Application already initialized');
+    console.warn("Application already initialized");
     return globalApplication;
   }
-  
+
   globalApplication = new Application();
   await globalApplication.initialize();
-  
+
   return globalApplication;
 }
 

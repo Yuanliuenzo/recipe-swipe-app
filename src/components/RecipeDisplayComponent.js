@@ -3,7 +3,7 @@
  * Reusable component for displaying recipes with mobile toggle functionality
  */
 
-import { RecipeFormatter } from '../shared/RecipeFormatter.js';
+import { RecipeFormatter } from "../shared/RecipeFormatter.js";
 
 export class RecipeDisplayComponent {
   /**
@@ -13,20 +13,26 @@ export class RecipeDisplayComponent {
    * @returns {Object} - { html, formatted, setupToggleLogic }
    */
   static generateRecipeHTML(recipe, options = {}) {
-    const { title, showTitle = true, customActions = '' } = options;
-    
+    const { title, showTitle = true, customActions = "" } = options;
+
     // Format the recipe
     const formatted = RecipeFormatter.format(recipe.recipeText.recipe);
-    
+
     // Generate HTML
     const html = `
-      ${showTitle ? `
+      ${
+        showTitle
+          ? `
         <div class="recipe-detail-header">
           <h2>${title || formatted.title}</h2>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
       
-      ${formatted.hasIngredients && formatted.hasInstructions ? `
+      ${
+        formatted.hasIngredients && formatted.hasInstructions
+          ? `
         <div class="mobile-recipe-toggle">
           <button class="mobile-recipe-toggle-btn active" data-target="ingredients">
             Ingredients
@@ -35,23 +41,29 @@ export class RecipeDisplayComponent {
             Instructions
           </button>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
 
       <div class="mobile-recipe-content">
         ${formatted.html}
       </div>
       
-      ${customActions ? `
+      ${
+        customActions
+          ? `
         <div class="recipe-actions">
           ${customActions}
         </div>
-      ` : ''}
+      `
+          : ""
+      }
     `;
 
     return {
       html,
       formatted,
-      setupToggleLogic: (container) => this.setupToggleLogic(container, formatted)
+      setupToggleLogic: container => this.setupToggleLogic(container, formatted)
     };
   }
 
@@ -65,33 +77,33 @@ export class RecipeDisplayComponent {
       return;
     }
 
-    const content = container.querySelector('.mobile-recipe-content');
-    const buttons = container.querySelectorAll('.mobile-recipe-toggle-btn');
+    const content = container.querySelector(".mobile-recipe-content");
+    const buttons = container.querySelectorAll(".mobile-recipe-toggle-btn");
 
     if (!content || !buttons.length) {
       return;
     }
 
     // Initially hide instructions, show ingredients
-    content.querySelectorAll('[data-recipe-section]').forEach(section => {
-      const isActive = section.dataset.recipeSection === 'ingredients';
-      section.classList.toggle('is-active', isActive);
+    content.querySelectorAll("[data-recipe-section]").forEach(section => {
+      const isActive = section.dataset.recipeSection === "ingredients";
+      section.classList.toggle("is-active", isActive);
     });
 
     // Setup click handlers
     buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener("click", () => {
         const target = btn.dataset.target;
 
         // Update button states
         buttons.forEach(b =>
-          b.classList.toggle('active', b.dataset.target === target)
+          b.classList.toggle("active", b.dataset.target === target)
         );
 
         // Update section visibility
-        content.querySelectorAll('[data-recipe-section]').forEach(section => {
+        content.querySelectorAll("[data-recipe-section]").forEach(section => {
           const isActive = section.dataset.recipeSection === target;
-          section.classList.toggle('is-active', isActive);
+          section.classList.toggle("is-active", isActive);
         });
 
         // Scroll to top when toggling
@@ -108,9 +120,9 @@ export class RecipeDisplayComponent {
    */
   static render(container, recipe, options = {}) {
     const { html, setupToggleLogic } = this.generateRecipeHTML(recipe, options);
-    
+
     container.innerHTML = html;
-    
+
     // Setup toggle logic after DOM is ready
     setTimeout(() => {
       setupToggleLogic(container);
@@ -124,11 +136,11 @@ export class RecipeDisplayComponent {
    * @returns {Object} - { html, setupToggleLogic }
    */
   static generateModalHTML(recipe, options = {}) {
-    const { customFooter = '' } = options;
-    
+    const { customFooter = "" } = options;
+
     const { html, formatted, setupToggleLogic } = this.generateRecipeHTML(
-      recipe, 
-      { showTitle: false, customActions: '' }
+      recipe,
+      { showTitle: false, customActions: "" }
     );
 
     const modalHTML = `
@@ -140,18 +152,22 @@ export class RecipeDisplayComponent {
 
         ${html}
 
-        ${customFooter ? `
+        ${
+          customFooter
+            ? `
           <div class="favorite-sheet-footer">
             ${customFooter}
           </div>
-        ` : ''}
+        `
+            : ""
+        }
       </div>
     `;
 
     return {
       html: modalHTML,
       formatted,
-      setupToggleLogic: (container) => this.setupToggleLogic(container, formatted)
+      setupToggleLogic: container => this.setupToggleLogic(container, formatted)
     };
   }
 }

@@ -48,27 +48,31 @@ public/css/
 ## 🎨 Design System
 
 ### Color Palette (Japandi-inspired)
+
 ```css
 :root {
-    --color-bg: #f0f2f5;           /* Soft background */
-    --color-card: #ffffff;         /* Clean white cards */
-    --color-primary: #6a4e42;      /* Warm brown */
-    --color-secondary: #8b7355;    /* Muted accent */
-    --color-accent: #dcb984;       /* Soft gold */
-    --color-text: #34495e;         /* Dark text */
+  --color-bg: #f0f2f5; /* Soft background */
+  --color-card: #ffffff; /* Clean white cards */
+  --color-primary: #6a4e42; /* Warm brown */
+  --color-secondary: #8b7355; /* Muted accent */
+  --color-accent: #dcb984; /* Soft gold */
+  --color-text: #34495e; /* Dark text */
 }
 ```
 
 ### Typography Scale
+
 - **Primary Font**: 'Noto Sans' (clean, neutral)
 - **Heading Font**: 'Playfair Display' (elegant serif)
 - **Font Sizes**: 12px - 36px with responsive scaling
 
 ### Spacing System
+
 - **Scale**: 4px, 8px, 12px, 16px, 20px, 24px, 30px, 40px
 - **Consistent**: Used throughout all components
 
 ### Border Radius
+
 - **Soft**: 6px, 8px, 12px, 16px, 18px, 20px, 25px, 26px
 - **Japandi aesthetic**: Rounded but not overly soft
 
@@ -101,6 +105,7 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 📱 Responsive Design
 
 ### Breakpoints
+
 - **XS**: 480px (Phones)
 - **SM**: 640px (Landscape phones)
 - **MD**: 768px (Tablets)
@@ -108,6 +113,7 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 - **XL**: 1280px (Large desktops)
 
 ### Mobile-First Approach
+
 - Base styles target mobile devices
 - Enhanced styles added via media queries for larger screens
 - Touch-optimized interactions for mobile
@@ -115,26 +121,31 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 🎯 Best Practices
 
 ### 1. **Consistent Naming**
+
 - Use BEM-inspired naming: `.component__element--modifier`
 - Mobile prefixes: `.mobile-component`
 - Semantic class names
 
 ### 2. **CSS Variables**
+
 - Use CSS custom properties for colors, spacing, shadows
 - Define in `_variables.css`
 - Reference throughout: `var(--color-primary)`
 
 ### 3. **Component Isolation**
+
 - Each component in its own file
 - Minimal dependencies between components
 - Clear separation of concerns
 
 ### 4. **Performance**
+
 - Hardware acceleration for animations
 - Efficient selectors
 - Minimal repaints and reflows
 
 ### 5. **Accessibility**
+
 - Focus states for all interactive elements
 - High contrast mode support
 - Reduced motion preferences respected
@@ -142,6 +153,7 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 🔧 Development Workflow
 
 ### Adding a New Component
+
 1. Create component file: `components/_new-component.css`
 2. Define styles using design tokens
 3. Add import to entry files
@@ -149,12 +161,14 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 5. Update documentation
 
 ### Debugging
+
 1. Use browser dev tools to inspect
 2. Check z-index layering with `_z-index.css` utilities
 3. Verify responsive behavior
 4. Test with reduced motion preferences
 
 ### Migration from Old CSS
+
 1. **Old files**: `mobile.css`, `style.css` (preserved)
 2. **New files**: `mobile-new.css`, `style-new.css` (active)
 3. **HTML updated**: Reference new CSS files
@@ -163,21 +177,25 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 🎨 Japandi Design Principles
 
 ### Minimalism
+
 - Clean, uncluttered interfaces
 - Purposeful use of space
 - Essential elements only
 
 ### Natural Materials
+
 - Warm, earthy color palette
 - Soft shadows and gradients
 - Organic shapes and textures
 
 ### Functionality
+
 - Every element has a purpose
 - Clear visual hierarchy
 - Intuitive interactions
 
 ### Harmony
+
 - Balanced compositions
 - Consistent spacing and rhythm
 - Cohesive design language
@@ -185,10 +203,12 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 📊 File Sizes & Performance
 
 ### Before Modularization
+
 - `mobile.css`: ~2,300 lines, ~45KB
 - `style.css`: ~1,400 lines, ~28KB
 
 ### After Modularization
+
 - **Total**: Same functionality, better organization
 - **Individual files**: 100-400 lines each
 - **Benefits**: Better caching, easier maintenance, team collaboration
@@ -196,6 +216,7 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 ## 🚀 Future Enhancements
 
 ### Planned Improvements
+
 1. **CSS-in-JS integration** for dynamic theming
 2. **Component library documentation**
 3. **Design tokens expansion**
@@ -203,6 +224,7 @@ The entry files (`mobile-new.css` and `style-new.css`) import modules in logical
 5. **Performance monitoring** for CSS loading
 
 ### Scalability
+
 - Easy to add new features
 - Clear architecture for team development
 - Maintainable codebase

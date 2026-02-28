@@ -27,22 +27,26 @@ A beautiful recipe discovery app with AI-powered recipe generation, built with a
 ## Installation
 
 1. Clone the repository
+
 ```bash
 git clone <your-repo-url>
 cd recipe-swipe-app
 ```
 
 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 3. Start Ollama (if not already running)
+
 ```bash
 ollama serve
 ```
 
 4. Start the server
+
 ```bash
 node server.js
 ```
@@ -52,7 +56,7 @@ node server.js
 ## Usage
 
 1. **Swipe right** 👍 for recipes you like
-2. **Swipe left** 👎 for recipes you don't like  
+2. **Swipe left** 👎 for recipes you don't like
 3. After 5 rounds, see your winner with sparkles
 4. **Click the card** to flip it
 5. **Generate Recipe** to get AI-powered recipe details

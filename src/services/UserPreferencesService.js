@@ -21,10 +21,9 @@ export class UserPreferencesService {
   async ensureLoaded() {
     if (this.loadingPromise) return this.loadingPromise;
 
-    this.loadingPromise = this.loadUserPreferences()
-        .finally(() => {
-          this.loadingPromise = null;
-        });
+    this.loadingPromise = this.loadUserPreferences().finally(() => {
+      this.loadingPromise = null;
+    });
 
     return this.loadingPromise;
   }
@@ -35,8 +34,8 @@ export class UserPreferencesService {
 
   async loadUserPreferences() {
     try {
-      const response = await fetch('/api/preferences', {
-        credentials: 'include'
+      const response = await fetch("/api/preferences", {
+        credentials: "include"
       });
 
       if (!response.ok) {
@@ -48,20 +47,19 @@ export class UserPreferencesService {
 
       const data = await response.json();
 
-      if (!data || typeof data.preferences !== 'object') {
-        throw new Error('Invalid preferences response shape');
+      if (!data || typeof data.preferences !== "object") {
+        throw new Error("Invalid preferences response shape");
       }
 
       const preferences = this.normalize(data.preferences);
 
       this.stateManager.setState({ preferences });
 
-      console.log('✅ Preferences loaded:', preferences);
+      console.log("✅ Preferences loaded:", preferences);
 
       return preferences;
-
     } catch (error) {
-      console.error('❌ Failed to load preferences:', error);
+      console.error("❌ Failed to load preferences:", error);
       return this.setDefaults();
     }
   }
@@ -74,10 +72,10 @@ export class UserPreferencesService {
     const normalized = this.normalize(preferences);
 
     try {
-      const response = await fetch('/api/preferences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const response = await fetch("/api/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(normalized)
       });
 
@@ -91,12 +89,11 @@ export class UserPreferencesService {
 
       this.stateManager.setState({ preferences: updated });
 
-      console.log('💾 Preferences saved:', updated);
+      console.log("💾 Preferences saved:", updated);
 
       return updated;
-
     } catch (error) {
-      console.error('❌ Save failed:', error);
+      console.error("❌ Save failed:", error);
       throw error;
     }
   }
@@ -107,9 +104,9 @@ export class UserPreferencesService {
 
   normalize(prefs = {}) {
     return {
-      diet: prefs.diet || 'None',
-      budget: prefs.budget || 'No',
-      seasonalKing: prefs.seasonalKing || 'No'
+      diet: prefs.diet || "None",
+      budget: prefs.budget || "No",
+      seasonalKing: prefs.seasonalKing || "No"
     };
   }
 
@@ -120,7 +117,7 @@ export class UserPreferencesService {
   }
 
   getPreferences() {
-    return this.stateManager.get('preferences');
+    return this.stateManager.get("preferences");
   }
 
   async updatePreference(key, value) {
@@ -135,21 +132,22 @@ export class UserPreferencesService {
   =============================== */
 
   async showPreferences() {
-    console.log('🔧 showPreferences() called');
-    
+    console.log("🔧 showPreferences() called");
+
     await this.ensureLoaded();
     const preferences = this.getPreferences();
 
     // Create preferences content
-    const screen = document.createElement('div');
-    screen.className = 'mobile-preferences-screen';
+    const screen = document.createElement("div");
+    screen.className = "mobile-preferences-screen";
     screen.innerHTML = this.renderPreferencesHTML(preferences);
 
     // Add close handler
-    screen.querySelector('.mobile-favorites-close')
-      .addEventListener('click', () => {
+    screen
+      .querySelector(".mobile-favorites-close")
+      .addEventListener("click", () => {
         if (this.navigationService) {
-          this.navigationService.go('main');
+          this.navigationService.go("main");
         }
       });
 
@@ -157,7 +155,7 @@ export class UserPreferencesService {
     if (this.navigationService) {
       this.navigationService.renderPreferences(screen);
     }
-    console.log('✅ Preferences screen rendered');
+    console.log("✅ Preferences screen rendered");
   }
 
   renderPreferencesHTML(preferences) {
@@ -170,25 +168,25 @@ export class UserPreferencesService {
       <div class="mobile-favorites-list">
 
         ${this.renderRadioGroup(
-        'Dietary Restrictions',
-        'diet',
-        ['None', 'Vegetarian', 'Vegan', 'Gluten-Free'],
-        preferences.diet
-    )}
+          "Dietary Restrictions",
+          "diet",
+          ["None", "Vegetarian", "Vegan", "Gluten-Free"],
+          preferences.diet
+        )}
 
         ${this.renderRadioGroup(
-        'Budget',
-        'budget',
-        ['No', 'Yes'],
-        preferences.budget
-    )}
+          "Budget",
+          "budget",
+          ["No", "Yes"],
+          preferences.budget
+        )}
 
         ${this.renderRadioGroup(
-        'Seasonal King',
-        'seasonalKing',
-        ['No', 'Yes'],
-        preferences.seasonalKing
-    )}
+          "Seasonal King",
+          "seasonalKing",
+          ["No", "Yes"],
+          preferences.seasonalKing
+        )}
 
         <div class="mobile-preference-actions">
           <button class="mobile-save-btn">Save Preferences</button>
@@ -203,46 +201,54 @@ export class UserPreferencesService {
       <div class="mobile-preference-group">
         <h3>${title}</h3>
         <div class="mobile-preference-options">
-          ${options.map(opt => `
+          ${options
+            .map(
+              opt => `
             <label class="mobile-preference-option">
               <input type="radio" name="${name}" value="${opt}"
-                ${selected === opt ? 'checked' : ''}>
+                ${selected === opt ? "checked" : ""}>
               <span>${opt}</span>
             </label>
-          `).join('')}
+          `
+            )
+            .join("")}
         </div>
       </div>
     `;
   }
 
   attachEvents(screen) {
-    screen.querySelector('.mobile-favorites-close')
-        .addEventListener('click', () => this.closePreferences());
+    screen
+      .querySelector(".mobile-favorites-close")
+      .addEventListener("click", () => this.closePreferences());
 
-    screen.querySelector('.mobile-save-btn')
-        .addEventListener('click', () => this.saveFromModal(screen));
+    screen
+      .querySelector(".mobile-save-btn")
+      .addEventListener("click", () => this.saveFromModal(screen));
   }
 
   closePreferences() {
-    const screen = document.querySelector('.mobile-preferences-screen');
+    const screen = document.querySelector(".mobile-preferences-screen");
     if (screen) screen.remove();
 
-    document.body.classList.remove('app--overlay-open');
+    document.body.classList.remove("app--overlay-open");
   }
 
   async saveFromModal(screen) {
     const diet = screen.querySelector('input[name="diet"]:checked')?.value;
     const budget = screen.querySelector('input[name="budget"]:checked')?.value;
-    const seasonalKing = screen.querySelector('input[name="seasonalKing"]:checked')?.value;
+    const seasonalKing = screen.querySelector(
+      'input[name="seasonalKing"]:checked'
+    )?.value;
 
     const preferences = this.normalize({ diet, budget, seasonalKing });
 
     try {
       await this.saveUserPreferences(preferences);
       this.closePreferences();
-      this.showToast('Preferences saved successfully!');
+      this.showToast("Preferences saved successfully!");
     } catch {
-      this.showToast('Failed to save preferences');
+      this.showToast("Failed to save preferences");
     }
   }
 
@@ -251,8 +257,8 @@ export class UserPreferencesService {
   =============================== */
 
   showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
+    const toast = document.createElement("div");
+    toast.className = "toast";
     toast.textContent = message;
 
     document.body.appendChild(toast);

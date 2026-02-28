@@ -7,24 +7,26 @@ export class RecipeSuggestionsView {
   constructor(container, { serviceRegistry }) {
     this.container = container;
     this.serviceRegistry = serviceRegistry;
-    this.recipeSuggestionService = serviceRegistry.get('recipeSuggestion');
+    this.recipeSuggestionService = serviceRegistry.get("recipeSuggestion");
   }
 
   async render() {
     this.showLoading();
 
     try {
-      const suggestions = await this.recipeSuggestionService.generateSuggestions();
-      this.container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
-      this.container.classList.add('suggestions-mode');
+      const suggestions =
+        await this.recipeSuggestionService.generateSuggestions();
+      this.container.innerHTML =
+        this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+      this.container.classList.add("suggestions-mode");
       this.setupInteractions();
     } catch (error) {
-      console.error('Failed to generate suggestions:', error);
-      this.showError('Failed to generate suggestions');
+      console.error("Failed to generate suggestions:", error);
+      this.showError("Failed to generate suggestions");
     }
   }
 
-  showLoading(message = 'Getting suggestions...') {
+  showLoading(message = "Getting suggestions...") {
     this.container.innerHTML = `
       <div class="suggestions-loading">
         <div class="loading-spinner"></div>
@@ -45,8 +47,8 @@ export class RecipeSuggestionsView {
 
   setupInteractions() {
     // Setup suggestion selection buttons
-    this.container.querySelectorAll('.select-recipe-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+    this.container.querySelectorAll(".select-recipe-btn").forEach(btn => {
+      btn.addEventListener("click", async e => {
         e.stopPropagation();
 
         if (navigator.vibrate) {
@@ -54,17 +56,21 @@ export class RecipeSuggestionsView {
         }
 
         const originalText = btn.textContent;
-        btn.innerHTML = '<span class="mobile-loading-spinner"></span> Generating...';
+        btn.innerHTML =
+          '<span class="mobile-loading-spinner"></span> Generating...';
         btn.disabled = true;
 
         const suggestionId = btn.dataset.suggestionId;
-        const suggestion = this.recipeSuggestionService.selectSuggestion(suggestionId);
+        const suggestion =
+          this.recipeSuggestionService.selectSuggestion(suggestionId);
 
         if (suggestion) {
           // Emit event to show recipe detail
-          this.container.dispatchEvent(new CustomEvent('recipeSelected', { 
-            detail: { suggestion } 
-          }));
+          this.container.dispatchEvent(
+            new CustomEvent("recipeSelected", {
+              detail: { suggestion }
+            })
+          );
         }
 
         setTimeout(() => {
@@ -75,23 +81,25 @@ export class RecipeSuggestionsView {
     });
 
     // Setup regenerate button
-    const regenerateBtn = this.container.querySelector('.regenerate-btn');
+    const regenerateBtn = this.container.querySelector(".regenerate-btn");
     if (regenerateBtn) {
-      regenerateBtn.addEventListener('click', async () => {
+      regenerateBtn.addEventListener("click", async () => {
         if (navigator.vibrate) {
           navigator.vibrate([10, 30, 10]);
         }
-        
-        this.showLoading('Finding fresh recipe ideas for you...');
-        
+
+        this.showLoading("Finding fresh recipe ideas for you...");
+
         try {
-          const suggestions = await this.recipeSuggestionService.generateSuggestions();
-          this.container.innerHTML = this.recipeSuggestionService.createSuggestionsGrid(suggestions);
-          this.container.classList.add('suggestions-mode');
+          const suggestions =
+            await this.recipeSuggestionService.generateSuggestions();
+          this.container.innerHTML =
+            this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+          this.container.classList.add("suggestions-mode");
           this.setupInteractions();
         } catch (error) {
-          console.error('Failed to regenerate suggestions:', error);
-          this.showError('Failed to generate suggestions');
+          console.error("Failed to regenerate suggestions:", error);
+          this.showError("Failed to generate suggestions");
         }
       });
     }
@@ -108,7 +116,7 @@ export class RecipeSuggestionsView {
   destroy() {
     // Cleanup event listeners and DOM
     if (this.container) {
-      this.container.innerHTML = '';
+      this.container.innerHTML = "";
     }
   }
 }

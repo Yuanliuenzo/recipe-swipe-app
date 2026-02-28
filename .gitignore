@@ -82,6 +82,5 @@ ehthumbs.db
 Thumbs.db
 
 # Debug utilities (development only)
-src/utils/DebugUtil.js
 src/utils/PhoneDebugUtil.js
 debug-phone.js
