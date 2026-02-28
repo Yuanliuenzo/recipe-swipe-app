@@ -73,5 +73,43 @@
     
     <!-- Load clean unified architecture -->
     <script type="module" src="../src/main.js"></script>
+    
+    <!-- Phone Debug Utility (only loads on touch devices) -->
+    <script type="module">
+        import { phoneDebug } from '../src/utils/PhoneDebugUtil.js';
+        
+        // Make phoneDebug available globally
+        window.phoneDebug = phoneDebug;
+        
+        // Add debug toggle function
+        window.togglePhoneDebug = function() {
+            if (window.phoneDebug) {
+                window.phoneDebug.toggle();
+                console.log('🔧 Phone debug toggled');
+            }
+        };
+        
+        // Triple-tap to toggle (tap top-left corner)
+        let tapCount = 0;
+        let tapTimeout = null;
+        
+        document.addEventListener('click', function(e) {
+            if (e.clientX < 100 && e.clientY < 100) {
+                tapCount++;
+                
+                if (tapCount === 1) {
+                    tapTimeout = setTimeout(() => {
+                        tapCount = 0;
+                    }, 500);
+                } else if (tapCount === 3) {
+                    clearTimeout(tapTimeout);
+                    tapCount = 0;
+                    window.togglePhoneDebug();
+                }
+            }
+        });
+        
+        console.log('🔧 Phone debug loaded. Triple-tap top-left corner to toggle debug overlay.');
+    </script>
 </body>
 </html>

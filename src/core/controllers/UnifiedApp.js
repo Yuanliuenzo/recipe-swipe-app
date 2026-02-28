@@ -20,6 +20,7 @@ import { PromptBuilder } from '../../shared/PromptBuilder.js';
 import { RecipeDetailView } from '../../components/views/RecipeDetailView.js';
 import { RecipeSuggestionsView } from '../../components/views/RecipeSuggestionsView.js';
 import { CONFIG } from '../Config.js';
+import { debug } from '../../utils/DebugUtil.js';
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -64,7 +65,7 @@ export class UnifiedApp {
     }
 
     try {
-      console.log('🎯 Initializing Unified App Controller...');
+      debug.app('Initializing Unified App Controller...');
       
       // 1. Initialize services
       await this.initializeServices();
@@ -86,7 +87,7 @@ export class UnifiedApp {
       
       this.isInitialized = true;
       console.log('✅ Unified App initialized successfully!');
-      
+
     } catch (error) {
       console.error('❌ Failed to initialize Unified App:', error);
       throw error;
@@ -174,7 +175,6 @@ export class UnifiedApp {
     this.swipeEngine = new SwipeEngine(cardElement, {
       onSwipeLeft: () => this.handleSwipe('left'),
       onSwipeRight: () => this.handleSwipe('right'),
-      threshold: 0.3,
       maxRotation: 15
     });
 
@@ -228,7 +228,7 @@ export class UnifiedApp {
       this.containers.cardContainer.innerHTML = '';
       this.currentCard = new VibeCard(this.containers.cardContainer, { vibe: nextVibe });
       this.currentCard.mount();
-      
+
       // Setup swipe handling for new card
       this.setupSwipeHandling();
       
