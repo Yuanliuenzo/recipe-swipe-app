@@ -113,10 +113,14 @@ export class RecipeSuggestionService {
   // Stage 2: Generate full recipe for a selected suggestion
   async generateFullRecipe(suggestionId, timeoutMs = 60000) {
     const suggestion = this.currentSuggestions.find(s => s.id === suggestionId);
-    if (!suggestion) throw new Error("Suggestion not found");
+    if (!suggestion) {
+      throw new Error("Suggestion not found");
+    }
 
     // Return cached version if available
-    if (suggestion.fullRecipe) return suggestion.fullRecipe;
+    if (suggestion.fullRecipe) {
+      return suggestion.fullRecipe;
+    }
 
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
@@ -225,7 +229,9 @@ Do not omit headers. Keep concise but complete.
     try {
       if (typeof recipeData === "string") {
         const parsed = JSON.parse(recipeData);
-        if (Array.isArray(parsed.suggestions)) return parsed.suggestions;
+        if (Array.isArray(parsed.suggestions)) {
+          return parsed.suggestions;
+        }
       } else if (recipeData.suggestions) {
         return recipeData.suggestions;
       }

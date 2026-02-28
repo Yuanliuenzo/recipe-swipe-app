@@ -241,7 +241,9 @@ export class UIService {
   // Animate element
   animateElement(element, animation) {
     try {
-      if (!element) return;
+      if (!element) {
+        return;
+      }
 
       element.classList.add(animation);
 

@@ -1,65 +1,94 @@
 const js = require("@eslint/js");
+const globals = require("globals");
+const prettier = require("eslint-config-prettier");
 
 module.exports = [
+  // Base ESLint recommended rules
   js.configs.recommended,
+
+  // Disable formatting rules that conflict with Prettier
+  prettier,
+
+  // Main project rules
   {
     rules: {
-      // Only basic formatting rules - very safe
-      semi: ["error", "always"],
-      quotes: ["error", "double"],
+      /*
+       * =========================
+       * 🔒 Error Prevention
+       * =========================
+       */
+      "no-undef": "error",
+      "no-unreachable": "error",
+      "no-unsafe-finally": "error",
+      "no-unused-private-class-members": "error",
+      "no-constant-binary-expression": "error",
+
+      /*
+       * =========================
+       * 🧠 Code Quality
+       * =========================
+       */
+      eqeqeq: ["error", "always"],
+      curly: ["error", "all"],
+      "no-shadow": "warn",
+      "no-return-await": "error",
+      "no-useless-return": "warn",
+      "no-useless-constructor": "error",
+      "no-duplicate-imports": "error",
+      "no-var": "error",
+      "prefer-const": "warn",
+      "prefer-template": "warn",
+      "object-shorthand": ["warn", "always"],
+      "no-implicit-coercion": "warn",
+
+      /*
+       * =========================
+       * 🧹 Clean Code
+       * =========================
+       */
       "no-trailing-spaces": "error",
       "no-multiple-empty-lines": ["error", { max: 1 }],
+      "eol-last": ["error", "always"],
 
-      // Very relaxed rules - allow debugging
-      "no-unused-vars": "off",
-      "no-useless-assignment": "off",
+      /*
+       * =========================
+       * 🛠 Developer Experience
+       * =========================
+       */
+      "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+      "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+
+      /*
+       * =========================
+       * 🔓 Relaxed Rules
+       * =========================
+       */
+      "no-unused-vars": [
+        "warn",
+        {
+          varsIgnorePattern: "^_",
+          argsIgnorePattern: "^_"
+        }
+      ],
       "no-prototype-builtins": "off",
-      "no-useless-escape": "off",
-
-      // Basic error prevention
-      "no-undef": "error",
-
-      // Allow console and debugging
-      "no-console": "off",
-      "no-debugger": "off"
+      "no-useless-escape": "off"
     }
   },
+
+  // JS Files
   {
     files: ["**/*.js"],
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: "latest",
       sourceType: "module",
       globals: {
-        // Browser globals
-        window: "readonly",
-        document: "readonly",
-        console: "readonly",
-        navigator: "readonly",
-        HTMLElement: "readonly",
-        fetch: "readonly",
-        requestAnimationFrame: "readonly",
-        CustomEvent: "readonly",
-        performance: "readonly",
-        alert: "readonly",
-        confirm: "readonly",
-
-        // Node.js globals
-        process: "readonly",
-        Buffer: "readonly",
-        __dirname: "readonly",
-        __filename: "readonly",
-        module: "readonly",
-        require: "readonly",
-        exports: "readonly",
-        global: "readonly",
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
-        setInterval: "readonly",
-        clearInterval: "readonly",
-        crypto: "readonly"
+        ...globals.browser,
+        ...globals.node
       }
     }
   },
+
+  // Ignore build artifacts
   {
     ignores: [
       "node_modules/**",

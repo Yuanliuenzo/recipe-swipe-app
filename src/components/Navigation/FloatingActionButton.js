@@ -76,7 +76,9 @@ export class FloatingActionButton extends Component {
     const menu = this.find("[data-fab-menu]");
     const overlay = this.find("[data-fab-overlay]");
 
-    if (!toggle || !menu || !overlay) return;
+    if (!toggle || !menu || !overlay) {
+      return;
+    }
 
     // Toggle FAB menu
     this.addEventListener(toggle, "click", e => {
@@ -102,7 +104,9 @@ export class FloatingActionButton extends Component {
   setupOverlay() {
     const overlay = this.find("[data-fab-overlay]");
 
-    if (!overlay) return;
+    if (!overlay) {
+      return;
+    }
 
     // Close menu when clicking overlay
     this.addEventListener(overlay, "click", () => {

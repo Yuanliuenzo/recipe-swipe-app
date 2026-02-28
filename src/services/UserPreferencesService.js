@@ -12,14 +12,18 @@ export class UserPreferencesService {
   =============================== */
 
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
 
     await this.ensureLoaded();
     this.initialized = true;
   }
 
   async ensureLoaded() {
-    if (this.loadingPromise) return this.loadingPromise;
+    if (this.loadingPromise) {
+      return this.loadingPromise;
+    }
 
     this.loadingPromise = this.loadUserPreferences().finally(() => {
       this.loadingPromise = null;
@@ -229,7 +233,9 @@ export class UserPreferencesService {
 
   closePreferences() {
     const screen = document.querySelector(".mobile-preferences-screen");
-    if (screen) screen.remove();
+    if (screen) {
+      screen.remove();
+    }
 
     document.body.classList.remove("app--overlay-open");
   }

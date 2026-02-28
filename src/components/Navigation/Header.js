@@ -60,7 +60,9 @@ export class Header extends Component {
     const toggle = this.find("[data-dropdown-toggle]");
     const menu = this.find("[data-dropdown-menu]");
 
-    if (!toggle || !menu) return;
+    if (!toggle || !menu) {
+      return;
+    }
 
     // Toggle dropdown
     this.addEventListener(toggle, "click", e => {

@@ -23,7 +23,9 @@ export class NavigationService {
   }
 
   async go(view) {
-    if (view === this.current || this.isTransitioning) return;
+    if (view === this.current || this.isTransitioning) {
+      return;
+    }
 
     console.log(`🧭 Navigating: ${this.current} → ${view}`);
 

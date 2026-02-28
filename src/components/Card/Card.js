@@ -69,7 +69,9 @@ export class Card extends Component {
   // Animate card out
   animateOut(direction = "right", distance = 500) {
     const cardElement = this.find(`[data-component-id="${this.id}"]`);
-    if (!cardElement) return;
+    if (!cardElement) {
+      return;
+    }
 
     const rotation = direction === "right" ? distance * 0.05 : -distance * 0.05;
     cardElement.style.transition = "all 0.3s ease-out";
@@ -80,7 +82,9 @@ export class Card extends Component {
   // Add swipe effect
   addSwipeEffect(x = 0, y = 0, rotation = 0, scale = 1) {
     const cardElement = this.find(`[data-component-id="${this.id}"]`);
-    if (!cardElement) return;
+    if (!cardElement) {
+      return;
+    }
 
     cardElement.style.transform = `translateX(${x}px) translateY(${y}px) rotate(${rotation}deg) scale(${scale})`;
   }
@@ -88,7 +92,9 @@ export class Card extends Component {
   // Reset card position
   resetPosition() {
     const cardElement = this.find(`[data-component-id="${this.id}"]`);
-    if (!cardElement) return;
+    if (!cardElement) {
+      return;
+    }
 
     cardElement.style.transition = "transform 0.3s ease";
     cardElement.style.transform =
@@ -98,7 +104,9 @@ export class Card extends Component {
   // Set card border color
   setBorderColor(color) {
     const cardElement = this.find(`[data-component-id="${this.id}"]`);
-    if (!cardElement) return;
+    if (!cardElement) {
+      return;
+    }
 
     cardElement.style.border = `2px solid ${color}50`;
   }

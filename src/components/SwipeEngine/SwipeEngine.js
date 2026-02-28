@@ -212,7 +212,9 @@ class MouseSwipeHandler extends BaseSwipeHandler {
   }
 
   handleMouseMove(e) {
-    if (!this.isDragging) return;
+    if (!this.isDragging) {
+      return;
+    }
 
     this.currentX = e.clientX - this.startX;
     this.currentY = e.clientY - this.startY;
@@ -233,7 +235,9 @@ class MouseSwipeHandler extends BaseSwipeHandler {
   }
 
   handleMouseUp(e) {
-    if (!this.isDragging) return;
+    if (!this.isDragging) {
+      return;
+    }
 
     this.isDragging = false;
     this.element.style.transition = "transform 0.3s ease";
@@ -306,7 +310,9 @@ class TouchSwipeHandler extends BaseSwipeHandler {
   }
 
   handleTouchMove(e) {
-    if (!this.isDragging) return;
+    if (!this.isDragging) {
+      return;
+    }
 
     if (!this.gestureLocked) {
       const deltaX = e.touches[0].clientX - this.startX;
@@ -345,7 +351,9 @@ class TouchSwipeHandler extends BaseSwipeHandler {
   }
 
   handleTouchEnd(e) {
-    if (!this.isDragging) return;
+    if (!this.isDragging) {
+      return;
+    }
 
     this.isDragging = false;
     this.element.style.transition = "transform 0.3s ease-out";

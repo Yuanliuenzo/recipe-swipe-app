@@ -140,7 +140,9 @@ export class DomUtils {
 
   // Get element position relative to viewport
   static getPosition(element) {
-    if (!element) return { top: 0, left: 0, width: 0, height: 0 };
+    if (!element) {
+      return { top: 0, left: 0, width: 0, height: 0 };
+    }
 
     const rect = element.getBoundingClientRect();
     return {

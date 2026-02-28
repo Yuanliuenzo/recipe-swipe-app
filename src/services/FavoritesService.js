@@ -22,7 +22,9 @@ export class FavoritesService {
   ===================================================== */
 
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
     await this.loadFavorites();
     this.initialized = true;
   }
@@ -30,7 +32,9 @@ export class FavoritesService {
   async loadFavorites() {
     try {
       const res = await fetch("/api/favorites", { credentials: "include" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
 
       const favorites = data.favorites || [];

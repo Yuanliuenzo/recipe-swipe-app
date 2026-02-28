@@ -84,7 +84,9 @@ export class ErrorBoundary extends Component {
 
   // Get user-friendly error message
   getUserFriendlyMessage(error) {
-    if (!error) return "An unknown error occurred";
+    if (!error) {
+      return "An unknown error occurred";
+    }
 
     // Common error patterns and user-friendly messages
     const errorPatterns = {

@@ -19,7 +19,9 @@ export class SwipeUtils {
     };
 
     const handleMouseMove = e => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       currentX = e.clientX - startX;
       currentY = e.clientY - startY;
@@ -39,7 +41,9 @@ export class SwipeUtils {
     };
 
     const handleMouseUp = () => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       isDragging = false;
       element.style.cursor = "grab";
@@ -91,7 +95,9 @@ export class SwipeUtils {
     };
 
     const handleTouchMove = e => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       const touch = e.touches[0];
       currentX = touch.clientX - startX;
@@ -114,7 +120,9 @@ export class SwipeUtils {
     };
 
     const handleTouchEnd = () => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       isDragging = false;
       element.style.transition = "all 0.3s ease-out";

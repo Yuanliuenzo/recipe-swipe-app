@@ -14,12 +14,14 @@ export class RecipeFormatter {
     const lines = rawText.split("\n").map(l => l.trim());
 
     let title = "Untitled Recipe";
-    let ingredients = [];
-    let instructions = [];
+    const ingredients = [];
+    const instructions = [];
     let currentSection = null;
 
     lines.forEach(line => {
-      if (!line) return;
+      if (!line) {
+        return;
+      }
 
       const lower = line.toLowerCase();
 

@@ -166,7 +166,9 @@ Make sure the recipe is practical and delicious.`;
       hasSeasonalConstraint: false
     };
 
-    if (!prompt) return info;
+    if (!prompt) {
+      return info;
+    }
 
     const lowerPrompt = prompt.toLowerCase();
 

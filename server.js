@@ -107,7 +107,7 @@ app.use(async (req, res, next) => {
   if (username) {
     const userData = getUser(username);
     req.user = userData;
-    console.log("DEBUG: User found:", !!req.user);
+    console.log("DEBUG: User found:", Boolean(req.user));
     console.log("DEBUG: User data:", JSON.stringify(req.user, null, 2));
 
     // Ensure preferences are immediately available
@@ -228,7 +228,9 @@ app.post("/api/favorites", async (req, res) => {
     createdAt: new Date().toISOString()
   };
   req.user.favorites.unshift(favorite); // newest first
-  if (req.user.favorites.length > 20) req.user.favorites.pop(); // cap at 20
+  if (req.user.favorites.length > 20) {
+    req.user.favorites.pop();
+  } // cap at 20
   await saveUsers(); // Save to file
   res.json({ favorite });
 });
@@ -257,8 +259,12 @@ app.patch("/api/favorites/:id", async (req, res) => {
   if (!fav) {
     return res.status(404).json({ error: "Favorite not found" });
   }
-  if (typeof rating === "number") fav.rating = rating;
-  if (typeof note === "string") fav.note = note.trim();
+  if (typeof rating === "number") {
+    fav.rating = rating;
+  }
+  if (typeof note === "string") {
+    fav.note = note.trim();
+  }
   await saveUsers(); // Save to file
   res.json({ favorite: fav });
 });

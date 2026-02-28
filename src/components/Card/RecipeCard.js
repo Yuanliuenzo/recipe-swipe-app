@@ -85,7 +85,9 @@ export class RecipeCard extends Card {
 
   setupToggleButtons() {
     const toggleButtons = this.findAll(".recipe-toggle-btn");
-    if (toggleButtons.length === 0) return;
+    if (toggleButtons.length === 0) {
+      return;
+    }
 
     toggleButtons.forEach(button => {
       this.addEventListener(button, "click", e => {
@@ -99,11 +101,14 @@ export class RecipeCard extends Card {
   }
 
   showSection(sectionName) {
-    if (!this.formattedRecipe || typeof this.formattedRecipe === "string")
+    if (!this.formattedRecipe || typeof this.formattedRecipe === "string") {
       return;
+    }
 
     const content = this.find(".recipe-content");
-    if (!content) return;
+    if (!content) {
+      return;
+    }
 
     // Hide all sections
     content.querySelectorAll("[data-recipe-section]").forEach(section => {
@@ -129,7 +134,9 @@ export class RecipeCard extends Card {
 
   // Get recipe title
   getRecipeTitle() {
-    if (!this.formattedRecipe) return "";
+    if (!this.formattedRecipe) {
+      return "";
+    }
     return (
       this.formattedRecipe.title ||
       RecipeFormatter.extractTitle(this.props.recipeText)

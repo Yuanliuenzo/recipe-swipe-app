@@ -189,8 +189,8 @@ export class Application {
         const memory = performance.memory;
         if (memory.usedJSHeapSize > 50 * 1024 * 1024) {
           console.warn("⚠️ High memory usage detected:", {
-            used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + "MB",
-            total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + "MB"
+            used: `${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB`,
+            total: `${Math.round(memory.totalJSHeapSize / 1024 / 1024)}MB`
           });
         }
       }, 10000);

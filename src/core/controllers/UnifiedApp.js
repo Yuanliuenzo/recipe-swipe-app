@@ -187,12 +187,16 @@ export class UnifiedApp {
   }
 
   setupSwipeHandling() {
-    if (!this.currentCard) return;
+    if (!this.currentCard) {
+      return;
+    }
 
     const cardElement = this.containers.cardContainer.querySelector(
       ".vibe-card, .mobile-vibe-card"
     );
-    if (!cardElement) return;
+    if (!cardElement) {
+      return;
+    }
 
     // Create swipe engine
     this.swipeEngine = new SwipeEngine(cardElement, {
@@ -209,8 +213,12 @@ export class UnifiedApp {
 
     // Add keyboard support
     document.addEventListener("keydown", e => {
-      if (e.key === "ArrowRight") this.handleSwipe("right");
-      if (e.key === "ArrowLeft") this.handleSwipe("left");
+      if (e.key === "ArrowRight") {
+        this.handleSwipe("right");
+      }
+      if (e.key === "ArrowLeft") {
+        this.handleSwipe("left");
+      }
     });
   }
 
@@ -398,7 +406,9 @@ export class UnifiedApp {
 
   showSimpleResult() {
     const container = this.containers.cardContainer;
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     container.innerHTML = `
       <div style="
