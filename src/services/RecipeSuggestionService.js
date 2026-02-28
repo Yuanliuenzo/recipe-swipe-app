@@ -18,52 +18,69 @@ export class RecipeSuggestionService {
   // --------------------------
   // Stage 1: Generate recipe suggestions (titles + brief descriptions)
   // --------------------------
-  async generateSuggestions() {
+  async generateSuggestions(maxRetries = 3) {
     const prompt = this.buildTitleSuggestionPrompt();
 
-    try {
-      const response = await apiService.generateRecipeSuggestions(prompt, 5);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Generating recipe suggestions (attempt ${attempt}/${maxRetries})...`);
+        
+        // Increase timeout for subsequent attempts
+        const timeoutMs = 60000 + (attempt - 1) * 30000; // 60s, 90s, 120s
+        
+        const response = await apiService.generateRecipeSuggestions(prompt, 5, timeoutMs);
 
-      if (!response) {
-        console.warn('⚠️ Empty response from API, using fallback suggestions.');
-        this.currentSuggestions = this.fallbackSuggestions();
-        return this.currentSuggestions;
-      }
+        if (!response) {
+          console.warn('⚠️ Empty response from API, using fallback suggestions.');
+          this.currentSuggestions = this.fallbackSuggestions();
+          return this.currentSuggestions;
+        }
 
-      let suggestions = [];
+        let suggestions = [];
 
-      // Case 1: Response contains suggestions array
-      if (Array.isArray(response.suggestions)) {
-        suggestions = response.suggestions;
+        // Case 1: Response contains suggestions array
+        if (Array.isArray(response.suggestions)) {
+          suggestions = response.suggestions;
 
         // Case 2: Response contains single recipe (server sent full recipe)
-      } else if (response.recipe) {
-        suggestions = this.parseRecipeResponse(response.recipe);
+        } else if (response.recipe) {
+          suggestions = this.parseRecipeResponse(response.recipe);
 
         // Case 3: Response contains a title
-      } else if (response.title) {
-        suggestions = [{ title: response.title, description: response.description || 'Personalized recipe based on your preferences' }];
+        } else if (response.title) {
+          suggestions = [{ title: response.title, description: response.description || 'Personalized recipe based on your preferences' }];
 
         // Case 4: Response is a string
-      } else if (typeof response === 'string') {
-        suggestions = [{ title: response, description: 'Personalized recipe based on your preferences' }];
+        } else if (typeof response === 'string') {
+          suggestions = [{ title: response, description: 'Personalized recipe based on your preferences' }];
+        }
+
+        // Map suggestions to internal format
+        this.currentSuggestions = (suggestions || this.fallbackSuggestions()).map((s, idx) => ({
+          id: this.generateId(),
+          index: idx + 1,
+          title: s.title || `Recipe ${idx + 1}`,
+          description: s.description || 'Personalized recipe based on your preferences',
+          fullRecipe: s.fullRecipe || null
+        }));
+
+        console.log(`✅ Successfully generated ${this.currentSuggestions.length} suggestions on attempt ${attempt}`);
+        return this.currentSuggestions;
+
+      } catch (error) {
+        console.error(`❌ Attempt ${attempt} failed:`, error.message);
+        
+        if (attempt === maxRetries) {
+          console.error('❌ All retry attempts failed, using fallback suggestions');
+          this.currentSuggestions = this.fallbackSuggestions();
+          return this.currentSuggestions;
+        }
+        
+        // Wait before retry (exponential backoff)
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 1s, 2s, 4s max
+        console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
       }
-
-      // Map suggestions to internal format
-      this.currentSuggestions = (suggestions || this.fallbackSuggestions()).map((s, idx) => ({
-        id: this.generateId(),
-        index: idx + 1,
-        title: s.title || `Recipe ${idx + 1}`,
-        description: s.description || 'Personalized recipe based on your preferences',
-        fullRecipe: s.fullRecipe || null
-      }));
-
-      return this.currentSuggestions;
-
-    } catch (error) {
-      console.error('❌ Failed to generate recipe suggestions:', error);
-      this.currentSuggestions = this.fallbackSuggestions();
-      return this.currentSuggestions;
     }
   }
 
