@@ -47,7 +47,7 @@ export class ApiService {
   }
 
   async generateRecipeSuggestions(prompt, count = 5) {
-    return this.post(CONFIG.ENDPOINTS.GENERATE_RECIPE, { prompt, count, suggestions: true }, 30000);
+    return this.post(CONFIG.ENDPOINTS.GENERATE_RECIPE, { prompt, count, suggestions: true }, 60000);
   }
 
   // User authentication
