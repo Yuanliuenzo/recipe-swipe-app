@@ -278,7 +278,7 @@ export class UnifiedApp {
     }
   }
 
-  showRecipeGeneration(profile) {
+  showRecipeGeneration() {
     // Hide main container, show result container
     const mobileContainer = document.querySelector(".mobile-container");
     const resultContainer = this.containers.resultContainer;

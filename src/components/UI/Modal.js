@@ -93,7 +93,7 @@ export class Modal extends Component {
     // Action buttons
     const actionButtons = this.findAll("[data-action]");
     actionButtons.forEach(button => {
-      this.addEventListener(button, "click", e => {
+      this.addEventListener(button, "click", _e => {
         const action = button.dataset.action;
         this.handleAction(action);
       });

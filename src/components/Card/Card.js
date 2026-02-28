@@ -7,7 +7,6 @@ export class Card extends Component {
       title: "",
       subtitle: "",
       image: "",
-      color: "#000",
       className: "",
       onClick: null,
       ...props
@@ -15,7 +14,7 @@ export class Card extends Component {
   }
 
   render() {
-    const { title, subtitle, image, color, className } = this.props;
+    const { title, subtitle, image, className } = this.props;
 
     return `
       <div class="card ${className}" data-component-id="${this.id}">

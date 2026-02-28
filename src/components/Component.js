@@ -213,7 +213,7 @@ export class Component {
     // Called before component is unmounted
   }
 
-  onUpdate(updates, prevState) {
+  onUpdate(_updates, _prevState) {
     // Called after state is updated but before re-render
   }
 

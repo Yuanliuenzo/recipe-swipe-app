@@ -138,10 +138,10 @@ export class RecipeDisplayComponent {
   static generateModalHTML(recipe, options = {}) {
     const { customFooter = "" } = options;
 
-    const { html, formatted, setupToggleLogic } = this.generateRecipeHTML(
-      recipe,
-      { showTitle: false, customActions: "" }
-    );
+    const { html, formatted } = this.generateRecipeHTML(recipe, {
+      showTitle: false,
+      customActions: ""
+    });
 
     const modalHTML = `
       <div class="favorite-sheet-container">

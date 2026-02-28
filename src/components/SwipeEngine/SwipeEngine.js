@@ -111,7 +111,7 @@ class BaseSwipeHandler {
     // To be implemented by subclasses
   }
 
-  on(event, callback) {
+  on(_event, _callback) {
     // To be implemented by subclasses
   }
 
@@ -197,7 +197,7 @@ class MouseSwipeHandler extends BaseSwipeHandler {
     document.removeEventListener("mouseup", this.mouseUpHandler);
   }
 
-  on(event, callback) {
+  on(_event, _callback) {
     // Mouse handler doesn't need additional event handling
   }
 
@@ -234,7 +234,7 @@ class MouseSwipeHandler extends BaseSwipeHandler {
     this.emit("swipeMove", swipe);
   }
 
-  handleMouseUp(e) {
+  handleMouseUp(_e) {
     if (!this.isDragging) {
       return;
     }
@@ -290,7 +290,7 @@ class TouchSwipeHandler extends BaseSwipeHandler {
     this.element.removeEventListener("touchend", this.touchEndHandler);
   }
 
-  on(event, callback) {
+  on(_event, _callback) {
     // Touch handler doesn't need additional event handling
   }
 
@@ -350,7 +350,7 @@ class TouchSwipeHandler extends BaseSwipeHandler {
     this.emit("swipeMove", swipe);
   }
 
-  handleTouchEnd(e) {
+  handleTouchEnd(_e) {
     if (!this.isDragging) {
       return;
     }

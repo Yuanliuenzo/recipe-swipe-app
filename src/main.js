@@ -18,20 +18,6 @@ window.recipeApp = {
   services: {} // Will be populated after app initialization
 };
 
-// Create state proxy for backward compatibility
-const stateProxy = new Proxy(
-  {},
-  {
-    get(target, prop) {
-      return globalStateManager.get(prop);
-    },
-    set(target, prop, value) {
-      globalStateManager.setState({ [prop]: value });
-      return true;
-    }
-  }
-);
-
 // Expose state variables that existing code expects
 window.vibeProfile = [];
 window.ingredientsAtHome = "";
@@ -75,7 +61,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Get the unified app and its services
     const unifiedApp = app.getUnifiedApp();
-    const serviceRegistry = app.getServiceRegistry();
 
     // Setup FAB menu toggle using proper event handling
     const fab = document.querySelector(".mobile-fab");
