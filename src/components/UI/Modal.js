@@ -1,5 +1,4 @@
 import { Component } from "../Component.js";
-import { DomUtils } from "../../utils/DomUtils.js";
 
 // Modal component with different types
 export class Modal extends Component {

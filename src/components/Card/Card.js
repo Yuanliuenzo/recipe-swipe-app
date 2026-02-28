@@ -1,5 +1,4 @@
 import { Component } from "../Component.js";
-import { DomUtils } from "../../utils/DomUtils.js";
 
 // Base Card component
 export class Card extends Component {

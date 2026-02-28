@@ -1,6 +1,9 @@
+// eslint.config.js
+
 const js = require("@eslint/js");
 const globals = require("globals");
 const prettier = require("eslint-config-prettier");
+const unusedImports = require("eslint-plugin-unused-imports");
 
 module.exports = [
   // Base ESLint recommended rules
@@ -11,6 +14,10 @@ module.exports = [
 
   // Main project rules
   {
+    plugins: {
+      "unused-imports": unusedImports
+    },
+
     rules: {
       /*
        * =========================
@@ -60,16 +67,32 @@ module.exports = [
 
       /*
        * =========================
-       * 🔓 Relaxed Rules
+       * 🧹 Unused Imports (PLUGIN)
        * =========================
        */
-      "no-unused-vars": [
+
+      // Turn OFF core rule
+      "no-unused-vars": "off",
+
+      // Remove unused imports automatically
+      "unused-imports/no-unused-imports": "error",
+
+      // Detect unused variables (but ignore _ prefixed)
+      "unused-imports/no-unused-vars": [
         "warn",
         {
+          vars: "all",
           varsIgnorePattern: "^_",
+          args: "after-used",
           argsIgnorePattern: "^_"
         }
       ],
+
+      /*
+       * =========================
+       * 🔓 Relaxed Rules
+       * =========================
+       */
       "no-prototype-builtins": "off",
       "no-useless-escape": "off"
     }

@@ -4,12 +4,10 @@
  */
 
 import { globalStateManager } from "../StateManager.js";
-import { globalEventBus } from "../EventBus.js";
 import { DeviceUtils } from "../../utils/DeviceUtils.js";
 import { VibeEngine } from "../../shared/VibeEngine.js";
 import { SwipeEngine } from "../../components/SwipeEngine/SwipeEngine.js";
 import { VibeCard } from "../../components/Card/VibeCard.js";
-import { RecipeCard } from "../../components/Card/RecipeCard.js";
 import { RecipeSuggestionService } from "../../services/RecipeSuggestionService.js";
 import { FavoritesService } from "../../services/FavoritesService.js";
 import { UserPreferencesService } from "../../services/UserPreferencesService.js";

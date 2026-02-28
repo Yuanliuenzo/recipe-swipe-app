@@ -1,5 +1,4 @@
 import { Component } from "../Component.js";
-import { DomUtils } from "../../utils/DomUtils.js";
 
 // Header component with user profile dropdown
 export class Header extends Component {
