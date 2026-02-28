@@ -12,6 +12,11 @@ export class VibeEngine {
   
   // Get next unique vibe
   getNextVibe() {
+    // Check if we've reached max rounds
+    if (this.currentRound >= CONFIG.MAX_VIBE_ROUNDS) {
+      return null;
+    }
+    
     // Reshuffle if we've used all vibes
     if (this.shuffledVibes.length === 0) {
       this.shuffleVibes();

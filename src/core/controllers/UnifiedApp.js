@@ -19,6 +19,7 @@ import { RecipeFormatter } from '../../shared/RecipeFormatter.js';
 import { PromptBuilder } from '../../shared/PromptBuilder.js';
 import { RecipeDetailView } from '../../components/views/RecipeDetailView.js';
 import { RecipeSuggestionsView } from '../../components/views/RecipeSuggestionsView.js';
+import { CONFIG } from '../Config.js';
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -153,7 +154,10 @@ export class UnifiedApp {
       
       // Setup swipe handling
       this.setupSwipeHandling();
-      
+
+      // Initialize round progress display
+      this.updateRoundProgress(1);
+
       console.log('✅ First card created successfully');
     } else {
       console.error('❌ No card container found');
@@ -397,15 +401,14 @@ export class UnifiedApp {
         return;
       }
 
-      const actualTotalRounds = this.vibeEngine.shuffledVibes.length + this.vibeEngine.usedVibes.size;
-      const remainingVibes = this.vibeEngine.shuffledVibes.length;
-      const progressPercentage = actualTotalRounds > 0 ? ((actualTotalRounds - remainingVibes) / actualTotalRounds) * 100 : 0;
+      const maxRounds = CONFIG.MAX_VIBE_ROUNDS;
+      const progressPercentage = maxRounds > 0 ? (currentRound / maxRounds) * 100 : 0;
 
       roundIndicator.setAttribute('data-round', currentRound.toString());
 
       const roundText = roundIndicator.querySelector('.round-text');
       if (roundText) {
-        roundText.textContent = `Round ${currentRound} of ${actualTotalRounds}`;
+        roundText.textContent = `Round ${currentRound} of ${maxRounds}`;
       }
 
       const progressBar = roundIndicator.querySelector('.round-progress');
@@ -422,7 +425,7 @@ export class UnifiedApp {
         }
       });
 
-      console.log(`📊 Updated round progress: ${currentRound}/${actualTotalRounds} (${progressPercentage.toFixed(1)}%)`);
+      console.log(`📊 Updated round progress: ${currentRound}/${maxRounds} (${progressPercentage.toFixed(1)}%)`);
     } catch (error) {
       console.error('❌ Failed to update round progress:', error);
     }
