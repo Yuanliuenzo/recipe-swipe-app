@@ -7,7 +7,6 @@ import { RecipeFormatter } from "../shared/RecipeFormatter.js";
 export class RecipeSuggestionService {
   constructor(stateManager) {
     this.stateManager = stateManager;
-    this.currentSuggestions = [];
   }
 
   // Generate a unique ID (collision-safe)
@@ -40,23 +39,24 @@ export class RecipeSuggestionService {
           console.warn(
             "⚠️ Empty response from API, using fallback suggestions."
           );
-          this.currentSuggestions = this.fallbackSuggestions();
-          return this.currentSuggestions;
+          const fallback = this.fallbackSuggestions();
+          this.stateManager.setState({ currentSuggestions: fallback });
+          return fallback;
         }
 
-        let suggestions = [];
+        let parsedSuggestions = [];
 
         // Case 1: Response contains suggestions array
         if (Array.isArray(response.suggestions)) {
-          suggestions = response.suggestions;
+          parsedSuggestions = response.suggestions;
 
           // Case 2: Response contains single recipe (server sent full recipe)
         } else if (response.recipe) {
-          suggestions = this.parseRecipeResponse(response.recipe);
+          parsedSuggestions = this.parseRecipeResponse(response.recipe);
 
           // Case 3: Response contains a title
         } else if (response.title) {
-          suggestions = [
+          parsedSuggestions = [
             {
               title: response.title,
               description:
@@ -67,7 +67,7 @@ export class RecipeSuggestionService {
 
           // Case 4: Response is a string
         } else if (typeof response === "string") {
-          suggestions = [
+          parsedSuggestions = [
             {
               title: response,
               description: "Personalized recipe based on your preferences"
@@ -76,8 +76,8 @@ export class RecipeSuggestionService {
         }
 
         // Map suggestions to internal format
-        this.currentSuggestions = (
-          suggestions || this.fallbackSuggestions()
+        const suggestions = (
+          parsedSuggestions || this.fallbackSuggestions()
         ).map((s, idx) => ({
           id: this.generateId(),
           index: idx + 1,
@@ -87,10 +87,17 @@ export class RecipeSuggestionService {
           fullRecipe: s.fullRecipe || null
         }));
 
+        // Store in state manager
+        this.stateManager.setState({ currentSuggestions: suggestions });
+
         console.log(
-          `✅ Successfully generated ${this.currentSuggestions.length} suggestions on attempt ${attempt}`
+          `✅ Successfully generated ${suggestions.length} suggestions on attempt ${attempt}`
         );
-        return this.currentSuggestions;
+
+        // 🚀 NEW: Pre-fetch all full recipes in parallel for instant UX
+        this.preFetchAllRecipes();
+
+        return suggestions;
       } catch (error) {
         console.error(`❌ Attempt ${attempt} failed:`, error.message);
 
@@ -98,8 +105,9 @@ export class RecipeSuggestionService {
           console.error(
             "❌ All retry attempts failed, using fallback suggestions"
           );
-          this.currentSuggestions = this.fallbackSuggestions();
-          return this.currentSuggestions;
+          const fallback = this.fallbackSuggestions();
+          this.stateManager.setState({ currentSuggestions: fallback });
+          return fallback;
         }
 
         // Wait before retry (exponential backoff)
@@ -110,9 +118,40 @@ export class RecipeSuggestionService {
     }
   }
 
-  // Stage 2: Generate full recipe for a selected suggestion
+  // 🚀 NEW: Pre-fetch all recipes in parallel for instant UX
+  async preFetchAllRecipes() {
+    const currentSuggestions =
+      this.stateManager.get("currentSuggestions") || [];
+    console.log("🚀 Pre-fetching all recipes in parallel...");
+
+    const fetchPromises = currentSuggestions.map(async suggestion => {
+      try {
+        const fullRecipe = await this.generateFullRecipe(suggestion.id, 90000);
+        console.log(`✅ Pre-fetched recipe: ${suggestion.title}`);
+        return { id: suggestion.id, success: true, recipe: fullRecipe };
+      } catch (error) {
+        console.error(
+          `❌ Failed to pre-fetch ${suggestion.title}:`,
+          error.message
+        );
+        return { id: suggestion.id, success: false, error };
+      }
+    });
+
+    // Wait for all parallel requests to complete
+    const results = await Promise.allSettled(fetchPromises);
+
+    const successful = results.filter(r => r.value?.success).length;
+    console.log(
+      `🎯 Pre-fetch complete: ${successful}/${currentSuggestions.length} recipes cached`
+    );
+  }
+
+  // Stage 2: Generate full recipe for a selected suggestion (now instant if pre-fetched)
   async generateFullRecipe(suggestionId, timeoutMs = 60000) {
-    const suggestion = this.currentSuggestions.find(s => s.id === suggestionId);
+    const currentSuggestions =
+      this.stateManager.get("currentSuggestions") || [];
+    const suggestion = currentSuggestions.find(s => s.id === suggestionId);
     if (!suggestion) {
       throw new Error("Suggestion not found");
     }
@@ -122,21 +161,72 @@ export class RecipeSuggestionService {
       return suggestion.fullRecipe;
     }
 
+    // 🚀 NEW: Check if this recipe is already being fetched (race condition prevention)
+    const pendingFetches = this.stateManager.get("pendingFetches") || new Map();
+    if (pendingFetches.has(suggestionId)) {
+      console.log(
+        `⏳ Recipe ${suggestion.title} already being fetched, waiting...`
+      );
+      return pendingFetches.get(suggestionId);
+    }
+
+    // Create and store the fetch promise
+    const fetchPromise = this._fetchAndCacheRecipe(suggestion, timeoutMs);
+    const newPendingFetches = new Map(pendingFetches);
+    newPendingFetches.set(suggestionId, fetchPromise);
+    this.stateManager.setState({ pendingFetches: newPendingFetches });
+
+    try {
+      const result = fetchPromise;
+      return result;
+    } finally {
+      // Clean up the pending fetch regardless of success/failure
+      const updatedPendingFetches =
+        this.stateManager.get("pendingFetches") || new Map();
+      updatedPendingFetches.delete(suggestionId);
+      this.stateManager.setState({ pendingFetches: updatedPendingFetches });
+    }
+  }
+
+  // Helper method to actually fetch and cache the recipe
+  async _fetchAndCacheRecipe(suggestion, timeoutMs) {
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
+
       const response = await apiService.generateRecipe(prompt, {
         timeout: timeoutMs
       });
 
-      // Parse and format recipe
-      const recipeText = response.recipeText || response.text || response;
-      const formatted = RecipeFormatter.format(recipeText.recipe);
+      // Extract recipe text correctly from LLM response
+      let recipeText;
+
+      // LLM service returns { recipe: "text" } for single recipes
+      if (response.recipe) {
+        recipeText = response.recipe; // Original working format
+      } else if (response.text) {
+        recipeText = response.text; // Fallback
+      } else if (typeof response === "string") {
+        recipeText = response; // Direct string response
+      } else {
+        throw new Error("Invalid response format from LLM service");
+      }
+
+      // Pass the correct text to formatter
+      const formatted = RecipeFormatter.format(recipeText);
 
       suggestion.fullRecipe = {
         recipeText,
-        title: response.title || suggestion.title,
+        title: suggestion.title, // Use our own title for consistency
         formatted
       };
+
+      // Update the suggestion in state manager
+      const currentSuggestions =
+        this.stateManager.get("currentSuggestions") || [];
+      const updatedSuggestions = currentSuggestions.map(s =>
+        s.id === suggestion.id ? suggestion : s
+      );
+      this.stateManager.setState({ currentSuggestions: updatedSuggestions });
 
       return suggestion.fullRecipe;
     } catch (error) {
@@ -258,7 +348,9 @@ Do not omit headers. Keep concise but complete.
   }
 
   selectSuggestion(suggestionId) {
-    return this.currentSuggestions.find(s => s.id === suggestionId);
+    const currentSuggestions =
+      this.stateManager.get("currentSuggestions") || [];
+    return currentSuggestions.find(s => s.id === suggestionId);
   }
 
   createSuggestionCard(suggestion) {

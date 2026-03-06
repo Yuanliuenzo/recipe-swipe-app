@@ -16,6 +16,10 @@ class StateManager {
       currentVibeRound: 0,
       shuffledVibes: [],
 
+      // Recipe state
+      currentSuggestions: [],
+      pendingFetches: new Map(),
+
       // UI state
       isLoading: false,
       error: null
