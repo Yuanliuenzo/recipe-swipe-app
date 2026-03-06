@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import fs from "fs/promises";
 import bcrypt from "bcrypt";
+import { llmService } from "./src/core/LLMService.js";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -320,25 +321,28 @@ app.post("/api/generateRecipe", async (req, res) => {
   console.log("POST /api/generateRecipe called with body:", req.body);
 
   try {
-    console.log("Calling Ollama with prompt:", req.body.prompt);
+    const { prompt, suggestions, count } = req.body;
 
-    const response = await fetch("http://127.0.0.1:11434/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "mistral:latest",
-        prompt: req.body.prompt || "Write me a recipe for a hungover day.",
-        stream: false
-      })
-    });
+    let result;
 
-    const data = await response.json();
+    if (suggestions) {
+      // Generate structured suggestions
+      console.log("Generating structured recipe suggestions...");
+      result = await llmService.generateSuggestions(prompt, count || 5, {
+        timeout: 60000
+      });
+    } else {
+      // Generate single recipe
+      console.log("Generating single recipe...");
+      result = await llmService.generateRecipe(prompt, {
+        timeout: 60000
+      });
+    }
 
-    console.log("Ollama responded");
-
-    res.json({ recipe: data.response });
+    console.log("✅ LLM service responded successfully");
+    res.json(result);
   } catch (error) {
-    console.error("Error details:", error);
+    console.error("❌ LLM service error:", error);
     res
       .status(500)
       .json({ error: "Something went wrong", details: error.message });

@@ -11,18 +11,30 @@ export class RecipeSuggestionsView {
   }
 
   async render() {
-    this.showLoading();
+    const existingSuggestions =
+      this.recipeSuggestionService.stateManager.get("currentSuggestions") || [];
 
-    try {
-      const suggestions =
-        await this.recipeSuggestionService.generateSuggestions();
+    if (existingSuggestions.length > 0) {
+      console.log("🔄 Using existing suggestions from state manager");
       this.container.innerHTML =
-        this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+        this.recipeSuggestionService.createSuggestionsGrid(existingSuggestions);
       this.container.classList.add("suggestions-mode");
       this.setupInteractions();
-    } catch (error) {
-      console.error("Failed to generate suggestions:", error);
-      this.showError("Failed to generate suggestions");
+    } else {
+      console.log("🆕 No existing suggestions, generating new ones");
+      this.showLoading();
+
+      try {
+        const suggestions =
+          await this.recipeSuggestionService.generateSuggestions();
+        this.container.innerHTML =
+          this.recipeSuggestionService.createSuggestionsGrid(suggestions);
+        this.container.classList.add("suggestions-mode");
+        this.setupInteractions();
+      } catch (error) {
+        console.error("Failed to generate suggestions:", error);
+        this.showError("Failed to generate suggestions");
+      }
     }
   }
 

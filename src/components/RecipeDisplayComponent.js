@@ -16,7 +16,8 @@ export class RecipeDisplayComponent {
     const { title, showTitle = true, customActions = "" } = options;
 
     // Format the recipe
-    const formatted = RecipeFormatter.format(recipe.recipeText.recipe);
+    const formatted =
+      recipe.formatted || RecipeFormatter.format(recipe.recipeText);
 
     // Generate HTML
     const html = `
