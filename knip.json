@@ -1,4 +1,6 @@
 {
   "entry": ["src/main.js"],
-  "project": ["src/**/*.js"]
+  "project": ["src/**/*.js"],
+  "ignoreDependencies": ["husky"],
+  "ignoreBinaries": ["lint-staged"]
 }

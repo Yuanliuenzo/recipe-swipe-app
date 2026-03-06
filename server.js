@@ -1,9 +1,14 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const fs = require("fs").promises;
-const bcrypt = require("bcrypt");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
+import fs from "fs/promises";
+import bcrypt from "bcrypt";
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
