@@ -15,13 +15,11 @@ export class RecipeSuggestionsView {
       this.recipeSuggestionService.stateManager.get("currentSuggestions") || [];
 
     if (existingSuggestions.length > 0) {
-      console.log("🔄 Using existing suggestions from state manager");
       this.container.innerHTML =
         this.recipeSuggestionService.createSuggestionsGrid(existingSuggestions);
       this.container.classList.add("suggestions-mode");
       this.setupInteractions();
     } else {
-      console.log("🆕 No existing suggestions, generating new ones");
       this.showLoading();
 
       try {

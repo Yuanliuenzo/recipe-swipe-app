@@ -89,37 +89,19 @@ export class LLMService {
 
   // Response parsing with schema support
   _parseResponse(result, schema) {
-    console.log(`🐛 LLM DEBUG: Raw result:`, result);
-    console.log(`🐛 LLM DEBUG: Schema:`, schema);
-
     if (!schema) {
-      console.log(`🐛 LLM DEBUG: No schema, returning raw text`);
       return result.text;
     }
 
     try {
       // Try to parse as JSON if schema expects structured data
       if (schema.type === "object") {
-        console.log(`🐛 LLM DEBUG: Trying to parse as JSON...`);
         const parsed = JSON.parse(result.text);
-        console.log(`🐛 LLM DEBUG: Parsed JSON:`, parsed);
         return this._validateSchema(parsed, schema);
       }
     } catch (error) {
-      console.warn(
-        "⚠️ Failed to parse structured response, returning raw text"
-      );
-      console.log(`🐛 LLM DEBUG: Parse error:`, error.message);
-      console.log(
-        `🐛 LLM DEBUG: Text that failed to parse:`,
-        `${result.text?.substring(0, 500)}...`
-      );
-
-      // 🛠️ FIXED: For recipe generation, wrap raw text in expected format
+      // For recipe generation, wrap raw text in expected format
       if (schema.required && schema.required.includes("recipe")) {
-        console.log(
-          `🐛 LLM DEBUG: Wrapping raw text in { recipe: text } format`
-        );
         return { recipe: result.text };
       }
 

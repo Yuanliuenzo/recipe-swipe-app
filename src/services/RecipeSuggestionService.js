@@ -35,10 +35,6 @@ export class RecipeSuggestionService {
           timeoutMs
         );
 
-        console.log(`🐛 DEBUG: Suggestions API response:`, response);
-        console.log(`🐛 DEBUG: Response type:`, typeof response);
-        console.log(`🐛 DEBUG: Response keys:`, Object.keys(response || {}));
-
         if (!response) {
           console.warn(
             "⚠️ Empty response from API, using fallback suggestions."
@@ -196,52 +192,27 @@ export class RecipeSuggestionService {
   async _fetchAndCacheRecipe(suggestion, timeoutMs) {
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
-      console.log(
-        `🐛 DEBUG: Fetching recipe for "${suggestion.title}" with prompt:`,
-        `${prompt.substring(0, 200)}...`
-      );
 
       const response = await apiService.generateRecipe(prompt, {
         timeout: timeoutMs
       });
 
-      console.log(`🐛 DEBUG: Raw LLM response:`, response);
-      console.log(`🐛 DEBUG: Response type:`, typeof response);
-      console.log(`🐛 DEBUG: Response keys:`, Object.keys(response || {}));
-
-      // 🛠️ FIXED: Extract recipe text correctly from LLM response (back to original format)
+      // Extract recipe text correctly from LLM response
       let recipeText;
 
       // LLM service returns { recipe: "text" } for single recipes
       if (response.recipe) {
         recipeText = response.recipe; // Original working format
-        console.log(`🐛 DEBUG: Using response.recipe (ORIGINAL FORMAT)`);
       } else if (response.text) {
         recipeText = response.text; // Fallback
-        console.log(`🐛 DEBUG: Using response.text`);
       } else if (typeof response === "string") {
         recipeText = response; // Direct string response
-        console.log(`🐛 DEBUG: Response is string, using directly`);
       } else {
-        console.log(`🐛 DEBUG: Invalid response format, throwing error`);
-        console.log(`🐛 DEBUG: Full response:`, response);
         throw new Error("Invalid response format from LLM service");
       }
 
-      console.log(`🐛 DEBUG: Extracted recipeText type:`, typeof recipeText);
-      console.log(
-        `🐛 DEBUG: RecipeText preview:`,
-        `${recipeText?.substring(0, 300)}...`
-      );
-
-      // 🛠️ FIXED: Pass the correct text to formatter
+      // Pass the correct text to formatter
       const formatted = RecipeFormatter.format(recipeText);
-
-      console.log(`🐛 DEBUG: Formatted result:`, formatted);
-      console.log(
-        `🐛 DEBUG: Formatted HTML preview:`,
-        `${formatted.html?.substring(0, 200)}...`
-      );
 
       suggestion.fullRecipe = {
         recipeText,
@@ -249,7 +220,7 @@ export class RecipeSuggestionService {
         formatted
       };
 
-      // 🛠️ NEW: Update the suggestion in state manager
+      // Update the suggestion in state manager
       const currentSuggestions =
         this.stateManager.get("currentSuggestions") || [];
       const updatedSuggestions = currentSuggestions.map(s =>
@@ -257,7 +228,6 @@ export class RecipeSuggestionService {
       );
       this.stateManager.setState({ currentSuggestions: updatedSuggestions });
 
-      console.log(`✅ Successfully cached recipe: ${suggestion.title}`);
       return suggestion.fullRecipe;
     } catch (error) {
       console.error("❌ Failed to generate full recipe:", error);
