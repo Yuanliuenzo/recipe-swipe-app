@@ -18,6 +18,7 @@ import { PromptBuilder } from "../../shared/PromptBuilder.js";
 import { RecipeDetailView } from "../../components/views/RecipeDetailView.js";
 import { RecipeSuggestionsView } from "../../components/views/RecipeSuggestionsView.js";
 import { CONFIG } from "../Config.js";
+import { QuestionEngine } from "../QuestionEngine.js";
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -46,6 +47,10 @@ export class UnifiedApp {
     this.recipeSuggestionService = new RecipeSuggestionService(
       globalStateManager
     );
+
+    // 🆕 Question Engine for minimal essential questions
+    this.questionEngine = new QuestionEngine(globalStateManager);
+    this.currentQuestionView = null;
 
     // Now inject dependencies back into services
     this.favoritesService.navigationService = this.navigationService;
@@ -357,29 +362,14 @@ export class UnifiedApp {
       generateBtn.disabled = true;
 
       try {
-        this.showSuggestionsView(recipeCard);
+        // 🆕 Show questions first, then suggestions
+        await this.showQuestionFlow(recipeCard);
       } catch (error) {
-        console.error("Failed to generate suggestions:", error);
+        console.error("Failed to start question flow:", error);
         generateBtn.textContent = "Try Again";
         generateBtn.disabled = false;
       }
     });
-  }
-
-  showSuggestionsView(container) {
-    // Reuse existing view if available, otherwise create new one
-    if (!this.recipeSuggestionsView) {
-      this.recipeSuggestionsView = new RecipeSuggestionsView(container, {
-        serviceRegistry: this.serviceRegistry
-      });
-
-      this.recipeSuggestionsView.on("recipeSelected", e => {
-        this.handleRecipeSelected(e.detail.suggestion);
-      });
-    }
-
-    this.currentView = this.recipeSuggestionsView;
-    this.recipeSuggestionsView.render();
   }
 
   handleRecipeSelected(suggestion) {
@@ -541,5 +531,107 @@ export class UnifiedApp {
     });
 
     this.isInitialized = false;
+  }
+
+  // 🆕 Question Flow Methods
+  async showQuestionFlow(container) {
+    // Reset question engine for new session
+    this.questionEngine.reset();
+
+    // Start with first question
+    await this.showNextQuestion(container);
+  }
+
+  async showNextQuestion(container) {
+    const question = this.questionEngine.getNextQuestion();
+
+    if (!question) {
+      // No more questions, proceed to suggestions
+      await this.showSuggestionsView(container);
+      return;
+    }
+
+    // Load and render the appropriate question component
+    await this.renderQuestion(container, question);
+  }
+
+  async renderQuestion(container, question) {
+    // Clean up previous question view
+    if (this.currentQuestionView) {
+      this.currentQuestionView.destroy();
+    }
+
+    // Dynamically import the question component
+    let QuestionComponent;
+    try {
+      switch (question.component) {
+        case "MealContextQuestion": {
+          const module =
+            await import("../../components/questions/MealContextQuestion.js");
+          QuestionComponent = module.MealContextQuestion;
+          break;
+        }
+        case "SpecialistModeQuestion": {
+          const specialistModule =
+            await import("../../components/questions/SpecialistModeQuestion.js");
+          QuestionComponent = specialistModule.SpecialistModeQuestion;
+          break;
+        }
+        case "TimeConstraintQuestion": {
+          const timeModule =
+            await import("../../components/questions/TimeConstraintQuestion.js");
+          QuestionComponent = timeModule.TimeConstraintQuestion;
+          break;
+        }
+        default:
+          throw new Error(`Unknown question component: ${question.component}`);
+      }
+
+      // Create and render the question
+      this.currentQuestionView = new QuestionComponent(container, {
+        onAnswer: (questionId, answer) =>
+          this.handleQuestionAnswer(questionId, answer),
+        stateManager: globalStateManager
+      });
+
+      this.currentQuestionView.render(question.config);
+    } catch (error) {
+      console.error("Failed to load question component:", error);
+      // Fallback to suggestions if question fails
+      await this.showSuggestionsView(container);
+    }
+  }
+
+  async handleQuestionAnswer(questionId, answer) {
+    // Process the answer through the question engine
+    this.questionEngine.processAnswer(questionId, answer);
+
+    // Show next question or proceed to suggestions
+    await this.showNextQuestion(
+      this.containers.resultContainer.querySelector(".mobile-recipe-card")
+    );
+  }
+
+  // 🆕 Enhanced suggestions method that incorporates question answers
+  async showSuggestionsView(container) {
+    // Get prompt modifiers from question engine
+    const promptModifiers = this.questionEngine.getPromptModifiers();
+    console.log("🎯 Question-based modifiers:", promptModifiers);
+
+    // Reuse existing view if available, otherwise create new one
+    if (!this.recipeSuggestionsView) {
+      this.recipeSuggestionsView = new RecipeSuggestionsView(container, {
+        serviceRegistry: this.serviceRegistry
+      });
+
+      this.recipeSuggestionsView.on("recipeSelected", e => {
+        this.handleRecipeSelected(e.detail.suggestion);
+      });
+    }
+
+    this.currentView = this.recipeSuggestionsView;
+
+    // Pass question modifiers to suggestions view
+    await this.recipeSuggestionsView.render(promptModifiers);
   }
 }

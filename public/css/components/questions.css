@@ -1,0 +1,344 @@
+/**
+ * Question Components CSS
+ * Visual, touch-friendly question interfaces
+ */
+
+/* Base Question Styles */
+.meal-context-question,
+.specialist-mode-question,
+.time-constraint-question {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.question-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.question-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Meal Context Grid */
+.meal-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.meal-option {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.meal-option::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--option-color, #4caf50);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.meal-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.meal-option.selected {
+  border-color: var(--option-color, #4caf50);
+  background: var(--option-color, #4caf50);
+  color: white;
+}
+
+.meal-option.selected::before {
+  transform: scaleX(1);
+}
+
+.meal-option-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  filter: grayscale(0.2);
+  transition: filter 0.3s ease;
+}
+
+.meal-option.selected .meal-option-icon {
+  filter: grayscale(0);
+}
+
+.meal-option-label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Specialist Mode Grid */
+.specialist-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.specialist-option {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.specialist-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.specialist-option.selected {
+  border-color: var(--option-color, #4caf50);
+  background: var(--option-color, #4caf50);
+  color: white;
+}
+
+.specialist-option-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.specialist-option-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Time Constraint Grid */
+.time-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.time-option {
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.time-option:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.time-option.selected {
+  border-color: var(--option-color, #4caf50);
+  background: var(--option-color, #4caf50);
+  color: white;
+}
+
+.time-option-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.time-option-content {
+  flex: 1;
+}
+
+.time-option-label {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.time-option-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Question Actions */
+.question-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.question-actions .japandi-btn {
+  min-width: 120px;
+}
+
+/* Japandi Button Styles */
+.japandi-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.japandi-btn-primary {
+  background: #4caf50;
+  color: white;
+}
+
+.japandi-btn-primary:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.japandi-btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+
+.japandi-btn-secondary:hover {
+  background: #e8e8e8;
+  transform: translateY(-1px);
+}
+
+.japandi-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .meal-context-question,
+  .specialist-mode-question,
+  .time-constraint-question {
+    padding: 1rem;
+  }
+
+  .question-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .meal-options-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .specialist-options-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .meal-option,
+  .specialist-option {
+    padding: 1rem;
+  }
+
+  .meal-option-icon {
+    font-size: 2rem;
+  }
+
+  .specialist-option-icon {
+    font-size: 1.5rem;
+  }
+
+  .question-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .question-actions .japandi-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .specialist-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .time-option {
+    padding: 1rem;
+  }
+
+  .time-option-icon {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation Support */
+@media (prefers-reduced-motion: reduce) {
+  .meal-option,
+  .specialist-option,
+  .time-option {
+    transition: none;
+  }
+
+  .meal-option:hover,
+  .specialist-option:hover,
+  .time-option:hover {
+    transform: none;
+  }
+}
+
+/* Focus States for Accessibility */
+.meal-option:focus,
+.specialist-option:focus,
+.time-option:focus {
+  outline: 2px solid #4caf50;
+  outline-offset: 2px;
+}
+
+/* Loading States */
+.question-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.question-loading .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

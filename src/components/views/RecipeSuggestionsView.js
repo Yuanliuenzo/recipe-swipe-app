@@ -10,7 +10,7 @@ export class RecipeSuggestionsView {
     this.recipeSuggestionService = serviceRegistry.get("recipeSuggestion");
   }
 
-  async render() {
+  async render(promptModifiers = []) {
     const existingSuggestions =
       this.recipeSuggestionService.stateManager.get("currentSuggestions") || [];
 
@@ -24,7 +24,9 @@ export class RecipeSuggestionsView {
 
       try {
         const suggestions =
-          await this.recipeSuggestionService.generateSuggestions();
+          await this.recipeSuggestionService.generateSuggestions(
+            promptModifiers
+          );
         this.container.innerHTML =
           this.recipeSuggestionService.createSuggestionsGrid(suggestions);
         this.container.classList.add("suggestions-mode");

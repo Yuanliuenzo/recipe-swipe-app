@@ -14,23 +14,29 @@ export class RecipeSuggestionService {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
-  // --------------------------
   // Stage 1: Generate recipe suggestions (titles + brief descriptions)
   // --------------------------
-  async generateSuggestions(maxRetries = 3) {
-    const prompt = this.buildTitleSuggestionPrompt();
+  async generateSuggestions(promptModifiers = [], maxRetries = 3) {
+    const basePrompt = this.buildTitleSuggestionPrompt();
+
+    // 🆕 Incorporate question-based modifiers into the prompt
+    const enhancedPrompt = this.enhancePromptWithModifiers(
+      basePrompt,
+      promptModifiers
+    );
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         console.log(
           `🔄 Generating recipe suggestions (attempt ${attempt}/${maxRetries})...`
         );
+        console.log("🎯 Using modifiers:", promptModifiers);
 
         // Increase timeout for subsequent attempts
         const timeoutMs = 60000 + (attempt - 1) * 30000; // 60s, 90s, 120s
 
         const response = await apiService.generateRecipeSuggestions(
-          prompt,
+          enhancedPrompt,
           5,
           timeoutMs
         );
@@ -271,6 +277,20 @@ Keep titles appealing, descriptions concise (≤50 words), and match preferences
 `;
 
     return prompt;
+  }
+
+  // 🆕 Enhance prompt with question-based modifiers
+  enhancePromptWithModifiers(basePrompt, modifiers) {
+    if (!modifiers || modifiers.length === 0) {
+      return basePrompt;
+    }
+
+    const modifierText = modifiers.filter(m => m).join(", ");
+
+    return `${basePrompt}
+
+IMPORTANT: The user has provided specific preferences: ${modifierText}.
+Please ensure all suggestions match these requirements exactly.`;
   }
 
   buildFullRecipePrompt(selectedTitle) {
