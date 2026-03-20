@@ -8,9 +8,17 @@ class StateManager {
       // User state
       currentUsername: "",
       vibeProfile: [],
+      negativeVibes: [], // vibes the user swiped left on
       ingredientsAtHome: "",
       favorites: [],
       preferences: { ...DEFAULT_PREFERENCES },
+
+      // Per-session context (set in questionnaire before swiping)
+      sessionContext: {
+        mealType: null, // "breakfast" | "brunch" | "lunch" | "dinner" | "snack"
+        servingSize: null, // "solo" | "couple" | "group"
+        timeAvailable: null // "quick" | "normal" | "leisurely"
+      },
 
       // Game state
       currentVibeRound: 0,

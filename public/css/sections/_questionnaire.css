@@ -1,0 +1,229 @@
+/* ================================
+   QUESTIONNAIRE — Pre-swipe setup screen
+   ================================ */
+
+.questionnaire-card {
+  background: var(--color-card);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-2xl);
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: questionnaire-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes questionnaire-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.questionnaire-header {
+  padding: var(--space-3xl) var(--space-3xl) var(--space-xl);
+  background: var(--gradient-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.questionnaire-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-xs);
+  line-height: 1.2;
+}
+
+.questionnaire-subtitle {
+  font-size: 13px;
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+/* Body */
+.questionnaire-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.q-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.q-label {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.q-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+}
+
+.q-hint {
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Option buttons (pill/chip style) */
+.q-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.q-option {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.q-option:hover {
+  border-color: var(--color-accent);
+  background: rgba(220, 185, 132, 0.08);
+}
+
+.q-option:active {
+  transform: scale(0.96);
+}
+
+.q-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(106, 78, 66, 0.3);
+}
+
+/* Fridge ingredients input */
+.q-ingredients-input {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  color: var(--color-text);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.q-ingredients-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.q-ingredients-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(220, 185, 132, 0.15);
+}
+
+/* Footer */
+.questionnaire-footer {
+  padding: var(--space-xl) var(--space-3xl) var(--space-3xl);
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.q-submit-btn {
+  width: 100%;
+  padding: var(--space-lg);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.q-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Progressive reveal animation for dynamically added steps */
+.q-step-reveal {
+  animation: q-step-reveal 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes q-step-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tablet & desktop: slightly more padding */
+@media (min-width: 768px) {
+  .questionnaire-card {
+    max-width: 460px;
+  }
+
+  .questionnaire-header {
+    padding: var(--space-4xl) var(--space-4xl) var(--space-2xl);
+  }
+
+  .questionnaire-body {
+    padding: var(--space-2xl) var(--space-4xl);
+    gap: var(--space-3xl);
+  }
+
+  .questionnaire-footer {
+    padding: var(--space-2xl) var(--space-4xl) var(--space-4xl);
+  }
+
+  .questionnaire-title {
+    font-size: 26px;
+  }
+}

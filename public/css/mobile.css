@@ -73,6 +73,9 @@
 /* Vibes Sections - Mobile Vibe Cards, Overlays, Summaries */
 @import "sections/_vibes.css";
 
+/* Questionnaire - Pre-swipe setup screen */
+@import "sections/_questionnaire.css";
+
 /* ================================
    UTILITIES LAYER
    ================================ */

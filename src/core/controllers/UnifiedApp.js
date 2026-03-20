@@ -17,7 +17,7 @@ import { RecipeFormatter } from "../../shared/RecipeFormatter.js";
 import { PromptBuilder } from "../../shared/PromptBuilder.js";
 import { RecipeDetailView } from "../../components/views/RecipeDetailView.js";
 import { RecipeSuggestionsView } from "../../components/views/RecipeSuggestionsView.js";
-import { CONFIG } from "../Config.js";
+import { CONFIG, MEAL_TYPES, QUESTIONNAIRE_FLOWS } from "../Config.js";
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -79,14 +79,11 @@ export class UnifiedApp {
       // 2. Setup DOM containers
       this.setupContainers();
 
-      // 3. Initialize vibe engine
-      this.vibeEngine.reset();
-
-      // 4. Load user data
+      // 3. Load user data
       await this.loadUserData();
 
-      // 5. Create first card
-      await this.createFirstCard();
+      // 4. Show questionnaire before starting the swipe game
+      this.showQuestionnaire();
 
       // 6. Setup event listeners
       this.setupEventListeners();
@@ -175,8 +172,8 @@ export class UnifiedApp {
       // Setup swipe handling
       this.setupSwipeHandling();
 
-      // Initialize round progress display
-      this.updateRoundProgress(1);
+      // Initialize round progress display (card 1 of MAX_VIBE_ROUNDS)
+      this.updateRoundProgress(this.vibeEngine.getCurrentRound());
 
       console.log("✅ First card created successfully");
     } else {
@@ -231,14 +228,18 @@ export class UnifiedApp {
     console.log(`👆 Swipe ${direction}: ${currentVibe.name}`);
 
     if (direction === "right") {
-      // Add to profile
       const currentProfile = globalStateManager.get("vibeProfile");
-      const updatedProfile = [...currentProfile, currentVibe];
-      globalStateManager.setState({ vibeProfile: updatedProfile });
-      console.log(`❤️ Added ${currentVibe.name} to profile`);
-
-      // Update round progress
-      this.updateRoundProgress(updatedProfile.length);
+      globalStateManager.setState({
+        vibeProfile: [...currentProfile, currentVibe]
+      });
+      console.log(`❤️ Added ${currentVibe.name} to vibe profile`);
+    } else {
+      // Track negative vibes — used in prompts to steer away from unwanted moods
+      const negativeVibes = globalStateManager.get("negativeVibes") || [];
+      globalStateManager.setState({
+        negativeVibes: [...negativeVibes, currentVibe]
+      });
+      console.log(`👎 Added ${currentVibe.name} to negative vibes`);
     }
 
     // Show next card
@@ -250,18 +251,16 @@ export class UnifiedApp {
     if (nextVibe) {
       console.log(`🔄 Loading next vibe: ${nextVibe.name}`);
 
-      // Store current vibe
       globalStateManager.setState({ currentVibe: nextVibe });
 
-      // Clear and create new card
       this.containers.cardContainer.innerHTML = "";
       this.currentCard = new VibeCard(this.containers.cardContainer, {
         vibe: nextVibe
       });
       this.currentCard.mount();
 
-      // Setup swipe handling for new card
       this.setupSwipeHandling();
+      this.updateRoundProgress(this.vibeEngine.getCurrentRound());
     } else {
       this.showResult();
     }
@@ -278,8 +277,212 @@ export class UnifiedApp {
     }
   }
 
+  showQuestionnaire() {
+    const header = document.querySelector(".mobile-header");
+    if (header) {
+      header.style.display = "none";
+    }
+
+    const container = this.containers.cardContainer;
+    if (!container) {
+      return;
+    }
+
+    const mealOptions = MEAL_TYPES.map(
+      m =>
+        `<button class="q-option" data-field="mealType" data-value="${m.value}">${m.emoji} ${m.label}</button>`
+    ).join("");
+
+    // Only Q1 is rendered upfront — Q2, Q3, and ingredients reveal progressively
+    container.innerHTML = `
+      <div class="questionnaire-card">
+        <div class="questionnaire-header">
+          <h2 class="questionnaire-title">What are we cooking?</h2>
+          <p class="questionnaire-subtitle">A couple of quick questions first</p>
+        </div>
+        <div class="questionnaire-body" id="questionnaire-body">
+          <div class="q-step" data-step="1">
+            <label class="q-label">What are you making?</label>
+            <div class="q-options">${mealOptions}</div>
+          </div>
+        </div>
+        <div class="questionnaire-footer">
+          <button class="japandi-btn japandi-btn-primary q-submit-btn" disabled>
+            Start Swiping →
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.setupAdaptiveQuestionnaire(container);
+  }
+
+  setupAdaptiveQuestionnaire(container) {
+    const answers = { mealType: null, servingSize: null, timeAvailable: null };
+    const body = container.querySelector("#questionnaire-body");
+    const submitBtn = container.querySelector(".q-submit-btn");
+
+    // Single delegated listener handles all option clicks
+    container.addEventListener("click", e => {
+      const btn = e.target.closest(".q-option");
+      if (!btn) {
+        return;
+      }
+
+      const field = btn.dataset.field;
+      const value = btn.dataset.value;
+
+      container
+        .querySelectorAll(`.q-option[data-field="${field}"]`)
+        .forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      answers[field] = value;
+
+      if (field === "mealType") {
+        // Clear any previously revealed steps when meal type changes
+        body
+          .querySelectorAll(
+            "[data-step='2'],[data-step='3'],[data-step='ingredients']"
+          )
+          .forEach(el => el.remove());
+        answers.servingSize = null;
+        answers.timeAvailable = null;
+        submitBtn.disabled = true;
+        this._revealQ2(body, answers, submitBtn, value);
+      } else if (field === "servingSize") {
+        body
+          .querySelectorAll("[data-step='3'],[data-step='ingredients']")
+          .forEach(el => el.remove());
+        answers.timeAvailable = null;
+        submitBtn.disabled = true;
+        this._revealQ3orIngredients(body, answers, submitBtn);
+      } else if (field === "timeAvailable") {
+        body
+          .querySelectorAll("[data-step='ingredients']")
+          .forEach(el => el.remove());
+        this._revealIngredients(body, submitBtn);
+      }
+    });
+
+    submitBtn.addEventListener("click", () => {
+      globalStateManager.setState({
+        sessionContext: {
+          mealType: answers.mealType,
+          servingSize: answers.servingSize,
+          timeAvailable: answers.timeAvailable
+        }
+      });
+
+      const ingredientsInput = container.querySelector(".q-ingredients-input");
+      const rawIngredients = ingredientsInput?.value.trim();
+      if (rawIngredients) {
+        globalStateManager.setState({ ingredientsAtHome: rawIngredients });
+      }
+
+      this.startVibeGame();
+    });
+  }
+
+  _revealQ2(body, answers, submitBtn, mealType) {
+    const flow = QUESTIONNAIRE_FLOWS[mealType];
+    if (!flow) {
+      return;
+    }
+
+    const optionsHtml = flow.q2.options
+      .map(
+        o =>
+          `<button class="q-option" data-field="servingSize" data-value="${o.value}">${o.emoji} ${o.label}</button>`
+      )
+      .join("");
+
+    const step = document.createElement("div");
+    step.className = "q-step q-step-reveal";
+    step.dataset.step = "2";
+    step.innerHTML = `
+      <label class="q-label">${flow.q2.label}</label>
+      <div class="q-options">${optionsHtml}</div>
+    `;
+    body.appendChild(step);
+    this._scrollToStep(body);
+  }
+
+  _revealQ3orIngredients(body, answers, submitBtn) {
+    const flow = QUESTIONNAIRE_FLOWS[answers.mealType];
+    if (!flow) {
+      return;
+    }
+
+    if (flow.q3.skip) {
+      // Set the default time and go straight to ingredients
+      answers.timeAvailable = flow.q3.default;
+      this._revealIngredients(body, submitBtn);
+    } else {
+      this._revealQ3(body, answers, submitBtn, flow.q3);
+    }
+  }
+
+  _revealQ3(body, answers, submitBtn, q3config) {
+    const optionsHtml = q3config.options
+      .map(
+        o =>
+          `<button class="q-option" data-field="timeAvailable" data-value="${o.value}">${o.emoji} ${o.label}</button>`
+      )
+      .join("");
+
+    const step = document.createElement("div");
+    step.className = "q-step q-step-reveal";
+    step.dataset.step = "3";
+    step.innerHTML = `
+      <label class="q-label">${q3config.label}</label>
+      <div class="q-options">${optionsHtml}</div>
+    `;
+    body.appendChild(step);
+    this._scrollToStep(body);
+  }
+
+  _revealIngredients(body, submitBtn) {
+    const step = document.createElement("div");
+    step.className = "q-step q-step-reveal";
+    step.dataset.step = "ingredients";
+    step.innerHTML = `
+      <label class="q-label">
+        What's in your fridge?
+        <span class="q-optional">optional</span>
+      </label>
+      <p class="q-hint">We'll use what fits naturally — no need to force everything in</p>
+      <input type="text" class="q-ingredients-input" placeholder="chicken, garlic, lemon..." />
+    `;
+    body.appendChild(step);
+    this._scrollToStep(body);
+
+    // All required answers collected — unlock the submit button
+    submitBtn.disabled = false;
+  }
+
+  _scrollToStep(body) {
+    // Give the DOM a tick to paint the new step before scrolling
+    requestAnimationFrame(() => {
+      body.scrollTo({ top: body.scrollHeight, behavior: "smooth" });
+    });
+  }
+
+  startVibeGame() {
+    // Restore the round indicator
+    const header = document.querySelector(".mobile-header");
+    if (header) {
+      header.style.display = "";
+    }
+
+    // Reset vibe engine with session context for contextual filtering
+    const sessionContext = globalStateManager.get("sessionContext");
+    this.vibeEngine.reset(sessionContext);
+
+    this.createFirstCard();
+  }
+
   showRecipeGeneration() {
-    // Hide main container, show result container
+    // Ingredients were already collected in the questionnaire — go straight to suggestions
     const mobileContainer = document.querySelector(".mobile-container");
     const resultContainer = this.containers.resultContainer;
 
@@ -293,77 +496,10 @@ export class UnifiedApp {
 
       const recipeCard = resultContainer.querySelector(".mobile-recipe-card");
       if (recipeCard) {
-        recipeCard.innerHTML = this.createIngredientsInput();
         recipeCard.classList.add("suggestions-mode");
-        this.setupIngredientsActions(recipeCard);
+        this.showSuggestionsView(recipeCard);
       }
     }
-  }
-
-  createIngredientsInput() {
-    return `
-      <div class="ingredients-container">
-        <h2>🍳 Ready to Cook!</h2>
-        <p style="color: #666;">Let's find you a delicious recipe!</p>
-        <h3>🏡 What do you have at home?</h3>
-        <p class="ingredients-subtitle">Optional: Add ingredients you'd like to use</p>
-        <textarea class="ingredients-input" placeholder="chicken breast, rice, garlic, spinach..." rows="3"></textarea>
-        <div class="ingredients-actions">
-          <button class="japandi-btn japandi-btn-subtle add-ingredients-btn" type="button">+ Add Ingredients</button>
-        </div>
-        <div class="ingredients-confirmation"></div>
-        <button class="japandi-btn japandi-btn-primary mobile-generate-btn" type="button">💡 Get Recipe Suggestions</button>
-      </div>
-    `;
-  }
-
-  setupIngredientsActions(recipeCard) {
-    const addBtn = recipeCard.querySelector(".add-ingredients-btn");
-    const ingredientsInput = recipeCard.querySelector(".ingredients-input");
-    const confirmation = recipeCard.querySelector(".ingredients-confirmation");
-    const generateBtn = recipeCard.querySelector(".mobile-generate-btn");
-
-    addBtn.addEventListener("click", () => {
-      const rawValue = ingredientsInput.value.trim();
-      if (rawValue) {
-        const newItems = rawValue
-          .split(",")
-          .map(item => item.trim().toLowerCase())
-          .filter(item => item.length > 0);
-        const existingItems =
-          globalStateManager
-            .get("ingredientsAtHome")
-            ?.split(",")
-            .map(item => item.trim().toLowerCase()) || [];
-        const combined = [...existingItems, ...newItems];
-        const uniqueItems = [...new Set(combined)];
-
-        globalStateManager.setState({
-          ingredientsAtHome: uniqueItems.join(", ")
-        });
-        ingredientsInput.value = "";
-
-        confirmation.textContent = `✅ Added: ${newItems.join(", ")}`;
-        confirmation.style.color = "#4CAF50";
-        confirmation.classList.add("show");
-
-        setTimeout(() => confirmation.classList.remove("show"), 3000);
-      }
-    });
-
-    generateBtn.addEventListener("click", async () => {
-      generateBtn.innerHTML =
-        '<span class="mobile-loading-spinner"></span> Getting suggestions... (this may take 30+ seconds)';
-      generateBtn.disabled = true;
-
-      try {
-        this.showSuggestionsView(recipeCard);
-      } catch (error) {
-        console.error("Failed to generate suggestions:", error);
-        generateBtn.textContent = "Try Again";
-        generateBtn.disabled = false;
-      }
-    });
   }
 
   showSuggestionsView(container) {
