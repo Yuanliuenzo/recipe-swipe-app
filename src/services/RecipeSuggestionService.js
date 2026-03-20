@@ -3,6 +3,7 @@
 
 import { apiService } from "../core/ApiService.js";
 import { RecipeFormatter } from "../shared/RecipeFormatter.js";
+import { getCurrentSeason } from "../utils/LLMUtils.js";
 
 export class RecipeSuggestionService {
   constructor(stateManager) {
@@ -118,32 +119,31 @@ export class RecipeSuggestionService {
     }
   }
 
-  // 🚀 NEW: Pre-fetch all recipes in parallel for instant UX
+  // Pre-fetch recipes sequentially — Ollama handles one request at a time,
+  // so parallel requests just queue up and each one times out waiting.
   async preFetchAllRecipes() {
-    const currentSuggestions =
-      this.stateManager.get("currentSuggestions") || [];
-    console.log("🚀 Pre-fetching all recipes in parallel...");
-
-    const fetchPromises = currentSuggestions.map(async suggestion => {
-      try {
-        const fullRecipe = await this.generateFullRecipe(suggestion.id, 90000);
-        console.log(`✅ Pre-fetched recipe: ${suggestion.title}`);
-        return { id: suggestion.id, success: true, recipe: fullRecipe };
-      } catch (error) {
-        console.error(
-          `❌ Failed to pre-fetch ${suggestion.title}:`,
-          error.message
-        );
-        return { id: suggestion.id, success: false, error };
-      }
-    });
-
-    // Wait for all parallel requests to complete
-    const results = await Promise.allSettled(fetchPromises);
-
-    const successful = results.filter(r => r.value?.success).length;
+    const suggestions = this.stateManager.get("currentSuggestions") || [];
     console.log(
-      `🎯 Pre-fetch complete: ${successful}/${currentSuggestions.length} recipes cached`
+      `🚀 Pre-fetching ${suggestions.length} recipes sequentially...`
+    );
+
+    let fetched = 0;
+    for (const suggestion of suggestions) {
+      try {
+        await this.generateFullRecipe(suggestion.id, 90000);
+        fetched++;
+        console.log(
+          `✅ Pre-fetched (${fetched}/${suggestions.length}): ${suggestion.title}`
+        );
+      } catch (error) {
+        console.warn(
+          `⚠️ Pre-fetch skipped for "${suggestion.title}": ${error.message}`
+        );
+      }
+    }
+
+    console.log(
+      `🎯 Pre-fetch complete: ${fetched}/${suggestions.length} cached`
     );
   }
 
@@ -239,19 +239,8 @@ export class RecipeSuggestionService {
   // Prompt builders
   // --------------------------
 
-  // Returns the current season based on the month, for automatic seasonal context
   _getSeason() {
-    const month = new Date().getMonth(); // 0-based
-    if (month >= 2 && month <= 4) {
-      return "spring";
-    }
-    if (month >= 5 && month <= 7) {
-      return "summer";
-    }
-    if (month >= 8 && month <= 10) {
-      return "autumn";
-    }
-    return "winter";
+    return getCurrentSeason();
   }
 
   buildTitleSuggestionPrompt() {

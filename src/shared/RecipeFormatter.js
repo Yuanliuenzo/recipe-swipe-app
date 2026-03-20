@@ -2,6 +2,11 @@
 export class RecipeFormatter {
   // Main formatting function
   static format(rawText = "") {
+    // Handle legacy { recipe: "..." } object format stored before the refactor
+    if (rawText && typeof rawText === "object") {
+      rawText = rawText.recipe || "";
+    }
+
     if (!rawText || typeof rawText !== "string") {
       return {
         html: "<p>No recipe available</p>",
@@ -143,6 +148,9 @@ export class RecipeFormatter {
 
   // Extract just the title
   static extractTitle(recipeText) {
+    if (recipeText && typeof recipeText === "object") {
+      recipeText = recipeText.recipe || "";
+    }
     if (!recipeText || typeof recipeText !== "string") {
       return "Untitled Recipe";
     }

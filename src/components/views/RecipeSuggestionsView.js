@@ -3,14 +3,19 @@
  * Handles rendering and interactions for recipe suggestions grid
  */
 
+import { SearchBar } from "../SearchBar/SearchBar.js";
+
 export class RecipeSuggestionsView {
   constructor(container, { serviceRegistry }) {
     this.container = container;
     this.serviceRegistry = serviceRegistry;
     this.recipeSuggestionService = serviceRegistry.get("recipeSuggestion");
+    this.searchBar = null;
   }
 
   async render() {
+    this.searchBar = new SearchBar(this.container);
+
     const existingSuggestions =
       this.recipeSuggestionService.stateManager.get("currentSuggestions") || [];
 
@@ -18,6 +23,7 @@ export class RecipeSuggestionsView {
       this.container.innerHTML =
         this.recipeSuggestionService.createSuggestionsGrid(existingSuggestions);
       this.container.classList.add("suggestions-mode");
+      this.searchBar.render();
       this.setupInteractions();
     } else {
       this.showLoading();
@@ -28,6 +34,7 @@ export class RecipeSuggestionsView {
         this.container.innerHTML =
           this.recipeSuggestionService.createSuggestionsGrid(suggestions);
         this.container.classList.add("suggestions-mode");
+        this.searchBar.render();
         this.setupInteractions();
       } catch (error) {
         console.error("Failed to generate suggestions:", error);
@@ -106,6 +113,7 @@ export class RecipeSuggestionsView {
           this.container.innerHTML =
             this.recipeSuggestionService.createSuggestionsGrid(suggestions);
           this.container.classList.add("suggestions-mode");
+          this.searchBar.render();
           this.setupInteractions();
         } catch (error) {
           console.error("Failed to regenerate suggestions:", error);
@@ -124,7 +132,10 @@ export class RecipeSuggestionsView {
   }
 
   destroy() {
-    // Cleanup event listeners and DOM
+    if (this.searchBar) {
+      this.searchBar.destroy();
+      this.searchBar = null;
+    }
     if (this.container) {
       this.container.innerHTML = "";
     }
