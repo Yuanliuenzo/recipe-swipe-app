@@ -238,36 +238,99 @@ export class RecipeSuggestionService {
   // --------------------------
   // Prompt builders
   // --------------------------
+
+  // Returns the current season based on the month, for automatic seasonal context
+  _getSeason() {
+    const month = new Date().getMonth(); // 0-based
+    if (month >= 2 && month <= 4) {
+      return "spring";
+    }
+    if (month >= 5 && month <= 7) {
+      return "summer";
+    }
+    if (month >= 8 && month <= 10) {
+      return "autumn";
+    }
+    return "winter";
+  }
+
   buildTitleSuggestionPrompt() {
     const vibes = this.stateManager.get("vibeProfile") || [];
+    const negativeVibes = this.stateManager.get("negativeVibes") || [];
     const preferences = this.stateManager.get("preferences") || {};
+    const sessionContext = this.stateManager.get("sessionContext") || {};
     const ingredients = this.stateManager.get("ingredientsAtHome") || "";
+    const season = this._getSeason();
+
+    const mealLabels = {
+      breakfast: "Breakfast",
+      brunch: "Brunch",
+      lunch: "Lunch",
+      dinner: "Dinner",
+      snack: "Snack"
+    };
+    const servingLabels = {
+      solo: "1 person",
+      couple: "2–3 people",
+      group: "4 or more people"
+    };
+    const timeLabels = {
+      quick: "under 20 minutes",
+      normal: "30–45 minutes",
+      leisurely: "an hour or more"
+    };
 
     let prompt =
-      "Based on user preferences, suggest exactly 5 recipe titles with brief descriptions:\n\n";
+      "Suggest exactly 5 recipe titles that match the following user context:\n\n";
 
-    if (vibes.length) {
-      prompt += `Selected Vibes: ${vibes.map(v => `${v.emoji} ${v.name}`).join(", ")}\n`;
+    // --- Factual constraints (hard requirements) ---
+    if (sessionContext.mealType) {
+      prompt += `Meal type: ${mealLabels[sessionContext.mealType]} — all 5 suggestions MUST be appropriate for this meal\n`;
     }
-    prompt += `Dietary Preferences: ${preferences.diet || "None"}\n`;
-    prompt += `Budget Conscious: ${preferences.budget || "No"}\n`;
-    prompt += `Seasonal King: ${preferences.seasonalKing || "No"}\n`;
+    if (sessionContext.servingSize) {
+      prompt += `Serving size: ${servingLabels[sessionContext.servingSize]}\n`;
+    }
+    if (sessionContext.timeAvailable) {
+      prompt += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
+    }
+    if (preferences.diet && preferences.diet !== "None") {
+      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    }
+    if (preferences.budget === "Yes") {
+      prompt += `Budget: affordable, everyday ingredients preferred\n`;
+    }
 
+    // --- Emotional vibes (stylistic guidance) ---
+    if (vibes.length) {
+      prompt += `\nMood/Vibes the user is feeling:\n`;
+      vibes.forEach(v => (prompt += `  • ${v.emoji} ${v.name}: ${v.prompt}\n`));
+    }
+    if (negativeVibes.length) {
+      prompt += `\nNOT in the mood for: ${negativeVibes.map(v => `${v.emoji} ${v.name}`).join(", ")} — avoid suggestions that feel like these\n`;
+    }
+
+    // --- Seasonal context (automatic, soft guidance) ---
+    prompt += `\nCurrent season: ${season} in the northern hemisphere — lean toward seasonal ingredients where it genuinely improves the dish\n`;
+
+    // --- Ingredients (soft preference) ---
     if (ingredients.trim()) {
-      prompt += `Preferably try to include one or more of these ingredients: ${ingredients}\n`;
+      prompt += `\nIngredients available at home: ${ingredients}\n`;
+      prompt += `Use whichever of these make a natural fit for the dish — do not force all of them in\n`;
     }
 
     prompt += `
-Please respond with exactly 5 suggestions in JSON format:
+Please respond with exactly 5 suggestions in this JSON format:
 {
   "suggestions": [
-    { "title": "Recipe Title 1", "description": "Brief explanation" },
-    { "title": "Recipe Title 2", "description": "Brief explanation" },
-    ...
+    { "title": "Recipe Title 1", "description": "Brief explanation (max 40 words)" },
+    { "title": "Recipe Title 2", "description": "Brief explanation (max 40 words)" },
+    { "title": "Recipe Title 3", "description": "Brief explanation (max 40 words)" },
+    { "title": "Recipe Title 4", "description": "Brief explanation (max 40 words)" },
+    { "title": "Recipe Title 5", "description": "Brief explanation (max 40 words)" }
   ]
 }
 
-Keep titles appealing, descriptions concise (≤50 words), and match preferences.
+Keep titles appealing and accurate. Descriptions should hint at why each matches the mood.
 `;
 
     return prompt;
@@ -275,21 +338,50 @@ Keep titles appealing, descriptions concise (≤50 words), and match preferences
 
   buildFullRecipePrompt(selectedTitle) {
     const vibes = this.stateManager.get("vibeProfile") || [];
+    const negativeVibes = this.stateManager.get("negativeVibes") || [];
     const preferences = this.stateManager.get("preferences") || {};
+    const sessionContext = this.stateManager.get("sessionContext") || {};
     const ingredients = this.stateManager.get("ingredientsAtHome") || "";
+    const season = this._getSeason();
+
+    const servingLabels = {
+      solo: "1 person",
+      couple: "2–3 people",
+      group: "4 or more people"
+    };
+    const timeLabels = {
+      quick: "under 20 minutes",
+      normal: "30–45 minutes",
+      leisurely: "an hour or more"
+    };
 
     let prompt = `Generate a complete recipe for "${selectedTitle}"\n\n`;
 
-    if (vibes.length) {
-      prompt += `User Vibes: ${vibes.map(v => `${v.emoji} ${v.name}`).join(", ")}\n`;
+    if (sessionContext.servingSize) {
+      prompt += `Servings: ${servingLabels[sessionContext.servingSize]}\n`;
+    }
+    if (sessionContext.timeAvailable) {
+      prompt += `Time constraint: ${timeLabels[sessionContext.timeAvailable]}\n`;
+    }
+    if (preferences.diet && preferences.diet !== "None") {
+      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    }
+    if (preferences.budget === "Yes") {
+      prompt += `Budget: affordable ingredients\n`;
     }
 
-    prompt += `Dietary Preferences: ${preferences.diet || "None"}\n`;
-    prompt += `Budget Conscious: ${preferences.budget || "No"}\n`;
-    prompt += `Seasonal King: ${preferences.seasonalKing || "No"}\n`;
+    if (vibes.length) {
+      prompt += `\nMood: ${vibes.map(v => `${v.emoji} ${v.name}`).join(", ")}\n`;
+    }
+    if (negativeVibes.length) {
+      prompt += `Avoid: ${negativeVibes.map(v => v.name).join(", ")}\n`;
+    }
+
+    prompt += `Season: ${season} — use seasonal ingredients where appropriate\n`;
 
     if (ingredients.trim()) {
-      prompt += `Available Ingredients: ${ingredients}\n`;
+      prompt += `\nIngredients available: ${ingredients}\n`;
+      prompt += `(Use whichever make a natural fit — no need to force all of them in)\n`;
     }
 
     prompt += `

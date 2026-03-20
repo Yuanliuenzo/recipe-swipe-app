@@ -10,6 +10,38 @@ export class VibeEngine {
     this.currentRound = 0;
   }
 
+  // Remove vibes that don't make sense for the given session context
+  filterVibesByContext(vibes, context) {
+    if (!context) {
+      return vibes;
+    }
+    const { mealType, servingSize, timeAvailable } = context;
+
+    return vibes.filter(vibe => {
+      // Spicy/intense doesn't fit breakfast
+      if (vibe.name === "Bold & Intense" && mealType === "breakfast") {
+        return false;
+      }
+
+      // Impressing someone doesn't fit breakfast, snack, or a very quick cook
+      if (
+        vibe.name === "Impress Someone" &&
+        (mealType === "breakfast" ||
+          mealType === "snack" ||
+          timeAvailable === "quick")
+      ) {
+        return false;
+      }
+
+      // Sharing vibes don't fit solo cooking
+      if (vibe.name === "Sharing is Caring" && servingSize === "solo") {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
   // Get next unique vibe
   getNextVibe() {
     // Check if we've reached max rounds
@@ -44,11 +76,12 @@ export class VibeEngine {
     globalEventBus.emit("vibes:shuffled", { count: this.shuffledVibes.length });
   }
 
-  // Reset for new game
-  reset() {
+  // Reset for new game, optionally filtering vibes by session context
+  reset(sessionContext = null) {
     this.shuffledVibes = [];
     this.usedVibes.clear();
     this.currentRound = 0;
+    this.vibes = this.filterVibesByContext([...VIBES], sessionContext);
 
     globalEventBus.emit("vibe:reset");
   }
