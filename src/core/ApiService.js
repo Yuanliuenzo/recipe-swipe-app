@@ -66,11 +66,11 @@ class ApiService {
   }
 
   // Recipe-specific APIs
-  async generateRecipe(prompt) {
-    return this.post(CONFIG.ENDPOINTS.GENERATE_RECIPE, { prompt }, 60000);
+  async generateRecipe(prompt, timeoutMs = 90000) {
+    return this.post(CONFIG.ENDPOINTS.GENERATE_RECIPE, { prompt }, timeoutMs);
   }
 
-  async generateRecipeSuggestions(prompt, count = 5, timeoutMs = 60000) {
+  async generateRecipeSuggestions(prompt, count = 5, timeoutMs = 120000) {
     return this.post(
       CONFIG.ENDPOINTS.GENERATE_RECIPE,
       { prompt, count, suggestions: true },

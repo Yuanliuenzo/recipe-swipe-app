@@ -326,16 +326,16 @@ app.post("/api/generateRecipe", async (req, res) => {
     let result;
 
     if (suggestions) {
-      // Generate structured suggestions
+      // Generate structured suggestions — give plenty of time, Mistral is slow
       console.log("Generating structured recipe suggestions...");
       result = await llmService.generateSuggestions(prompt, count || 5, {
-        timeout: 60000
+        timeout: 120000
       });
     } else {
       // Generate single recipe
       console.log("Generating single recipe...");
       result = await llmService.generateRecipe(prompt, {
-        timeout: 60000
+        timeout: 90000
       });
     }
 

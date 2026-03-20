@@ -1,5 +1,6 @@
 // LLM Abstraction Layer
 // Provides unified interface for different LLM providers with retry logic and error handling
+import { extractJSON } from "../utils/LLMUtils.js";
 
 export class LLMService {
   constructor(provider = "ollama", config = {}) {
@@ -78,6 +79,16 @@ export class LLMService {
     }
 
     const data = await response.json();
+
+    if (data.error) {
+      throw new Error(`Ollama error: ${data.error}`);
+    }
+    if (!data.response) {
+      throw new Error(
+        "Ollama returned an empty response — model may still be loading"
+      );
+    }
+
     return { text: data.response };
   }
 
@@ -93,19 +104,24 @@ export class LLMService {
       return result.text;
     }
 
-    try {
-      // Try to parse as JSON if schema expects structured data
-      if (schema.type === "object") {
-        const parsed = JSON.parse(result.text);
-        return this._validateSchema(parsed, schema);
-      }
-    } catch (error) {
-      // For recipe generation, wrap raw text in expected format
+    if (schema.type === "object") {
+      // Recipe text is plain prose — wrap it directly rather than trying JSON.parse
       if (schema.required && schema.required.includes("recipe")) {
         return { recipe: result.text };
       }
 
-      return result.text;
+      // For structured responses (suggestions), extract and parse JSON
+      try {
+        const jsonText = extractJSON(result.text);
+        const parsed = JSON.parse(jsonText);
+        return this._validateSchema(parsed, schema);
+      } catch (error) {
+        // Throw so the retry loop in complete() has a chance to re-ask the model
+        throw new Error(
+          `Failed to parse LLM JSON response: ${error.message}. Raw text (first 200 chars): ${result.text?.slice(0, 200)}`,
+          { cause: error }
+        );
+      }
     }
 
     return result.text;

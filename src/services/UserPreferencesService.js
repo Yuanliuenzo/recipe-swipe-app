@@ -146,7 +146,7 @@ export class UserPreferencesService {
     screen.className = "mobile-preferences-screen";
     screen.innerHTML = this.renderPreferencesHTML(preferences);
 
-    // Add close handler
+    // Wire up close button
     screen
       .querySelector(".mobile-favorites-close")
       .addEventListener("click", () => {
@@ -155,9 +155,18 @@ export class UserPreferencesService {
         }
       });
 
+    // Wire up save button (was defined in attachEvents() but never called)
+    screen
+      .querySelector(".mobile-save-btn")
+      .addEventListener("click", () => this.saveFromModal(screen));
+
     // Render into the preferences view
     if (this.navigationService) {
       this.navigationService.renderPreferences(screen);
+    } else {
+      console.error(
+        "❌ UserPreferencesService: navigationService not set — preferences cannot be rendered"
+      );
     }
     console.log("✅ Preferences screen rendered");
   }
