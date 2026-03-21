@@ -69,6 +69,11 @@ logs
 # DynamoDB Local files
 .dynamodb/
 
+# SQLite database (runtime data — never commit)
+db/*.db
+db/*.db-shm
+db/*.db-wal
+
 # TernJS port file
 .tern-port
 
