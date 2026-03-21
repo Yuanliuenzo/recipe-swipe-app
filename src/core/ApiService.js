@@ -78,6 +78,69 @@ class ApiService {
     );
   }
 
+  /**
+   * Stream a full recipe via SSE, calling onToken for each token received.
+   * Returns the complete assembled text when done.
+   *
+   * @param {string} prompt
+   * @param {(token: string, fullText: string) => void} [onToken]
+   * @returns {Promise<string>} full recipe text
+   */
+  async streamRecipe(prompt, onToken) {
+    const res = await fetch("/api/streamRecipe", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!res.ok) {
+      throw new Error(`Stream HTTP ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let fullText = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop(); // keep incomplete trailing line
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) {
+          continue;
+        }
+        const data = line.slice(6).trim();
+        if (data === "[DONE]") {
+          return fullText;
+        }
+        try {
+          const { token, error } = JSON.parse(data);
+          if (error) {
+            throw new Error(error);
+          }
+          if (token) {
+            fullText += token;
+            onToken?.(token, fullText);
+          }
+        } catch (e) {
+          if (e.message !== "Unexpected end of JSON input") {
+            throw e;
+          }
+        }
+      }
+    }
+
+    return fullText;
+  }
+
   // User authentication
   async login(username, password) {
     return this.post(CONFIG.ENDPOINTS.LOGIN, { username, password });

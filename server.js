@@ -5,7 +5,9 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
-import { llmService } from "./src/core/LLMService.js";
+import * as gateway from "./ai/gateway.js";
+import { extractJSON } from "./src/utils/LLMUtils.js";
+import { stats as cacheStats } from "./ai/cache.js";
 import db from "./db/database.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -374,23 +376,64 @@ app.use("/src", express.static(path.join(__dirname, "src")));
 
 // ─── LLM ──────────────────────────────────────────────────────────────────────
 
+// Non-streaming: used for suggestions (needs complete JSON before parsing)
 app.post("/api/generateRecipe", async (req, res) => {
-  console.log("POST /api/generateRecipe");
+  console.log(`POST /api/generateRecipe [${gateway.activeProvider()}]`);
   try {
     const { prompt, suggestions, count } = req.body;
-    const result = suggestions
-      ? await llmService.generateSuggestions(prompt, count || 5, {
-          timeout: 120000
-        })
-      : await llmService.generateRecipe(prompt, { timeout: 90000 });
 
-    console.log("✅ LLM responded successfully");
-    res.json(result);
+    if (suggestions) {
+      // Suggestions need full JSON — use non-streaming complete with cache
+      const countVal = count || 5;
+      const fullPrompt = `${prompt}
+
+Please respond with exactly ${countVal} suggestions in JSON format:
+{
+  "suggestions": [
+    { "title": "Recipe Title 1", "description": "Brief explanation" },
+    { "title": "Recipe Title 2", "description": "Brief explanation" }
+  ]
+}`;
+      const text = await gateway.complete(fullPrompt, { timeout: 60000 });
+      const json = extractJSON(text);
+      res.json(JSON.parse(json));
+    } else {
+      // Single recipe — also non-streaming path (client uses /api/streamRecipe for SSE)
+      const text = await gateway.complete(prompt, { timeout: 90000 });
+      res.json({ recipe: text });
+    }
   } catch (error) {
     console.error("❌ LLM error:", error);
     res
       .status(500)
       .json({ error: "Something went wrong", details: error.message });
+  }
+});
+
+// Streaming: used for full recipe text — tokens arrive in real time
+app.post("/api/streamRecipe", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  console.log(`POST /api/streamRecipe [${gateway.activeProvider()}]`);
+
+  try {
+    for await (const token of gateway.streamTokens(req.body.prompt, {
+      timeout: 90000
+    })) {
+      res.write(`data: ${JSON.stringify({ token })}\n\n`);
+    }
+    res.write("data: [DONE]\n\n");
+  } catch (error) {
+    console.error("❌ Stream error:", error);
+    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+  } finally {
+    res.end();
   }
 });
 
@@ -407,6 +450,8 @@ app.get("/api/health", (req, res) => {
     proto: req.headers["x-forwarded-proto"] || "http",
     secure: req.secure,
     activeSessions: sessionCount,
+    llmProvider: gateway.activeProvider(),
+    cache: cacheStats(),
     ua: req.headers["user-agent"]
   });
 });

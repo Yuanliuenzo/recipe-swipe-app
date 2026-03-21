@@ -1,5 +1,56 @@
 /* Recipe Sections - Recipe List, Instructions, Ingredients */
 
+/* ─── Streaming recipe view ──────────────────────────────────────────────────── */
+.recipe-stream-container {
+  padding: 24px 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipe-stream-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading, "Syne", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #2c2118);
+  opacity: 0.6;
+}
+
+.recipe-stream-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: currentColor;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.recipe-stream-body {
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text, #2c2118);
+  margin: 0;
+  padding: 0;
+}
+
 /* Recipe Content Container */
 .recipe-content {
   flex: 1;

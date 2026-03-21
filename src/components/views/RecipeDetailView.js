@@ -13,16 +13,19 @@ export class RecipeDetailView {
   }
 
   async render(suggestion) {
-    this.showLoading();
+    const streamEl = this.showStreaming(suggestion.title);
+    const recipeSuggestionService =
+      this.serviceRegistry.get("recipeSuggestion");
 
     try {
-      const recipeSuggestionService =
-        this.serviceRegistry.get("recipeSuggestion");
       const fullRecipe = await recipeSuggestionService.generateFullRecipe(
-        suggestion.id
+        suggestion.id,
+        (_token, fullText) => {
+          // Update the live preview with each token
+          streamEl.textContent = fullText;
+        }
       );
 
-      // Use RecipeDisplayComponent for consistent display
       const customActions = `
         <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
         <button class="japandi-btn japandi-btn-primary back-to-suggestions-btn" type="button">← Back</button>
@@ -40,14 +43,17 @@ export class RecipeDetailView {
     }
   }
 
-  showLoading() {
+  showStreaming(title) {
     this.container.innerHTML = `
-      <div class="suggestions-loading">
-        <div class="loading-spinner"></div>
-        <p>Generating your recipe...</p>
-        <p class="loading-subtitle">This may take 30–60 seconds</p>
+      <div class="recipe-stream-container">
+        <div class="recipe-stream-header">
+          <span class="recipe-stream-title">${title}</span>
+          <span class="recipe-stream-cursor"></span>
+        </div>
+        <pre class="recipe-stream-body"></pre>
       </div>
     `;
+    return this.container.querySelector(".recipe-stream-body");
   }
 
   showError(suggestion) {
