@@ -25,7 +25,7 @@ export class RecipeDetailView {
       // Use RecipeDisplayComponent for consistent display
       const customActions = `
         <button class="japandi-btn japandi-btn-subtle save-favorite-btn" type="button">⭐ Save</button>
-        <button class="japandi-btn japandi-btn-primary back-to-suggestions-btn" type="button">🔄 Back to Suggestions</button>
+        <button class="japandi-btn japandi-btn-primary back-to-suggestions-btn" type="button">← Back</button>
       `;
 
       RecipeDisplayComponent.render(this.container, fullRecipe, {
@@ -36,7 +36,7 @@ export class RecipeDetailView {
       this.setupActions(fullRecipe);
     } catch (error) {
       console.error("Failed to generate full recipe:", error);
-      this.showError("Failed to generate recipe");
+      this.showError(suggestion);
     }
   }
 
@@ -44,18 +44,32 @@ export class RecipeDetailView {
     this.container.innerHTML = `
       <div class="suggestions-loading">
         <div class="loading-spinner"></div>
-        <p>Generating full recipe...</p>
+        <p>Generating your recipe...</p>
+        <p class="loading-subtitle">This may take 30–60 seconds</p>
       </div>
     `;
   }
 
-  showError(message) {
+  showError(suggestion) {
     this.container.innerHTML = `
       <div class="suggestions-loading">
-        <p>❌ ${message}</p>
-        <button class="japandi-btn japandi-btn-primary" onclick="location.reload()">Try Again</button>
+        <p style="margin-bottom: 16px;">Something went wrong generating this recipe.</p>
+        <button class="japandi-btn japandi-btn-primary retry-btn" type="button" style="margin-bottom: 10px;">Try Again</button>
+        <button class="japandi-btn japandi-btn-subtle back-to-suggestions-btn" type="button">← Back to Suggestions</button>
       </div>
     `;
+
+    const retryBtn = this.container.querySelector(".retry-btn");
+    if (retryBtn && suggestion) {
+      retryBtn.addEventListener("click", () => this.render(suggestion));
+    }
+
+    const backBtn = this.container.querySelector(".back-to-suggestions-btn");
+    if (backBtn) {
+      backBtn.addEventListener("click", () => {
+        this.container.dispatchEvent(new CustomEvent("backToSuggestions"));
+      });
+    }
   }
 
   setupActions(fullRecipe) {

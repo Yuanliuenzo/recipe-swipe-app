@@ -95,9 +95,6 @@ export class RecipeSuggestionService {
           `✅ Successfully generated ${suggestions.length} suggestions on attempt ${attempt}`
         );
 
-        // 🚀 NEW: Pre-fetch all full recipes in parallel for instant UX
-        this.preFetchAllRecipes();
-
         return suggestions;
       } catch (error) {
         console.error(`❌ Attempt ${attempt} failed:`, error.message);
@@ -177,10 +174,9 @@ export class RecipeSuggestionService {
     this.stateManager.setState({ pendingFetches: newPendingFetches });
 
     try {
-      const result = fetchPromise;
-      return result;
+      return await fetchPromise;
     } finally {
-      // Clean up the pending fetch regardless of success/failure
+      // Clean up after the fetch completes (or fails)
       const updatedPendingFetches =
         this.stateManager.get("pendingFetches") || new Map();
       updatedPendingFetches.delete(suggestionId);
