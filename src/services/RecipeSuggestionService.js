@@ -189,9 +189,7 @@ export class RecipeSuggestionService {
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
 
-      const response = await apiService.generateRecipe(prompt, {
-        timeout: timeoutMs
-      });
+      const response = await apiService.generateRecipe(prompt, timeoutMs);
 
       // Extract recipe text correctly from LLM response
       let recipeText;
