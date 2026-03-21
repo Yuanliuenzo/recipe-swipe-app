@@ -1,28 +1,28 @@
-/* Underground Monk — Gorpcore × Chinese Ink × Botanical — Light Theme */
+/* Amsterdam / Berlin Minimal — clean, direct, one accent */
 :root {
-  /* ── Core Palette ── */
-  --color-bg: #f0ebe2; /* warm parchment — like aged paper */
-  --color-card: #faf6f0; /* warm white */
-  --color-surface: #f5f0e8; /* slightly deeper warm */
-  --color-primary: #b5463a; /* Chinese vermillion — muted, not loud */
-  --color-primary-dark: #8f3228;
-  --color-secondary: #6e8557; /* gorpcore sage/olive */
-  --color-accent: #c2923e; /* ochre/amber — harvest */
-  --color-accent-dark: #a07530;
-  --color-bloom: #c0828a; /* dusty peony */
-  --color-bloom-light: #d4a0a6;
-  --color-text: #28221c; /* deep warm charcoal, like ink on paper */
-  --color-text-light: #7a6e64;
-  --color-text-muted: #b0a496;
-  --color-border: #e0d8cc;
-  --color-border-light: #ece5db;
-  --color-overlay: rgba(28, 22, 16, 0.4);
-  --color-success: #6e8557;
-  --color-danger: #b5463a;
-  --color-warning: #c2923e;
+  /* ── Palette: white space + one bold accent ── */
+  --color-bg: #f5f3f0; /* barely warm white, like a gallery wall */
+  --color-card: #ffffff;
+  --color-surface: #f0ede9;
+  --color-primary: #c0413a; /* Chinese vermillion — the ONE accent */
+  --color-primary-dark: #9a3130;
+  --color-secondary: #888880; /* neutral warm grey — utility only */
+  --color-accent: #c0413a; /* same red, single accent system */
+  --color-accent-dark: #9a3130;
+  --color-bloom: #c0413a; /* all accent flows from the red */
+  --color-bloom-light: #d4706a;
+  --color-text: #141210; /* near-black — ink on paper */
+  --color-text-light: #888880;
+  --color-text-muted: #bcb8b2;
+  --color-border: #e4e0db;
+  --color-border-light: #ede9e4;
+  --color-overlay: rgba(14, 12, 10, 0.42);
+  --color-success: #2d6a4f;
+  --color-danger: #c0413a;
+  --color-warning: #c07a30;
 
   /* ── Typography ── */
-  --font-primary: "Space Grotesk", sans-serif;
+  --font-primary: "Inter", sans-serif;
   --font-heading: "Syne", sans-serif;
 
   /* ── Spacing ── */
@@ -35,27 +35,26 @@
   --space-3xl: 30px;
   --space-4xl: 40px;
 
-  /* ── Border Radius — mix of sharp & soft (gorpcore utility meets organic) ── */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 16px;
-  --radius-3xl: 18px;
-  --radius-4xl: 22px;
-  --radius-5xl: 24px;
+  /* ── Border Radius — restrained ── */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 16px;
+  --radius-4xl: 20px;
+  --radius-5xl: 22px;
   --radius-full: 50px;
 
-  /* ── Shadows — warm, paper-like ── */
-  --shadow-xs: 0 2px 4px rgba(40, 30, 20, 0.07);
-  --shadow-sm: 0 2px 8px rgba(40, 30, 20, 0.09);
-  --shadow-md: 0 4px 14px rgba(40, 30, 20, 0.1);
-  --shadow-lg: 0 6px 20px rgba(40, 30, 20, 0.12);
-  --shadow-xl: 0 10px 30px rgba(40, 30, 20, 0.14);
-  --shadow-2xl: 0 20px 60px rgba(40, 30, 20, 0.2);
-  --shadow-soft: 0 4px 14px rgba(40, 30, 20, 0.08);
-  --shadow-glow:
-    0 0 24px 6px rgba(181, 70, 58, 0.2), 0 0 50px 16px rgba(192, 130, 138, 0.1);
+  /* ── Shadows — minimal, almost flat ── */
+  --shadow-xs: 0 1px 3px rgba(14, 12, 10, 0.06);
+  --shadow-sm: 0 2px 6px rgba(14, 12, 10, 0.07);
+  --shadow-md: 0 4px 12px rgba(14, 12, 10, 0.08);
+  --shadow-lg: 0 6px 18px rgba(14, 12, 10, 0.09);
+  --shadow-xl: 0 10px 28px rgba(14, 12, 10, 0.1);
+  --shadow-2xl: 0 20px 50px rgba(14, 12, 10, 0.12);
+  --shadow-soft: 0 4px 12px rgba(14, 12, 10, 0.07);
+  --shadow-glow: 0 0 20px 4px rgba(192, 65, 58, 0.18);
 
   /* ── Z-Index Layering ── */
   --z-base: 1;
@@ -69,34 +68,34 @@
   --z-toast: 5000;
 
   /* ── Transitions ── */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.2s ease;
-  --transition-slow: 0.3s ease;
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.18s ease;
+  --transition-slow: 0.28s ease;
+  --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ── Gradients ── */
-  --gradient-primary: linear-gradient(135deg, #b5463a, #8f3228);
-  --gradient-primary-hover: linear-gradient(135deg, #8f3228, #752a22);
-  --gradient-secondary: linear-gradient(135deg, #6e8557, #566843);
-  --gradient-surface: linear-gradient(145deg, #f5f0e8, #ede7dc);
-  --gradient-vibe: linear-gradient(135deg, #b5463a 0%, #6e8557 100%);
+  /* ── Gradients — flat, barely there ── */
+  --gradient-primary: linear-gradient(135deg, #c0413a, #9a3130);
+  --gradient-primary-hover: linear-gradient(135deg, #9a3130, #7e2826);
+  --gradient-secondary: linear-gradient(135deg, #888880, #6a6a62);
+  --gradient-surface: linear-gradient(145deg, #f0ede9, #ede9e4);
+  --gradient-vibe: linear-gradient(160deg, #c0413a 0%, #2a2a28 100%);
   --gradient-overlay: linear-gradient(
     to top,
-    rgba(28, 22, 16, 0.82),
-    rgba(28, 22, 16, 0.38),
-    rgba(28, 22, 16, 0.06),
-    rgba(28, 22, 16, 0)
+    rgba(14, 12, 10, 0.86),
+    rgba(14, 12, 10, 0.4),
+    rgba(14, 12, 10, 0.04),
+    rgba(14, 12, 10, 0)
   );
 
   /* ── Progress ── */
-  --progress-bg: rgba(181, 70, 58, 0.1);
-  --progress-fill: linear-gradient(90deg, #b5463a, #c0828a);
-  --progress-dot: rgba(181, 70, 58, 0.2);
-  --progress-dot-active: #28221c;
+  --progress-bg: rgba(192, 65, 58, 0.08);
+  --progress-fill: linear-gradient(90deg, #c0413a, #d4706a);
+  --progress-dot: rgba(192, 65, 58, 0.18);
+  --progress-dot-active: #141210;
 
   /* ── Soft Button ── */
-  --btn-soft-bg: linear-gradient(135deg, #f2ece2, #e8e0d4);
-  --btn-soft-hover: linear-gradient(135deg, #e8e0d4, #dfd6c8);
-  --btn-soft-border: rgba(181, 70, 58, 0.2);
-  --btn-soft-shadow: rgba(181, 70, 58, 0.08);
+  --btn-soft-bg: linear-gradient(135deg, #f0ede9, #e8e4df);
+  --btn-soft-hover: linear-gradient(135deg, #e8e4df, #e0dbd4);
+  --btn-soft-border: rgba(192, 65, 58, 0.18);
+  --btn-soft-shadow: rgba(192, 65, 58, 0.06);
 }

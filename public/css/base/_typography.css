@@ -1,18 +1,18 @@
-/* Typography — Monk × Gorpcore × Editorial */
+/* Typography — Amsterdam/Berlin Minimal */
 
 /* Font Imports */
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap");
 
 /* Base Typography */
 body {
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--color-text);
   font-family: var(--font-primary);
-  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Headings */
+/* Headings — Syne for the Berlin-editorial punch */
 h1,
 h2,
 h3,
@@ -21,10 +21,10 @@ h5,
 h6 {
   font-family: var(--font-heading);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.05;
   margin-bottom: var(--space-lg);
   color: var(--color-text);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 h1 {
@@ -35,41 +35,41 @@ h1 {
 }
 
 h2 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
 }
 
 h3 {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
 }
 
 /* Mobile-specific heading sizes */
 .mobile-header h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--color-text);
   margin-bottom: var(--space-sm);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .mobile-favorites-header h2,
 .mobile-preferences-fullscreen .mobile-preferences-header h2 {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 20px;
   color: var(--color-text);
   margin: 0;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .favorite-sheet-header h2 {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 20px;
   color: var(--color-text);
   margin: 0;
   font-weight: 800;
-  letter-spacing: -0.025em;
-  line-height: 1.1;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 /* Text Elements */
@@ -90,16 +90,16 @@ a:hover {
 /* Specialized text styles */
 .vibe-name {
   font-family: var(--font-heading);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: var(--space-sm);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .mobile-vibe-name {
   font-family: var(--font-heading);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 800;
   color: white;
   margin-bottom: var(--space-sm);
@@ -108,15 +108,17 @@ a:hover {
 
 .vibe-description {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.55;
   max-width: 260px;
+  font-family: var(--font-primary);
 }
 
 .mobile-vibe-description {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.5;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.55;
+  font-family: var(--font-primary);
 }
 
 .recipe-title {
@@ -126,8 +128,8 @@ a:hover {
   color: var(--color-text);
   text-align: center;
   margin: 0 0 var(--space-xl) 0;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
 .mobile-recipe-title {
@@ -137,42 +139,44 @@ a:hover {
   color: var(--color-text);
   text-align: center;
   margin: 0 0 var(--space-xl) 0;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
 /* Labels and metadata */
 .ingredients-subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-muted);
   text-align: center;
   margin: 0 0 var(--space-lg) 0;
   line-height: 1.5;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
+  font-weight: 500;
 }
 
 .favorite-meta {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-light);
 }
 
 /* Status and helper text */
 .ingredients-confirmation {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   min-height: 18px;
   transition: opacity var(--transition-slow);
   text-align: center;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
-  background: rgba(181, 70, 58, 0.08);
+  background: rgba(192, 65, 58, 0.07);
   margin-bottom: var(--space-lg);
   opacity: 0;
   color: var(--color-primary);
+  letter-spacing: 0.02em;
 }
 
 .ingredients-confirmation.show {
@@ -181,14 +185,14 @@ a:hover {
 
 .mobile-ingredients-confirmation {
   margin-top: var(--space-sm);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   min-height: 18px;
   transition: opacity var(--transition-slow);
   text-align: center;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
-  background: rgba(181, 70, 58, 0.08);
+  background: rgba(192, 65, 58, 0.07);
   margin-bottom: var(--space-lg);
   opacity: 0;
   color: var(--color-primary);
@@ -203,9 +207,10 @@ a:hover {
 .mobile-recipe-loading-status {
   text-align: center;
   color: var(--color-text-light);
-  font-size: 13px;
+  font-size: 12px;
   margin-bottom: var(--space-lg);
   font-style: italic;
+  letter-spacing: 0.02em;
 }
 
 /* Empty states */
