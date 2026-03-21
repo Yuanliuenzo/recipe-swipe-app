@@ -1,0 +1,271 @@
+/* ================================================================
+   JAPANDI / SCANDI — earthy beige, terracotta, Chinese ink hint
+   Clean, warm, intentional. Space and material over decoration.
+   ================================================================ */
+
+/* ── Round indicator ────────────────────────────────────────────── */
+.round-text {
+  font-family: var(--font-primary);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Terracotta dot — a quiet nod to Chinese seal stamps */
+.round-text::before {
+  content: "·  ";
+  color: var(--color-primary);
+}
+
+/* ── Mobile header — warm terracotta hairline ───────────────────── */
+.mobile-header::after {
+  content: "";
+  display: block;
+  height: 1px;
+  width: 36px;
+  background: var(--color-primary);
+  margin: var(--space-sm) auto 0;
+  opacity: 0.5;
+}
+
+/* ── FAB Navigation — warm linen glass ─────────────────────────── */
+.mobile-fab {
+  background: rgba(247, 243, 236, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 2px 14px rgba(28, 18, 10, 0.1) !important;
+}
+
+.mobile-fab:hover {
+  border-color: rgba(192, 90, 58, 0.3) !important;
+  box-shadow: 0 4px 18px rgba(28, 18, 10, 0.13) !important;
+}
+
+.mobile-fab-menu {
+  background: rgba(247, 243, 236, 0.99) !important;
+  backdrop-filter: blur(18px) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: 0 10px 36px rgba(28, 18, 10, 0.12) !important;
+}
+
+.fab-item {
+  color: var(--color-text) !important;
+  font-family: var(--font-primary) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.fab-item:last-child {
+  border-bottom: none;
+}
+
+.fab-item:hover {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+
+.fab-item:active {
+  background: rgba(192, 90, 58, 0.07) !important;
+}
+
+/* ── Bottom Sheet ───────────────────────────────────────────────── */
+.favorite-sheet-container {
+  background: var(--color-card) !important;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 24px rgba(28, 18, 10, 0.07) !important;
+}
+
+.favorite-sheet-container::before {
+  background: var(--color-border) !important;
+}
+
+/* ── Alert Modal ────────────────────────────────────────────────── */
+.alert-modal .modal-content {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border);
+}
+
+/* ── Vibe cards ─────────────────────────────────────────────────── */
+.vibe-card {
+  background-color: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.vibe-tag,
+.mobile-vibe-tag {
+  background: var(--color-primary) !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  letter-spacing: 0.04em !important;
+}
+
+.vibe-summary h2,
+.mobile-vibe-summary h2 {
+  color: var(--color-text) !important;
+  font-family: var(--font-heading) !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* ── Swipe indicators ───────────────────────────────────────────── */
+.mobile-swipe-indicator.like {
+  color: var(--color-success) !important;
+}
+
+.mobile-swipe-indicator.nope {
+  color: var(--color-primary) !important;
+}
+
+/* ── Recipe card ────────────────────────────────────────────────── */
+.mobile-recipe-card {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* ── Recipe text ────────────────────────────────────────────────── */
+.mobile-recipe-section h3 {
+  color: var(--color-text) !important;
+  font-family: var(--font-heading) !important;
+  letter-spacing: -0.02em !important;
+  font-size: 16px !important;
+}
+
+.ingredients-list li,
+.instructions-list li {
+  color: var(--color-text) !important;
+}
+
+.mobile-ingredients-list .ingredients-list li,
+.mobile-instructions-list .instructions-list li {
+  border-bottom-color: var(--color-border-light) !important;
+}
+
+/* ── Recipe suggestion cards ────────────────────────────────────── */
+.recipe-suggestion-card {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.recipe-suggestion-card:hover {
+  border-color: rgba(192, 90, 58, 0.35) !important;
+  box-shadow: 0 6px 22px rgba(28, 18, 10, 0.1) !important;
+}
+
+/* ── Toggle ─────────────────────────────────────────────────────── */
+.mobile-recipe-toggle {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* ── Favorites / Preferences ────────────────────────────────────── */
+.mobile-favorites-fullscreen .debug-info,
+.debug-info {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-light) !important;
+}
+
+.mobile-favorite-card {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* ── App view backgrounds ───────────────────────────────────────── */
+.app-view {
+  background: var(--color-bg) !important;
+}
+
+.mobile-favorites-screen,
+.mobile-preferences-screen {
+  background: var(--color-bg) !important;
+}
+
+/* ── Form inputs ─────────────────────────────────────────────────── */
+input,
+select,
+textarea {
+  background: var(--color-card) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  font-family: var(--font-primary) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(192, 90, 58, 0.12) !important;
+  outline: none;
+}
+
+/* ── Loading spinner ─────────────────────────────────────────────── */
+.loading-spinner {
+  border-color: rgba(192, 90, 58, 0.14) !important;
+  border-top-color: var(--color-primary) !important;
+}
+
+/* ── Star rating — terracotta ────────────────────────────────────── */
+.star-rating .star.filled,
+.star-filled {
+  color: var(--color-accent) !important;
+}
+
+/* ── Scrollbar — thin, warm ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(192, 90, 58, 0.3);
+}
+
+/* ── Dropdown ────────────────────────────────────────────────────── */
+.unified-dropdown-content,
+.mobile-unified-dropdown-content {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.mobile-unified-dropdown-item {
+  color: var(--color-text) !important;
+  font-family: var(--font-primary) !important;
+}
+
+.mobile-unified-dropdown-item:hover {
+  background: var(--color-surface) !important;
+}
+
+/* ── Error / empty states ────────────────────────────────────────── */
+.vibe-error {
+  background: rgba(192, 90, 58, 0.07) !important;
+  border-color: rgba(192, 90, 58, 0.15) !important;
+  color: var(--color-primary) !important;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 1.5px solid var(--color-primary) !important;
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar in recipe content ─────────────────────────────────── */
+.recipe-content::-webkit-scrollbar-track,
+.mobile-recipe-content::-webkit-scrollbar-track {
+  background: var(--color-surface) !important;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb {
+  background: var(--color-border) !important;
+}

@@ -526,13 +526,26 @@ export class UnifiedApp {
   }
 
   showRecipeDetailView(container, suggestion) {
+    // Remove previous listener before adding a new one to prevent accumulation
+    if (this._backToSuggestionsHandler) {
+      container.removeEventListener(
+        "backToSuggestions",
+        this._backToSuggestionsHandler
+      );
+    }
+
+    this._backToSuggestionsHandler = () => {
+      this.showSuggestionsView(container);
+    };
+
     this.recipeDetailView = new RecipeDetailView(container, {
       serviceRegistry: this.serviceRegistry
     });
 
-    this.recipeDetailView.on("backToSuggestions", () => {
-      this.showSuggestionsView(container);
-    });
+    container.addEventListener(
+      "backToSuggestions",
+      this._backToSuggestionsHandler
+    );
 
     this.currentView = this.recipeDetailView;
     this.recipeDetailView.render(suggestion);

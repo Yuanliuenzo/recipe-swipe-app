@@ -1,29 +1,31 @@
-/* Japandi-inspired Color Palette & Design Tokens */
+/* Japandi / Scandi — earthy beige + terracotta + Chinese hint */
 :root {
-  /* Colors - Soft, Natural, Elegant */
-  --color-bg: #f0f2f5;
-  --color-card: #ffffff;
-  --color-surface: #fdfbf7;
-  --color-primary: #6a4e42;
-  --color-primary-dark: #5a3e32;
-  --color-secondary: #8b7355;
-  --color-accent: #dcb984;
-  --color-accent-dark: #c9a66b;
-  --color-text: #34495e;
-  --color-text-light: #7f8c8d;
-  --color-text-muted: #95a5a6;
-  --color-border: #ece7e2;
-  --color-border-light: #e0e0e0;
-  --color-overlay: rgba(0, 0, 0, 0.35);
-  --color-success: #155724;
-  --color-danger: #a55;
-  --color-warning: #ffd700;
+  /* ── Palette ── */
+  --color-bg: #ede8de; /* warm linen beige — the canvas */
+  --color-card: #f7f3ec; /* warm cream card */
+  --color-surface: #e8e1d6; /* slightly deeper beige surface */
+  --color-primary: #c05a3a; /* warm terracotta — main accent */
+  --color-primary-dark: #9e4428;
+  --color-secondary: #8a7a6a; /* warm stone/taupe */
+  --color-accent: #c4924a; /* warm amber clay */
+  --color-accent-dark: #a07538;
+  --color-bloom: #c08878; /* muted dusty salmon */
+  --color-bloom-light: #d4a090;
+  --color-text: #2c2118; /* deep warm charcoal — ink quality */
+  --color-text-light: #7a6a5c;
+  --color-text-muted: #b0a090;
+  --color-border: #ddd4c4;
+  --color-border-light: #e8e1d6;
+  --color-overlay: rgba(28, 18, 10, 0.44);
+  --color-success: #5a7a50;
+  --color-danger: #c05a3a;
+  --color-warning: #c4924a;
 
-  /* Typography */
-  --font-primary: "Noto Sans", sans-serif;
-  --font-heading: "Playfair Display", serif;
+  /* ── Typography ── */
+  --font-primary: "Inter", sans-serif;
+  --font-heading: "Syne", sans-serif;
 
-  /* Spacing - Consistent Scale */
+  /* ── Spacing ── */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
@@ -33,28 +35,30 @@
   --space-3xl: 30px;
   --space-4xl: 40px;
 
-  /* Border Radius - Soft & Modern */
-  --radius-sm: 6px;
+  /* ── Border Radius — soft, organic (Japandi) ── */
+  --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-2xl: 18px;
   --radius-3xl: 20px;
-  --radius-4xl: 25px;
+  --radius-4xl: 24px;
   --radius-5xl: 26px;
   --radius-full: 50px;
 
-  /* Shadows - Subtle Depth */
-  --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 6px 18px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.3);
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 30px 10px gold, 0 0 50px 20px rgba(255, 215, 0, 0.5);
+  /* ── Shadows — warm, soft depth ── */
+  --shadow-xs: 0 1px 3px rgba(28, 18, 10, 0.07);
+  --shadow-sm: 0 2px 8px rgba(28, 18, 10, 0.08);
+  --shadow-md: 0 4px 14px rgba(28, 18, 10, 0.09);
+  --shadow-lg: 0 6px 20px rgba(28, 18, 10, 0.11);
+  --shadow-xl: 0 10px 30px rgba(28, 18, 10, 0.13);
+  --shadow-2xl: 0 20px 52px rgba(28, 18, 10, 0.16);
+  --shadow-soft: 0 4px 14px rgba(28, 18, 10, 0.08);
+  --shadow-glow:
+    0 0 24px 6px rgba(192, 90, 58, 0.18),
+    0 0 50px 16px rgba(192, 136, 120, 0.09);
 
-  /* Z-Index Layering */
+  /* ── Z-Index Layering ── */
   --z-base: 1;
   --z-dropdown: 10;
   --z-sticky: 100;
@@ -65,35 +69,35 @@
   --z-tooltip: 4000;
   --z-toast: 5000;
 
-  /* Transitions */
+  /* ── Transitions ── */
   --transition-fast: 0.15s ease;
   --transition-base: 0.2s ease;
   --transition-slow: 0.3s ease;
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8b7355, #6a4e42);
-  --gradient-primary-hover: linear-gradient(135deg, #6a4e42, #5a3e32);
-  --gradient-secondary: linear-gradient(135deg, #95a5a6, #7f8c8d);
-  --gradient-surface: linear-gradient(145deg, #f5f2ed, #eae6df);
-  --gradient-vibe: linear-gradient(135deg, #8b7355, #6a4e42);
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #c05a3a, #9e4428);
+  --gradient-primary-hover: linear-gradient(135deg, #9e4428, #7e3420);
+  --gradient-secondary: linear-gradient(135deg, #8a7a6a, #6e6050);
+  --gradient-surface: linear-gradient(145deg, #e8e1d6, #e0d8cc);
+  --gradient-vibe: linear-gradient(150deg, #c05a3a 0%, #8a7a6a 100%);
   --gradient-overlay: linear-gradient(
     to top,
-    rgba(32, 28, 24, 0.72),
-    rgba(32, 28, 24, 0.4),
-    rgba(32, 28, 24, 0.1),
-    rgba(32, 28, 24, 0)
+    rgba(28, 18, 10, 0.84),
+    rgba(28, 18, 10, 0.38),
+    rgba(28, 18, 10, 0.04),
+    rgba(28, 18, 10, 0)
   );
 
-  /* Progress Bar Colors */
-  --progress-bg: rgba(220, 185, 132, 0.2);
-  --progress-fill: linear-gradient(90deg, #dcb984, #c9a66b);
-  --progress-dot: rgba(106, 78, 66, 0.3);
-  --progress-dot-active: #fdfbf7;
+  /* ── Progress ── */
+  --progress-bg: rgba(192, 90, 58, 0.1);
+  --progress-fill: linear-gradient(90deg, #c05a3a, #c08878);
+  --progress-dot: rgba(192, 90, 58, 0.2);
+  --progress-dot-active: #2c2118;
 
-  /* Soft Button Colors */
-  --btn-soft-bg: linear-gradient(135deg, #f8f6f2, #f0ebe2);
-  --btn-soft-hover: linear-gradient(135deg, #f0ebe2, #e6dcc2);
-  --btn-soft-border: rgba(220, 185, 132, 0.3);
-  --btn-soft-shadow: rgba(220, 185, 132, 0.15);
+  /* ── Soft Button ── */
+  --btn-soft-bg: linear-gradient(135deg, #ede8de, #e4dcd0);
+  --btn-soft-hover: linear-gradient(135deg, #e4dcd0, #ddd4c4);
+  --btn-soft-border: rgba(192, 90, 58, 0.2);
+  --btn-soft-shadow: rgba(192, 90, 58, 0.07);
 }

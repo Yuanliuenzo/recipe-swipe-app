@@ -19,6 +19,13 @@ export class RecipeSuggestionService {
   // Stage 1: Generate recipe suggestions (titles + brief descriptions)
   // --------------------------
   async generateSuggestions(maxRetries = 3) {
+    // Return cached suggestions if available (prevents double-generation)
+    const existing = this.stateManager.get("currentSuggestions") || [];
+    if (existing.length > 0) {
+      console.log("✅ Returning cached suggestions");
+      return existing;
+    }
+
     const prompt = this.buildTitleSuggestionPrompt();
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -94,9 +101,6 @@ export class RecipeSuggestionService {
         console.log(
           `✅ Successfully generated ${suggestions.length} suggestions on attempt ${attempt}`
         );
-
-        // 🚀 NEW: Pre-fetch all full recipes in parallel for instant UX
-        this.preFetchAllRecipes();
 
         return suggestions;
       } catch (error) {
@@ -177,10 +181,9 @@ export class RecipeSuggestionService {
     this.stateManager.setState({ pendingFetches: newPendingFetches });
 
     try {
-      const result = fetchPromise;
-      return result;
+      return await fetchPromise;
     } finally {
-      // Clean up the pending fetch regardless of success/failure
+      // Clean up after the fetch completes (or fails)
       const updatedPendingFetches =
         this.stateManager.get("pendingFetches") || new Map();
       updatedPendingFetches.delete(suggestionId);
@@ -193,9 +196,7 @@ export class RecipeSuggestionService {
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
 
-      const response = await apiService.generateRecipe(prompt, {
-        timeout: timeoutMs
-      });
+      const response = await apiService.generateRecipe(prompt, timeoutMs);
 
       // Extract recipe text correctly from LLM response
       let recipeText;

@@ -3,19 +3,14 @@
  * Handles rendering and interactions for recipe suggestions grid
  */
 
-import { SearchBar } from "../SearchBar/SearchBar.js";
-
 export class RecipeSuggestionsView {
   constructor(container, { serviceRegistry }) {
     this.container = container;
     this.serviceRegistry = serviceRegistry;
     this.recipeSuggestionService = serviceRegistry.get("recipeSuggestion");
-    this.searchBar = null;
   }
 
   async render() {
-    this.searchBar = new SearchBar(this.container);
-
     const existingSuggestions =
       this.recipeSuggestionService.stateManager.get("currentSuggestions") || [];
 
@@ -23,7 +18,6 @@ export class RecipeSuggestionsView {
       this.container.innerHTML =
         this.recipeSuggestionService.createSuggestionsGrid(existingSuggestions);
       this.container.classList.add("suggestions-mode");
-      this.searchBar.render();
       this.setupInteractions();
     } else {
       this.showLoading();
@@ -34,8 +28,12 @@ export class RecipeSuggestionsView {
         this.container.innerHTML =
           this.recipeSuggestionService.createSuggestionsGrid(suggestions);
         this.container.classList.add("suggestions-mode");
-        this.searchBar.render();
         this.setupInteractions();
+
+        // Pre-fetch all full recipes in the background (non-blocking).
+        // Deduplication in generateFullRecipe ensures no duplicate Ollama calls
+        // if the user clicks a recipe while pre-fetch is still in progress.
+        this.recipeSuggestionService.preFetchAllRecipes();
       } catch (error) {
         console.error("Failed to generate suggestions:", error);
         this.showError("Failed to generate suggestions");
@@ -107,14 +105,19 @@ export class RecipeSuggestionsView {
 
         this.showLoading("Finding fresh recipe ideas for you...");
 
+        // Clear cache so generateSuggestions fetches fresh results
+        this.recipeSuggestionService.stateManager.setState({
+          currentSuggestions: []
+        });
+
         try {
           const suggestions =
             await this.recipeSuggestionService.generateSuggestions();
           this.container.innerHTML =
             this.recipeSuggestionService.createSuggestionsGrid(suggestions);
           this.container.classList.add("suggestions-mode");
-          this.searchBar.render();
           this.setupInteractions();
+          this.recipeSuggestionService.preFetchAllRecipes();
         } catch (error) {
           console.error("Failed to regenerate suggestions:", error);
           this.showError("Failed to generate suggestions");
@@ -132,10 +135,6 @@ export class RecipeSuggestionsView {
   }
 
   destroy() {
-    if (this.searchBar) {
-      this.searchBar.destroy();
-      this.searchBar = null;
-    }
     if (this.container) {
       this.container.innerHTML = "";
     }
