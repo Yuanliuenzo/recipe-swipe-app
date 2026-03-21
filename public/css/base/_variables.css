@@ -1,25 +1,25 @@
-/* Amsterdam / Berlin Minimal — clean, direct, one accent */
+/* Japandi / Scandi — earthy beige + terracotta + Chinese hint */
 :root {
-  /* ── Palette: white space + one bold accent ── */
-  --color-bg: #f5f3f0; /* barely warm white, like a gallery wall */
-  --color-card: #ffffff;
-  --color-surface: #f0ede9;
-  --color-primary: #c0413a; /* Chinese vermillion — the ONE accent */
-  --color-primary-dark: #9a3130;
-  --color-secondary: #888880; /* neutral warm grey — utility only */
-  --color-accent: #c0413a; /* same red, single accent system */
-  --color-accent-dark: #9a3130;
-  --color-bloom: #c0413a; /* all accent flows from the red */
-  --color-bloom-light: #d4706a;
-  --color-text: #141210; /* near-black — ink on paper */
-  --color-text-light: #888880;
-  --color-text-muted: #bcb8b2;
-  --color-border: #e4e0db;
-  --color-border-light: #ede9e4;
-  --color-overlay: rgba(14, 12, 10, 0.42);
-  --color-success: #2d6a4f;
-  --color-danger: #c0413a;
-  --color-warning: #c07a30;
+  /* ── Palette ── */
+  --color-bg: #ede8de; /* warm linen beige — the canvas */
+  --color-card: #f7f3ec; /* warm cream card */
+  --color-surface: #e8e1d6; /* slightly deeper beige surface */
+  --color-primary: #c05a3a; /* warm terracotta — main accent */
+  --color-primary-dark: #9e4428;
+  --color-secondary: #8a7a6a; /* warm stone/taupe */
+  --color-accent: #c4924a; /* warm amber clay */
+  --color-accent-dark: #a07538;
+  --color-bloom: #c08878; /* muted dusty salmon */
+  --color-bloom-light: #d4a090;
+  --color-text: #2c2118; /* deep warm charcoal — ink quality */
+  --color-text-light: #7a6a5c;
+  --color-text-muted: #b0a090;
+  --color-border: #ddd4c4;
+  --color-border-light: #e8e1d6;
+  --color-overlay: rgba(28, 18, 10, 0.44);
+  --color-success: #5a7a50;
+  --color-danger: #c05a3a;
+  --color-warning: #c4924a;
 
   /* ── Typography ── */
   --font-primary: "Inter", sans-serif;
@@ -35,26 +35,28 @@
   --space-3xl: 30px;
   --space-4xl: 40px;
 
-  /* ── Border Radius — restrained ── */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 14px;
-  --radius-3xl: 16px;
-  --radius-4xl: 20px;
-  --radius-5xl: 22px;
+  /* ── Border Radius — soft, organic (Japandi) ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 18px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+  --radius-5xl: 26px;
   --radius-full: 50px;
 
-  /* ── Shadows — minimal, almost flat ── */
-  --shadow-xs: 0 1px 3px rgba(14, 12, 10, 0.06);
-  --shadow-sm: 0 2px 6px rgba(14, 12, 10, 0.07);
-  --shadow-md: 0 4px 12px rgba(14, 12, 10, 0.08);
-  --shadow-lg: 0 6px 18px rgba(14, 12, 10, 0.09);
-  --shadow-xl: 0 10px 28px rgba(14, 12, 10, 0.1);
-  --shadow-2xl: 0 20px 50px rgba(14, 12, 10, 0.12);
-  --shadow-soft: 0 4px 12px rgba(14, 12, 10, 0.07);
-  --shadow-glow: 0 0 20px 4px rgba(192, 65, 58, 0.18);
+  /* ── Shadows — warm, soft depth ── */
+  --shadow-xs: 0 1px 3px rgba(28, 18, 10, 0.07);
+  --shadow-sm: 0 2px 8px rgba(28, 18, 10, 0.08);
+  --shadow-md: 0 4px 14px rgba(28, 18, 10, 0.09);
+  --shadow-lg: 0 6px 20px rgba(28, 18, 10, 0.11);
+  --shadow-xl: 0 10px 30px rgba(28, 18, 10, 0.13);
+  --shadow-2xl: 0 20px 52px rgba(28, 18, 10, 0.16);
+  --shadow-soft: 0 4px 14px rgba(28, 18, 10, 0.08);
+  --shadow-glow:
+    0 0 24px 6px rgba(192, 90, 58, 0.18),
+    0 0 50px 16px rgba(192, 136, 120, 0.09);
 
   /* ── Z-Index Layering ── */
   --z-base: 1;
@@ -68,34 +70,34 @@
   --z-toast: 5000;
 
   /* ── Transitions ── */
-  --transition-fast: 0.12s ease;
-  --transition-base: 0.18s ease;
-  --transition-slow: 0.28s ease;
-  --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ── Gradients — flat, barely there ── */
-  --gradient-primary: linear-gradient(135deg, #c0413a, #9a3130);
-  --gradient-primary-hover: linear-gradient(135deg, #9a3130, #7e2826);
-  --gradient-secondary: linear-gradient(135deg, #888880, #6a6a62);
-  --gradient-surface: linear-gradient(145deg, #f0ede9, #ede9e4);
-  --gradient-vibe: linear-gradient(160deg, #c0413a 0%, #2a2a28 100%);
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #c05a3a, #9e4428);
+  --gradient-primary-hover: linear-gradient(135deg, #9e4428, #7e3420);
+  --gradient-secondary: linear-gradient(135deg, #8a7a6a, #6e6050);
+  --gradient-surface: linear-gradient(145deg, #e8e1d6, #e0d8cc);
+  --gradient-vibe: linear-gradient(150deg, #c05a3a 0%, #8a7a6a 100%);
   --gradient-overlay: linear-gradient(
     to top,
-    rgba(14, 12, 10, 0.86),
-    rgba(14, 12, 10, 0.4),
-    rgba(14, 12, 10, 0.04),
-    rgba(14, 12, 10, 0)
+    rgba(28, 18, 10, 0.84),
+    rgba(28, 18, 10, 0.38),
+    rgba(28, 18, 10, 0.04),
+    rgba(28, 18, 10, 0)
   );
 
   /* ── Progress ── */
-  --progress-bg: rgba(192, 65, 58, 0.08);
-  --progress-fill: linear-gradient(90deg, #c0413a, #d4706a);
-  --progress-dot: rgba(192, 65, 58, 0.18);
-  --progress-dot-active: #141210;
+  --progress-bg: rgba(192, 90, 58, 0.1);
+  --progress-fill: linear-gradient(90deg, #c05a3a, #c08878);
+  --progress-dot: rgba(192, 90, 58, 0.2);
+  --progress-dot-active: #2c2118;
 
   /* ── Soft Button ── */
-  --btn-soft-bg: linear-gradient(135deg, #f0ede9, #e8e4df);
-  --btn-soft-hover: linear-gradient(135deg, #e8e4df, #e0dbd4);
-  --btn-soft-border: rgba(192, 65, 58, 0.18);
-  --btn-soft-shadow: rgba(192, 65, 58, 0.06);
+  --btn-soft-bg: linear-gradient(135deg, #ede8de, #e4dcd0);
+  --btn-soft-hover: linear-gradient(135deg, #e4dcd0, #ddd4c4);
+  --btn-soft-border: rgba(192, 90, 58, 0.2);
+  --btn-soft-shadow: rgba(192, 90, 58, 0.07);
 }

@@ -1,12 +1,9 @@
 /* ================================================================
-   AMSTERDAM / BERLIN MINIMAL — Chinese vermillion accent on white
-   Less is more. Typography and space carry the design.
+   JAPANDI / SCANDI — earthy beige, terracotta, Chinese ink hint
+   Clean, warm, intentional. Space and material over decoration.
    ================================================================ */
 
-/* ── No decorative backgrounds — let white space breathe ────────── */
-/* (body::before removed — clean, nothing extra) */
-
-/* ── Round indicator / progress ─────────────────────────────────── */
+/* ── Round indicator ────────────────────────────────────────────── */
 .round-text {
   font-family: var(--font-primary);
   font-size: 11px;
@@ -16,46 +13,42 @@
   text-transform: uppercase;
 }
 
-/* Minimal red dash — the only flourish, very restrained */
+/* Terracotta dot — a quiet nod to Chinese seal stamps */
 .round-text::before {
   content: "·  ";
   color: var(--color-primary);
 }
 
-/* ── Mobile header — single thin red line underneath ───────────── */
+/* ── Mobile header — warm terracotta hairline ───────────────────── */
 .mobile-header::after {
   content: "";
   display: block;
   height: 1px;
-  width: 32px;
+  width: 36px;
   background: var(--color-primary);
   margin: var(--space-sm) auto 0;
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
-/* ── FAB Navigation — clean white ──────────────────────────────── */
+/* ── FAB Navigation — warm linen glass ─────────────────────────── */
 .mobile-fab {
-  background: rgba(255, 255, 255, 0.97) !important;
-  backdrop-filter: blur(12px) !important;
+  background: rgba(247, 243, 236, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
   border: 1px solid var(--color-border) !important;
   color: var(--color-text) !important;
-  box-shadow: 0 2px 12px rgba(14, 12, 10, 0.08) !important;
-  border-radius: var(
-    --radius-sm
-  ) !important; /* slightly square — more Berlin */
+  box-shadow: 0 2px 14px rgba(28, 18, 10, 0.1) !important;
 }
 
 .mobile-fab:hover {
-  border-color: rgba(192, 65, 58, 0.3) !important;
-  box-shadow: 0 4px 16px rgba(14, 12, 10, 0.1) !important;
+  border-color: rgba(192, 90, 58, 0.3) !important;
+  box-shadow: 0 4px 18px rgba(28, 18, 10, 0.13) !important;
 }
 
 .mobile-fab-menu {
-  background: rgba(255, 255, 255, 0.99) !important;
-  backdrop-filter: blur(16px) !important;
+  background: rgba(247, 243, 236, 0.99) !important;
+  backdrop-filter: blur(18px) !important;
   border: 1px solid var(--color-border) !important;
-  box-shadow: 0 8px 32px rgba(14, 12, 10, 0.1) !important;
-  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 10px 36px rgba(28, 18, 10, 0.12) !important;
 }
 
 .fab-item {
@@ -64,7 +57,6 @@
   font-size: 14px !important;
   font-weight: 500 !important;
   border-bottom: 1px solid var(--color-border-light);
-  letter-spacing: 0.01em;
 }
 
 .fab-item:last-child {
@@ -77,14 +69,14 @@
 }
 
 .fab-item:active {
-  background: rgba(192, 65, 58, 0.06) !important;
+  background: rgba(192, 90, 58, 0.07) !important;
 }
 
 /* ── Bottom Sheet ───────────────────────────────────────────────── */
 .favorite-sheet-container {
   background: var(--color-card) !important;
   border-top: 1px solid var(--color-border);
-  box-shadow: 0 -4px 20px rgba(14, 12, 10, 0.06) !important;
+  box-shadow: 0 -4px 24px rgba(28, 18, 10, 0.07) !important;
 }
 
 .favorite-sheet-container::before {
@@ -103,38 +95,28 @@
   border: 1px solid var(--color-border) !important;
 }
 
-/* Vibe tag pills — red on white, minimal */
-.vibe-tag {
+.vibe-tag,
+.mobile-vibe-tag {
   background: var(--color-primary) !important;
   box-shadow: none !important;
   font-size: 12px !important;
-  letter-spacing: 0.05em !important;
-  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
 }
 
-.mobile-vibe-tag {
-  background: var(--color-primary) !important;
-}
-
-/* Vibe summary headings */
 .vibe-summary h2,
 .mobile-vibe-summary h2 {
   color: var(--color-text) !important;
   font-family: var(--font-heading) !important;
-  letter-spacing: -0.03em !important;
+  letter-spacing: -0.025em !important;
 }
 
-/* Swipe indicators — clean, no text-shadow */
+/* ── Swipe indicators ───────────────────────────────────────────── */
 .mobile-swipe-indicator.like {
   color: var(--color-success) !important;
-  font-size: 64px !important;
-  font-family: var(--font-heading) !important;
 }
 
 .mobile-swipe-indicator.nope {
   color: var(--color-primary) !important;
-  font-size: 64px !important;
-  font-family: var(--font-heading) !important;
 }
 
 /* ── Recipe card ────────────────────────────────────────────────── */
@@ -143,7 +125,7 @@
   border: 1px solid var(--color-border) !important;
 }
 
-/* ── Recipe section text fixes ──────────────────────────────────── */
+/* ── Recipe text ────────────────────────────────────────────────── */
 .mobile-recipe-section h3 {
   color: var(--color-text) !important;
   font-family: var(--font-heading) !important;
@@ -161,16 +143,6 @@
   border-bottom-color: var(--color-border-light) !important;
 }
 
-/* ── Recipe scrollbars ──────────────────────────────────────────── */
-.recipe-content::-webkit-scrollbar-track,
-.mobile-recipe-content::-webkit-scrollbar-track {
-  background: var(--color-surface) !important;
-}
-
-.mobile-recipe-content::-webkit-scrollbar-thumb {
-  background: var(--color-border) !important;
-}
-
 /* ── Recipe suggestion cards ────────────────────────────────────── */
 .recipe-suggestion-card {
   background: var(--color-card) !important;
@@ -178,11 +150,11 @@
 }
 
 .recipe-suggestion-card:hover {
-  border-color: var(--color-primary) !important;
-  box-shadow: 0 6px 20px rgba(14, 12, 10, 0.08) !important;
+  border-color: rgba(192, 90, 58, 0.35) !important;
+  box-shadow: 0 6px 22px rgba(28, 18, 10, 0.1) !important;
 }
 
-/* ── Toggle (ingredients / instructions) ───────────────────────── */
+/* ── Toggle ─────────────────────────────────────────────────────── */
 .mobile-recipe-toggle {
   background: var(--color-surface) !important;
   border-color: var(--color-border) !important;
@@ -201,6 +173,16 @@
   border: 1px solid var(--color-border) !important;
 }
 
+/* ── App view backgrounds ───────────────────────────────────────── */
+.app-view {
+  background: var(--color-bg) !important;
+}
+
+.mobile-favorites-screen,
+.mobile-preferences-screen {
+  background: var(--color-bg) !important;
+}
+
 /* ── Form inputs ─────────────────────────────────────────────────── */
 input,
 select,
@@ -215,25 +197,25 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 2px rgba(192, 65, 58, 0.1) !important;
+  box-shadow: 0 0 0 2px rgba(192, 90, 58, 0.12) !important;
   outline: none;
 }
 
 /* ── Loading spinner ─────────────────────────────────────────────── */
 .loading-spinner {
-  border-color: rgba(192, 65, 58, 0.12) !important;
+  border-color: rgba(192, 90, 58, 0.14) !important;
   border-top-color: var(--color-primary) !important;
 }
 
-/* ── Star rating ─────────────────────────────────────────────────── */
+/* ── Star rating — terracotta ────────────────────────────────────── */
 .star-rating .star.filled,
 .star-filled {
-  color: var(--color-primary) !important; /* red stars, not gold */
+  color: var(--color-accent) !important;
 }
 
-/* ── Scrollbar — hairline thin ───────────────────────────────────── */
+/* ── Scrollbar — thin, warm ──────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 3px;
 }
 
 ::-webkit-scrollbar-track {
@@ -242,11 +224,11 @@ textarea:focus {
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(192, 65, 58, 0.35);
+  background: rgba(192, 90, 58, 0.3);
 }
 
 /* ── Dropdown ────────────────────────────────────────────────────── */
@@ -259,45 +241,31 @@ textarea:focus {
 .mobile-unified-dropdown-item {
   color: var(--color-text) !important;
   font-family: var(--font-primary) !important;
-  font-size: 14px !important;
 }
 
 .mobile-unified-dropdown-item:hover {
   background: var(--color-surface) !important;
 }
 
-/* ── Vibe error / empty states ──────────────────────────────────── */
+/* ── Error / empty states ────────────────────────────────────────── */
 .vibe-error {
-  background: rgba(192, 65, 58, 0.06) !important;
-  border-color: rgba(192, 65, 58, 0.15) !important;
+  background: rgba(192, 90, 58, 0.07) !important;
+  border-color: rgba(192, 90, 58, 0.15) !important;
   color: var(--color-primary) !important;
 }
 
-/* ── Buttons: slightly more squared in this aesthetic ───────────── */
-.japandi-btn {
-  border-radius: var(--radius-md) !important;
-  letter-spacing: 0.06em !important;
-}
-
-.mobile-save-btn,
-.mobile-generate-btn,
-.add-ingredients-btn {
-  border-radius: var(--radius-md) !important;
-  letter-spacing: 0.06em !important;
-}
-
-/* ── Mobile app view backgrounds ────────────────────────────────── */
-.app-view {
-  background: var(--color-bg) !important;
-}
-
-.mobile-favorites-screen,
-.mobile-preferences-screen {
-  background: var(--color-bg) !important;
-}
-
-/* ── Focus ring — red ────────────────────────────────────────────── */
+/* ── Focus ring ──────────────────────────────────────────────────── */
 *:focus-visible {
   outline: 1.5px solid var(--color-primary) !important;
   outline-offset: 2px;
+}
+
+/* ── Scrollbar in recipe content ─────────────────────────────────── */
+.recipe-content::-webkit-scrollbar-track,
+.mobile-recipe-content::-webkit-scrollbar-track {
+  background: var(--color-surface) !important;
+}
+
+.mobile-recipe-content::-webkit-scrollbar-thumb {
+  background: var(--color-border) !important;
 }
