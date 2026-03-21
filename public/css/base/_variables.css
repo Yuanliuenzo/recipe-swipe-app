@@ -1,29 +1,31 @@
-/* Japandi-inspired Color Palette & Design Tokens */
+/* Underground Monk — Gorpcore × Chinese Ink × Botanical — Light Theme */
 :root {
-  /* Colors - Soft, Natural, Elegant */
-  --color-bg: #f0f2f5;
-  --color-card: #ffffff;
-  --color-surface: #fdfbf7;
-  --color-primary: #6a4e42;
-  --color-primary-dark: #5a3e32;
-  --color-secondary: #8b7355;
-  --color-accent: #dcb984;
-  --color-accent-dark: #c9a66b;
-  --color-text: #34495e;
-  --color-text-light: #7f8c8d;
-  --color-text-muted: #95a5a6;
-  --color-border: #ece7e2;
-  --color-border-light: #e0e0e0;
-  --color-overlay: rgba(0, 0, 0, 0.35);
-  --color-success: #155724;
-  --color-danger: #a55;
-  --color-warning: #ffd700;
+  /* ── Core Palette ── */
+  --color-bg: #f0ebe2; /* warm parchment — like aged paper */
+  --color-card: #faf6f0; /* warm white */
+  --color-surface: #f5f0e8; /* slightly deeper warm */
+  --color-primary: #b5463a; /* Chinese vermillion — muted, not loud */
+  --color-primary-dark: #8f3228;
+  --color-secondary: #6e8557; /* gorpcore sage/olive */
+  --color-accent: #c2923e; /* ochre/amber — harvest */
+  --color-accent-dark: #a07530;
+  --color-bloom: #c0828a; /* dusty peony */
+  --color-bloom-light: #d4a0a6;
+  --color-text: #28221c; /* deep warm charcoal, like ink on paper */
+  --color-text-light: #7a6e64;
+  --color-text-muted: #b0a496;
+  --color-border: #e0d8cc;
+  --color-border-light: #ece5db;
+  --color-overlay: rgba(28, 22, 16, 0.4);
+  --color-success: #6e8557;
+  --color-danger: #b5463a;
+  --color-warning: #c2923e;
 
-  /* Typography */
-  --font-primary: "Noto Sans", sans-serif;
-  --font-heading: "Playfair Display", serif;
+  /* ── Typography ── */
+  --font-primary: "Space Grotesk", sans-serif;
+  --font-heading: "Syne", sans-serif;
 
-  /* Spacing - Consistent Scale */
+  /* ── Spacing ── */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
@@ -33,28 +35,29 @@
   --space-3xl: 30px;
   --space-4xl: 40px;
 
-  /* Border Radius - Soft & Modern */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 18px;
-  --radius-3xl: 20px;
-  --radius-4xl: 25px;
-  --radius-5xl: 26px;
+  /* ── Border Radius — mix of sharp & soft (gorpcore utility meets organic) ── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 18px;
+  --radius-4xl: 22px;
+  --radius-5xl: 24px;
   --radius-full: 50px;
 
-  /* Shadows - Subtle Depth */
-  --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 6px 18px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.3);
-  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 30px 10px gold, 0 0 50px 20px rgba(255, 215, 0, 0.5);
+  /* ── Shadows — warm, paper-like ── */
+  --shadow-xs: 0 2px 4px rgba(40, 30, 20, 0.07);
+  --shadow-sm: 0 2px 8px rgba(40, 30, 20, 0.09);
+  --shadow-md: 0 4px 14px rgba(40, 30, 20, 0.1);
+  --shadow-lg: 0 6px 20px rgba(40, 30, 20, 0.12);
+  --shadow-xl: 0 10px 30px rgba(40, 30, 20, 0.14);
+  --shadow-2xl: 0 20px 60px rgba(40, 30, 20, 0.2);
+  --shadow-soft: 0 4px 14px rgba(40, 30, 20, 0.08);
+  --shadow-glow:
+    0 0 24px 6px rgba(181, 70, 58, 0.2), 0 0 50px 16px rgba(192, 130, 138, 0.1);
 
-  /* Z-Index Layering */
+  /* ── Z-Index Layering ── */
   --z-base: 1;
   --z-dropdown: 10;
   --z-sticky: 100;
@@ -65,35 +68,35 @@
   --z-tooltip: 4000;
   --z-toast: 5000;
 
-  /* Transitions */
+  /* ── Transitions ── */
   --transition-fast: 0.15s ease;
   --transition-base: 0.2s ease;
   --transition-slow: 0.3s ease;
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8b7355, #6a4e42);
-  --gradient-primary-hover: linear-gradient(135deg, #6a4e42, #5a3e32);
-  --gradient-secondary: linear-gradient(135deg, #95a5a6, #7f8c8d);
-  --gradient-surface: linear-gradient(145deg, #f5f2ed, #eae6df);
-  --gradient-vibe: linear-gradient(135deg, #8b7355, #6a4e42);
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #b5463a, #8f3228);
+  --gradient-primary-hover: linear-gradient(135deg, #8f3228, #752a22);
+  --gradient-secondary: linear-gradient(135deg, #6e8557, #566843);
+  --gradient-surface: linear-gradient(145deg, #f5f0e8, #ede7dc);
+  --gradient-vibe: linear-gradient(135deg, #b5463a 0%, #6e8557 100%);
   --gradient-overlay: linear-gradient(
     to top,
-    rgba(32, 28, 24, 0.72),
-    rgba(32, 28, 24, 0.4),
-    rgba(32, 28, 24, 0.1),
-    rgba(32, 28, 24, 0)
+    rgba(28, 22, 16, 0.82),
+    rgba(28, 22, 16, 0.38),
+    rgba(28, 22, 16, 0.06),
+    rgba(28, 22, 16, 0)
   );
 
-  /* Progress Bar Colors */
-  --progress-bg: rgba(220, 185, 132, 0.2);
-  --progress-fill: linear-gradient(90deg, #dcb984, #c9a66b);
-  --progress-dot: rgba(106, 78, 66, 0.3);
-  --progress-dot-active: #fdfbf7;
+  /* ── Progress ── */
+  --progress-bg: rgba(181, 70, 58, 0.1);
+  --progress-fill: linear-gradient(90deg, #b5463a, #c0828a);
+  --progress-dot: rgba(181, 70, 58, 0.2);
+  --progress-dot-active: #28221c;
 
-  /* Soft Button Colors */
-  --btn-soft-bg: linear-gradient(135deg, #f8f6f2, #f0ebe2);
-  --btn-soft-hover: linear-gradient(135deg, #f0ebe2, #e6dcc2);
-  --btn-soft-border: rgba(220, 185, 132, 0.3);
-  --btn-soft-shadow: rgba(220, 185, 132, 0.15);
+  /* ── Soft Button ── */
+  --btn-soft-bg: linear-gradient(135deg, #f2ece2, #e8e0d4);
+  --btn-soft-hover: linear-gradient(135deg, #e8e0d4, #dfd6c8);
+  --btn-soft-border: rgba(181, 70, 58, 0.2);
+  --btn-soft-shadow: rgba(181, 70, 58, 0.08);
 }

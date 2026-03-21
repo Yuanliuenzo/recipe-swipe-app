@@ -1,13 +1,15 @@
-/* Typography System - Japandi Elegance */
+/* Typography — Monk × Gorpcore × Editorial */
 
 /* Font Imports */
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600&display=swap");
 
 /* Base Typography */
 body {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-text);
+  font-family: var(--font-primary);
+  letter-spacing: 0.005em;
 }
 
 /* Headings */
@@ -18,53 +20,56 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 800;
+  line-height: 1.1;
   margin-bottom: var(--space-lg);
-  color: var(--color-primary);
+  color: var(--color-text);
+  letter-spacing: -0.025em;
 }
 
 h1 {
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 800;
   text-align: center;
   margin-bottom: var(--space-xl);
 }
 
 h2 {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 h3 {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Mobile-specific heading sizes */
 .mobile-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text);
   margin-bottom: var(--space-sm);
+  letter-spacing: -0.025em;
 }
 
 .mobile-favorites-header h2,
 .mobile-preferences-fullscreen .mobile-preferences-header h2 {
   font-family: var(--font-heading);
-  font-size: 24px;
-  color: var(--color-primary);
+  font-size: 22px;
+  color: var(--color-text);
   margin: 0;
+  letter-spacing: -0.025em;
 }
 
 .favorite-sheet-header h2 {
   font-family: var(--font-heading);
-  font-size: 24px;
-  color: var(--color-primary);
+  font-size: 22px;
+  color: var(--color-text);
   margin: 0;
-  font-weight: 500;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 /* Text Elements */
@@ -84,81 +89,90 @@ a:hover {
 
 /* Specialized text styles */
 .vibe-name {
+  font-family: var(--font-heading);
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 800;
   color: #ffffff;
   margin-bottom: var(--space-sm);
+  letter-spacing: -0.025em;
 }
 
 .mobile-vibe-name {
+  font-family: var(--font-heading);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
   color: white;
   margin-bottom: var(--space-sm);
+  letter-spacing: -0.03em;
 }
 
 .vibe-description {
-  font-size: 14px;
-  color: #ffffff;
-  line-height: 1.4;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
   max-width: 260px;
 }
 
 .mobile-vibe-description {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.4;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
 }
 
 .recipe-title {
   font-family: var(--font-heading);
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-primary);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--color-text);
   text-align: center;
   margin: 0 0 var(--space-xl) 0;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
 }
 
 .mobile-recipe-title {
   font-family: var(--font-heading);
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--color-primary);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-text);
   text-align: center;
   margin: 0 0 var(--space-xl) 0;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
 }
 
 /* Labels and metadata */
 .ingredients-subtitle {
-  font-size: 14px;
-  color: var(--color-primary);
+  font-size: 12px;
+  color: var(--color-text-muted);
   text-align: center;
   margin: 0 0 var(--space-lg) 0;
-  line-height: 1.4;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .favorite-meta {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  font-size: 14px;
-  color: #999;
+  font-size: 13px;
+  color: var(--color-text-light);
 }
 
 /* Status and helper text */
 .ingredients-confirmation {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   min-height: 18px;
   transition: opacity var(--transition-slow);
   text-align: center;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(181, 70, 58, 0.08);
   margin-bottom: var(--space-lg);
   opacity: 0;
+  color: var(--color-primary);
 }
 
 .ingredients-confirmation.show {
@@ -168,15 +182,16 @@ a:hover {
 .mobile-ingredients-confirmation {
   margin-top: var(--space-sm);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   min-height: 18px;
   transition: opacity var(--transition-slow);
   text-align: center;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(181, 70, 58, 0.08);
   margin-bottom: var(--space-lg);
   opacity: 0;
+  color: var(--color-primary);
 }
 
 .mobile-ingredients-confirmation.show {
@@ -187,8 +202,8 @@ a:hover {
 .recipe-loading-status,
 .mobile-recipe-loading-status {
   text-align: center;
-  color: var(--color-primary);
-  font-size: 14px;
+  color: var(--color-text-light);
+  font-size: 13px;
   margin-bottom: var(--space-lg);
   font-style: italic;
 }
@@ -198,7 +213,7 @@ a:hover {
 .error-favorites,
 .mobile-empty-favorites {
   text-align: center;
-  color: #aaa;
+  color: var(--color-text-muted);
   font-style: italic;
   margin-top: 60px;
 }

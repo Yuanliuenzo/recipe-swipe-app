@@ -96,7 +96,8 @@
    THEME ENHANCEMENTS
    ================================ */
 
-/* Additional theme-specific enhancements can be added here */
+/* Underground × Gorpcore × Chinese Floral theme overrides */
+@import "theme/_underground.css";
 
 /* Performance optimizations */
 * {
