@@ -19,6 +19,13 @@ export class RecipeSuggestionService {
   // Stage 1: Generate recipe suggestions (titles + brief descriptions)
   // --------------------------
   async generateSuggestions(maxRetries = 3) {
+    // Return cached suggestions if available (prevents double-generation)
+    const existing = this.stateManager.get("currentSuggestions") || [];
+    if (existing.length > 0) {
+      console.log("✅ Returning cached suggestions");
+      return existing;
+    }
+
     const prompt = this.buildTitleSuggestionPrompt();
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
