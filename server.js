@@ -12,6 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1); // trust Cloudflare / nginx X-Forwarded-Proto
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -172,9 +173,12 @@ app.post("/login", async (req, res) => {
   console.log("DEBUG: Updated last login for:", username);
 
   console.log("DEBUG: Setting cookie with profile:", username);
+  const isHttps = req.secure || req.headers["x-forwarded-proto"] === "https";
   res.cookie("profile", username, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
-    httpOnly: true
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isHttps
   });
   console.log("DEBUG: Cookie set response headers:", res.getHeaders());
   res.json({ username });
@@ -347,6 +351,16 @@ app.post("/api/generateRecipe", async (req, res) => {
       .status(500)
       .json({ error: "Something went wrong", details: error.message });
   }
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    time: new Date().toISOString(),
+    proto: req.headers["x-forwarded-proto"] || "http",
+    secure: req.secure,
+    ua: req.headers["user-agent"]
+  });
 });
 
 // 404 handler
