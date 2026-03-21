@@ -4,8 +4,8 @@
   "description": "A beautiful recipe discovery app with AI-powered recipe generation and Tinder-like swipe interface",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env server.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write .",
