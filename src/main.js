@@ -133,10 +133,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Setup logout handler using event bus
-    globalEventBus.on("auth:logout", () => {
-      document.cookie =
-        "profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      window.location.reload();
+    globalEventBus.on("auth:logout", async () => {
+      await fetch("/logout", { method: "POST", credentials: "include" });
+      window.location.href = "/";
     });
 
     // Expose minimal global API for HTML onclick handlers

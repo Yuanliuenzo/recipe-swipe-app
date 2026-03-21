@@ -191,6 +191,7 @@
         try {
           const res = await fetch("/login", {
             method: "POST",
+            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
           });
@@ -199,13 +200,8 @@
             showError(err.error || "Something went wrong");
             return false;
           }
-          const data = await res.json();
-          console.log("Login successful:", data);
-
-          setTimeout(() => {
-            window.location.href = "/";
-          }, 500);
-
+          // Use replace() so the login page is not kept in browser history
+          window.location.replace("/");
           return true;
         } catch (e) {
           showError("Network error");

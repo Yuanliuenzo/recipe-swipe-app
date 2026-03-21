@@ -124,6 +124,8 @@ app.use((req, res, next) => {
 // ─── Routes ──────────────────────────────────────────────────────────────────
 
 app.get("/", (req, res) => {
+  // Never cache this route — it switches between login and app based on session
+  res.set("Cache-Control", "no-store");
   if (req.user) {
     res.sendFile(path.join(__dirname, "public", "index.html"));
   } else {
@@ -179,7 +181,9 @@ app.post("/logout", (req, res) => {
   if (sessionId) {
     db.prepare("DELETE FROM sessions WHERE id = ?").run(sessionId);
   }
-  res.clearCookie("sid");
+  // Attributes must match the original Set-Cookie for browsers (especially Safari) to accept the clear
+  const isHttps = req.secure || req.headers["x-forwarded-proto"] === "https";
+  res.clearCookie("sid", { httpOnly: true, sameSite: "lax", secure: isHttps });
   res.json({ ok: true });
 });
 
