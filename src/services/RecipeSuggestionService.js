@@ -134,7 +134,7 @@ export class RecipeSuggestionService {
     let fetched = 0;
     for (const suggestion of suggestions) {
       try {
-        await this.generateFullRecipe(suggestion.id, 90000);
+        await this.generateFullRecipe(suggestion.id);
         fetched++;
         console.log(
           `✅ Pre-fetched (${fetched}/${suggestions.length}): ${suggestion.title}`
@@ -151,8 +151,9 @@ export class RecipeSuggestionService {
     );
   }
 
-  // Stage 2: Generate full recipe for a selected suggestion (now instant if pre-fetched)
-  async generateFullRecipe(suggestionId, timeoutMs = 60000) {
+  // Stage 2: Generate full recipe for a selected suggestion
+  // onToken(token, fullText) is called on each streamed token for live rendering
+  async generateFullRecipe(suggestionId, onToken = null) {
     const currentSuggestions =
       this.stateManager.get("currentSuggestions") || [];
     const suggestion = currentSuggestions.find(s => s.id === suggestionId);
@@ -165,17 +166,14 @@ export class RecipeSuggestionService {
       return suggestion.fullRecipe;
     }
 
-    // 🚀 NEW: Check if this recipe is already being fetched (race condition prevention)
+    // Race condition prevention — if already fetching, await the same promise
     const pendingFetches = this.stateManager.get("pendingFetches") || new Map();
     if (pendingFetches.has(suggestionId)) {
-      console.log(
-        `⏳ Recipe ${suggestion.title} already being fetched, waiting...`
-      );
+      console.log(`⏳ Already fetching: ${suggestion.title}`);
       return pendingFetches.get(suggestionId);
     }
 
-    // Create and store the fetch promise
-    const fetchPromise = this._fetchAndCacheRecipe(suggestion, timeoutMs);
+    const fetchPromise = this._fetchAndCacheRecipe(suggestion, onToken);
     const newPendingFetches = new Map(pendingFetches);
     newPendingFetches.set(suggestionId, fetchPromise);
     this.stateManager.setState({ pendingFetches: newPendingFetches });
@@ -183,7 +181,6 @@ export class RecipeSuggestionService {
     try {
       return await fetchPromise;
     } finally {
-      // Clean up after the fetch completes (or fails)
       const updatedPendingFetches =
         this.stateManager.get("pendingFetches") || new Map();
       updatedPendingFetches.delete(suggestionId);
@@ -191,47 +188,35 @@ export class RecipeSuggestionService {
     }
   }
 
-  // Helper method to actually fetch and cache the recipe
-  async _fetchAndCacheRecipe(suggestion, timeoutMs) {
+  async _fetchAndCacheRecipe(suggestion, onToken = null) {
     try {
       const prompt = this.buildFullRecipePrompt(suggestion.title);
 
-      const response = await apiService.generateRecipe(prompt, timeoutMs);
+      // Use streaming — tokens appear in real time, full text assembled as they arrive
+      const recipeText = await apiService.streamRecipe(prompt, onToken);
 
-      // Extract recipe text correctly from LLM response
-      let recipeText;
-
-      // LLM service returns { recipe: "text" } for single recipes
-      if (response.recipe) {
-        recipeText = response.recipe; // Original working format
-      } else if (response.text) {
-        recipeText = response.text; // Fallback
-      } else if (typeof response === "string") {
-        recipeText = response; // Direct string response
-      } else {
-        throw new Error("Invalid response format from LLM service");
+      if (!recipeText) {
+        throw new Error("Empty response from LLM");
       }
 
-      // Pass the correct text to formatter
       const formatted = RecipeFormatter.format(recipeText);
-
       suggestion.fullRecipe = {
         recipeText,
-        title: suggestion.title, // Use our own title for consistency
+        title: suggestion.title,
         formatted
       };
 
-      // Update the suggestion in state manager
       const currentSuggestions =
         this.stateManager.get("currentSuggestions") || [];
-      const updatedSuggestions = currentSuggestions.map(s =>
-        s.id === suggestion.id ? suggestion : s
-      );
-      this.stateManager.setState({ currentSuggestions: updatedSuggestions });
+      this.stateManager.setState({
+        currentSuggestions: currentSuggestions.map(s =>
+          s.id === suggestion.id ? suggestion : s
+        )
+      });
 
       return suggestion.fullRecipe;
     } catch (error) {
-      console.error("❌ Failed to generate full recipe:", error);
+      console.error("❌ Failed to fetch recipe:", error);
       throw error;
     }
   }
