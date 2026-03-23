@@ -9,7 +9,7 @@ const isMobile = () => {
   );
 };
 
-// Vibe-specific card component
+// Image-based mood card — shows photo + evocative caption, no explicit labels
 export class VibeCard extends Card {
   constructor(container, props = {}) {
     super(container, {
@@ -17,66 +17,39 @@ export class VibeCard extends Card {
       ...props
     });
 
-    this.vibe = props.vibe;
+    this.vibe = props.vibe; // card object from cards.json
     this.round = props.round || 1;
   }
 
   render() {
     if (!this.vibe) {
-      console.warn("VibeCard: No vibe data provided");
-      return `<div class="${isMobile() ? "mobile-vibe-card" : "vibe-card"} error">No vibe data</div>`;
+      console.warn("VibeCard: No card data provided");
+      return `<div class="vibe-card error">No card data</div>`;
     }
 
-    const { name, emoji, description, image, color } = this.vibe;
+    const { id, image, caption } = this.vibe;
+    const cls = isMobile() ? "mobile-vibe-card" : "vibe-card";
 
-    if (isMobile()) {
-      // Mobile rendering with beautiful styling
-      return `
-        <div class="${isMobile() ? "mobile-vibe-card" : "vibe-card"}" 
-             data-component-id="${this.id}"
-             data-vibe-name="${name}"
-             style="background-image: url('${image}'); 
-                    background-size: cover; 
-                    background-position: center;
-                    border: 3px solid ${color}80;
-                    top: ${(this.round - 1) * 5}px;">
-          <div class="mobile-vibe-card-overlay">
-            <div class="mobile-vibe-emoji">${emoji}</div>
-            <div class="mobile-vibe-name">${name}</div>
-            <div class="mobile-vibe-description">${description}</div>
-          </div>
-        </div>
-      `;
-    } else {
-      // Web rendering (original)
-      return `
-        <div class="card vibe-card" 
-             data-component-id="${this.id}"
-             data-vibe-name="${name}"
-             style="background-image: url('${image}'); 
-                    background-size: cover; 
-                    background-position: center;
-                    border: 3px solid ${color}80;
-                    top: ${(this.round - 1) * 5}px;">
-          <div class="overlay vibe-overlay" 
-               style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));">
-            <div class="vibe-emoji">${emoji}</div>
-            <div class="vibe-name">${name}</div>
-            <div class="vibe-description">${description}</div>
-          </div>
-        </div>
-      `;
-    }
+    return `
+      <div class="${cls}"
+           data-component-id="${this.id}"
+           data-vibe-name="${id}"
+           style="background-image: url('${image}');
+                  background-size: cover;
+                  background-position: center;
+                  top: ${(this.round - 1) * 5}px;">
+        <div class="vibe-card-gradient"></div>
+        <div class="vibe-card-caption">${caption}</div>
+      </div>
+    `;
   }
 
   onMount() {
     super.onMount();
 
-    // Add entrance animation with stagger based on round
     const cardElement = this.find(`[data-component-id="${this.id}"]`);
     if (cardElement) {
       const delay = (this.round - 1) * 100;
-
       setTimeout(() => {
         cardElement.style.opacity = "1";
         cardElement.style.transform = "translateY(0) scale(1)";
@@ -84,22 +57,19 @@ export class VibeCard extends Card {
     }
   }
 
-  // Get vibe data
   getVibe() {
     return this.vibe;
   }
 
-  // Get vibe name
+  // Kept for backward-compat callers
   getVibeName() {
-    return this.vibe?.name || "";
+    return this.vibe?.id || "";
   }
 
-  // Get vibe color
   getVibeColor() {
-    return this.vibe?.color || "#000";
+    return "#000";
   }
 
-  // Add swipe-specific animations
   showLikeIndicator() {
     this.addSwipeEffect(150, 0, 7.5, 1.05);
   }
@@ -108,23 +78,18 @@ export class VibeCard extends Card {
     this.addSwipeEffect(-150, 0, -7.5, 1.05);
   }
 
-  // Animate swipe out with direction-specific effects
   swipeOut(direction = "right", callback = null) {
     const distance = direction === "right" ? 500 : -500;
     this.animateOut(direction, distance);
-
-    // Call callback after animation
     if (callback) {
       setTimeout(callback, CONFIG.ANIMATION_DURATION);
     }
   }
 
-  // Reset to neutral position
   resetToCenter() {
     this.resetPosition();
   }
 
-  // Update vibe data
   updateVibe(newVibe) {
     this.vibe = newVibe;
     this.forceUpdate();

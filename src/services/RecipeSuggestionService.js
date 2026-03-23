@@ -275,13 +275,28 @@ export class RecipeSuggestionService {
       prompt += `Budget: affordable, everyday ingredients preferred\n`;
     }
 
-    // --- Emotional vibes (stylistic guidance) ---
+    // --- Emotional vibes (inferred from image card tags) ---
     if (vibes.length) {
-      prompt += `\nMood/Vibes the user is feeling:\n`;
-      vibes.forEach(v => (prompt += `  • ${v.emoji} ${v.name}: ${v.prompt}\n`));
+      const moodTags = [...new Set(vibes.flatMap(c => c.tags?.mood || []))];
+      const flavorTags = [...new Set(vibes.flatMap(c => c.tags?.flavor || []))];
+      const styleTags = [...new Set(vibes.flatMap(c => c.tags?.style || []))];
+
+      prompt += `\nMood inferred from the user's image selections:\n`;
+      if (moodTags.length) {
+        prompt += `  • Feeling: ${moodTags.join(", ")}\n`;
+      }
+      if (flavorTags.length) {
+        prompt += `  • Craving: ${flavorTags.join(", ")}\n`;
+      }
+      if (styleTags.length) {
+        prompt += `  • Style: ${styleTags.join(", ")}\n`;
+      }
     }
     if (negativeVibes.length) {
-      prompt += `\nNOT in the mood for: ${negativeVibes.map(v => `${v.emoji} ${v.name}`).join(", ")} — avoid suggestions that feel like these\n`;
+      const avoidTags = [
+        ...new Set(negativeVibes.flatMap(c => c.tags?.mood || []))
+      ];
+      prompt += `\nNOT in the mood for: ${avoidTags.join(", ")} — avoid suggestions that feel like these\n`;
     }
 
     // --- Seasonal context (automatic, soft guidance) ---
@@ -346,10 +361,22 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
     }
 
     if (vibes.length) {
-      prompt += `\nMood: ${vibes.map(v => `${v.emoji} ${v.name}`).join(", ")}\n`;
+      const moodTags = [...new Set(vibes.flatMap(c => c.tags?.mood || []))];
+      const flavorTags = [...new Set(vibes.flatMap(c => c.tags?.flavor || []))];
+      const styleTags = [...new Set(vibes.flatMap(c => c.tags?.style || []))];
+      prompt += `\nMood: ${moodTags.join(", ")}\n`;
+      if (flavorTags.length) {
+        prompt += `Flavor cues: ${flavorTags.join(", ")}\n`;
+      }
+      if (styleTags.length) {
+        prompt += `Style: ${styleTags.join(", ")}\n`;
+      }
     }
     if (negativeVibes.length) {
-      prompt += `Avoid: ${negativeVibes.map(v => v.name).join(", ")}\n`;
+      const avoidTags = [
+        ...new Set(negativeVibes.flatMap(c => c.tags?.mood || []))
+      ];
+      prompt += `Avoid: ${avoidTags.join(", ")}\n`;
     }
 
     prompt += `Season: ${season} — use seasonal ingredients where appropriate\n`;

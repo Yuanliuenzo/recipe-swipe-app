@@ -1,40 +1,39 @@
-import { VIBES, CONFIG } from "../core/Config.js";
+import { CONFIG } from "../core/Config.js";
 import { globalEventBus } from "../core/EventBus.js";
+import CARDS from "../data/cards.js";
 
 // Vibe management and shuffling logic
 export class VibeEngine {
   constructor() {
-    this.vibes = [...VIBES];
-    this.shuffledVibes = [];
-    this.usedVibes = new Set();
+    this.allCards = [...CARDS];
+    this.shuffledCards = [];
+    this.usedCards = new Set();
     this.currentRound = 0;
   }
 
-  // Remove vibes that don't make sense for the given session context
-  filterVibesByContext(vibes, context) {
+  // Remove cards that don't fit the session context (mealType, time, etc.)
+  filterCardsByContext(cards, context) {
     if (!context) {
-      return vibes;
+      return cards;
     }
-    const { mealType, servingSize, timeAvailable } = context;
+    const { mealType, timeAvailable } = context;
 
-    return vibes.filter(vibe => {
-      // Spicy/intense doesn't fit breakfast
-      if (vibe.name === "Bold & Intense" && mealType === "breakfast") {
-        return false;
-      }
-
-      // Impressing someone doesn't fit breakfast, snack, or a very quick cook
+    return cards.filter(card => {
+      // Skip cards whose mealTypes list is restrictive and doesn't include this meal
       if (
-        vibe.name === "Impress Someone" &&
-        (mealType === "breakfast" ||
-          mealType === "snack" ||
-          timeAvailable === "quick")
+        mealType &&
+        !card.mealTypes.includes(mealType) &&
+        !card.mealTypes.includes("all")
       ) {
         return false;
       }
 
-      // Sharing vibes don't fit solo cooking
-      if (vibe.name === "Sharing is Caring" && servingSize === "solo") {
+      // Exclude feast/feast-style cards for solo quick meals
+      if (
+        timeAvailable === "quick" &&
+        (card.tags.style.includes("feast") ||
+          card.tags.style.includes("slow-cooked"))
+      ) {
         return false;
       }
 
@@ -42,88 +41,98 @@ export class VibeEngine {
     });
   }
 
-  // Get next unique vibe
+  // Get next unique card and preload the one after it
   getNextVibe() {
-    // Check if we've reached max rounds
     if (this.currentRound >= CONFIG.MAX_VIBE_ROUNDS) {
       return null;
     }
 
-    // Reshuffle if we've used all vibes
-    if (this.shuffledVibes.length === 0) {
-      this.shuffleVibes();
+    if (this.shuffledCards.length === 0) {
+      this.shuffleCards();
     }
 
-    const vibe = this.shuffledVibes.shift();
-    if (vibe) {
-      this.usedVibes.add(vibe.name);
+    const card = this.shuffledCards.shift();
+    if (card) {
+      this.usedCards.add(card.id);
       this.currentRound++;
 
-      // Emit events
-      globalEventBus.emit("vibe:selected", { vibe, round: this.currentRound });
+      // Preload next card's image while user views current one
+      if (this.shuffledCards[0]?.image) {
+        const img = new Image();
+        img.src = this.shuffledCards[0].image;
+      }
+
+      globalEventBus.emit("vibe:selected", {
+        vibe: card,
+        round: this.currentRound
+      });
       globalEventBus.emit("round:changed", { round: this.currentRound });
     }
 
-    return vibe;
+    return card;
   }
 
-  // Shuffle vibes that haven't been used
-  shuffleVibes() {
-    this.shuffledVibes = this.vibes
-      .filter(vibe => !this.usedVibes.has(vibe.name))
+  // Eagerly preload the first N card images so there's no wait on the opening card
+  preloadFirst(n = 4) {
+    const toLoad = this.shuffledCards.slice(0, n);
+    toLoad.forEach(card => {
+      const img = new Image();
+      img.src = card.image;
+    });
+  }
+
+  // Shuffle cards that haven't been used yet
+  shuffleCards() {
+    this.shuffledCards = this.allCards
+      .filter(card => !this.usedCards.has(card.id))
       .sort(() => Math.random() - 0.5);
 
-    globalEventBus.emit("vibes:shuffled", { count: this.shuffledVibes.length });
+    globalEventBus.emit("vibes:shuffled", { count: this.shuffledCards.length });
   }
 
-  // Reset for new game, optionally filtering vibes by session context
+  // Reset for new round, optionally filtering by session context
   reset(sessionContext = null) {
-    this.shuffledVibes = [];
-    this.usedVibes.clear();
+    this.shuffledCards = [];
+    this.usedCards.clear();
     this.currentRound = 0;
-    this.vibes = this.filterVibesByContext([...VIBES], sessionContext);
+    this.allCards = this.filterCardsByContext([...CARDS], sessionContext);
 
     globalEventBus.emit("vibe:reset");
   }
 
-  // Check if max rounds reached
+  // ---------- unchanged public API ----------
+
   isMaxRoundsReached() {
     return this.currentRound >= CONFIG.MAX_VIBE_ROUNDS;
   }
 
-  // Get current round number
   getCurrentRound() {
     return this.currentRound;
   }
 
-  // Get max rounds
   getMaxRounds() {
     return CONFIG.MAX_VIBE_ROUNDS;
   }
 
-  // Get all vibes
   getAllVibes() {
-    return [...this.vibes];
+    return [...this.allCards];
   }
 
-  // Get vibes by name
   getVibeByName(name) {
-    return this.vibes.find(vibe => vibe.name === name);
+    // Cards no longer have a "name" — kept for backward-compat, returns by id
+    return this.allCards.find(c => c.id === name);
   }
 
-  // Add vibe to profile (for tracking selections)
-  addToProfile(vibe) {
-    globalEventBus.emit("vibe:added-to-profile", { vibe });
+  addToProfile(card) {
+    globalEventBus.emit("vibe:added-to-profile", { vibe: card });
   }
 
-  // Get remaining vibes count
   getRemainingCount() {
-    return this.shuffledVibes.length;
+    return this.shuffledCards.length;
   }
 
-  // Force reshuffle (for testing or manual reset)
   forceReshuffle() {
-    this.usedVibes.clear();
-    this.shuffleVibes();
+    this.usedCards.clear();
+    this.shuffleCards();
   }
 }

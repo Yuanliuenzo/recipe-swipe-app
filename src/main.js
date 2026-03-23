@@ -6,7 +6,8 @@
 import { initializeApplication } from "./core/Application.js";
 import { globalStateManager } from "./core/StateManager.js";
 import { globalEventBus } from "./core/EventBus.js";
-import { VIBES, CONFIG } from "./core/Config.js";
+import { CONFIG } from "./core/Config.js";
+import CARDS from "./data/cards.js";
 import { setupGlobalErrorBoundary } from "./components/ErrorBoundary.js";
 
 // Expose minimal, controlled global API
@@ -16,7 +17,7 @@ window.recipeApp = {
   eventBus: globalEventBus,
 
   // App configuration
-  vibes: VIBES,
+  vibes: CARDS,
   maxVibeRounds: CONFIG.MAX_VIBE_ROUNDS,
 
   // Getters for backward compatibility (read-only access)

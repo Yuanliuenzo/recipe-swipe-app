@@ -478,6 +478,9 @@ export class UnifiedApp {
     const sessionContext = globalStateManager.get("sessionContext");
     this.vibeEngine.reset(sessionContext);
 
+    // Preload first few card images immediately so they're ready
+    this.vibeEngine.preloadFirst(4);
+
     this.createFirstCard();
   }
 

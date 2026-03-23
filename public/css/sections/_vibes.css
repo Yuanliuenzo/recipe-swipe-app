@@ -62,46 +62,41 @@
   font-weight: 500;
 }
 
-/* Vibe Cards (Desktop) */
+/* Vibe Cards — full-bleed image with caption overlay */
 .vibe-card {
-  background-color: #f8f9fa;
-  border: 2px solid #dee2e6;
+  background-color: #111;
+  border: none;
   box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
 }
 
-.vibe-overlay {
-  display: flex !important;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  text-align: center;
-  padding: 18px 20px 22px;
+/* Gradient scrim for caption legibility */
+.vibe-card-gradient {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  height: 100%;
-  background: var(--gradient-overlay);
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05) 40%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
+  pointer-events: none;
 }
 
-.vibe-emoji {
-  font-size: 48px;
-  margin-bottom: var(--space-md);
-}
-
-.vibe-name {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: var(--space-sm);
-}
-
-.vibe-description {
-  font-size: 14px;
-  color: #ffffff;
-  line-height: 1.4;
-  max-width: 260px;
+/* Evocative caption — bottom-left, clean */
+.vibe-card-caption {
+  position: absolute;
+  bottom: 28px;
+  left: 24px;
+  right: 24px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  line-height: 1.3;
+  letter-spacing: 0.2px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 /* Mobile Vibe Cards */
@@ -119,54 +114,14 @@
   transition: none;
 }
 
-.mobile-vibe-card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(32, 28, 24, 0.1),
-    rgba(32, 28, 24, 0.72)
-  );
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 30px 20px;
-  text-align: center;
-}
+/* Shared gradient + caption sit inside .vibe-card-gradient / .vibe-card-caption
+   (same classes used for both mobile and desktop — see VibeCard.js) */
 
 /* Modern swipe card image behavior */
 .mobile-vibe-card[style*="background-image"] {
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
-}
-
-/* Optional premium polish - soft inner gradient for readability */
-.mobile-vibe-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 40%);
-  pointer-events: none;
-}
-
-.mobile-vibe-emoji {
-  font-size: 60px;
-  margin-bottom: var(--space-md);
-}
-
-.mobile-vibe-name {
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: var(--space-sm);
-}
-
-.mobile-vibe-description {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.4;
 }
 
 /* Swipe Indicators */
@@ -334,28 +289,15 @@
     height: min(70vh, 500px);
   }
 
-  .mobile-vibe-emoji {
-    font-size: 48px;
-  }
-
-  .mobile-vibe-name {
-    font-size: 24px;
-  }
-
-  .mobile-vibe-description {
-    font-size: 14px;
+  .vibe-card-caption {
+    font-size: 18px;
+    bottom: 22px;
+    left: 18px;
+    right: 18px;
   }
 }
 
 @media (max-height: 700px) {
-  .mobile-vibe-emoji {
-    font-size: 50px;
-  }
-
-  .mobile-vibe-name {
-    font-size: 24px;
-  }
-
   .mobile-vibe-card {
     inset: 8px;
   }
