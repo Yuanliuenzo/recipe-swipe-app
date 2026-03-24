@@ -18,10 +18,8 @@ class StateManager {
         mealType: null, // "breakfast" | "brunch" | "lunch" | "dinner" | "snack"
         servingSize: null, // "solo" | "couple" | "group"
         timeAvailable: null, // "quick" | "normal" | "leisurely"
-        dishFormat: null, // prompt string from DISH_FORMATS, or null
-        dishFormatLabel: null, // display label e.g. "Soup or stew"
-        dishFormat2: null, // optional second dish (side/accompaniment) prompt
-        dishFormatLabel2: null // display label for second dish
+        dishFormat: null, // culinary direction prompt, or null
+        dishFormatLabel: null // display label e.g. "Mediterranean"
       },
 
       // Game state

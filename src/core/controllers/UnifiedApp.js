@@ -380,9 +380,7 @@ export class UnifiedApp {
       servingSize: null,
       timeAvailable: null,
       dishFormat: null,
-      dishFormatLabel: null,
-      dishFormat2: null,
-      dishFormatLabel2: null
+      dishFormatLabel: null
     };
     const body = container.querySelector("#questionnaire-body");
     const submitBtn = container.querySelector(".q-submit-btn");
@@ -413,8 +411,6 @@ export class UnifiedApp {
         answers.timeAvailable = null;
         answers.dishFormat = null;
         answers.dishFormatLabel = null;
-        answers.dishFormat2 = null;
-        answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
         this._revealQ2(body, answers, submitBtn, value);
       } else if (field === "servingSize") {
@@ -426,8 +422,6 @@ export class UnifiedApp {
         answers.timeAvailable = null;
         answers.dishFormat = null;
         answers.dishFormatLabel = null;
-        answers.dishFormat2 = null;
-        answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
         this._revealQ3orIngredients(body, answers, submitBtn);
       } else if (field === "timeAvailable") {
@@ -436,8 +430,6 @@ export class UnifiedApp {
           .forEach(el => el.remove());
         answers.dishFormat = null;
         answers.dishFormatLabel = null;
-        answers.dishFormat2 = null;
-        answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
         this._revealIngredients(body, answers, submitBtn);
       }
@@ -450,9 +442,7 @@ export class UnifiedApp {
           servingSize: answers.servingSize,
           timeAvailable: answers.timeAvailable,
           dishFormat: answers.dishFormat,
-          dishFormatLabel: answers.dishFormatLabel,
-          dishFormat2: answers.dishFormat2 || null,
-          dishFormatLabel2: answers.dishFormatLabel2 || null
+          dishFormatLabel: answers.dishFormatLabel
         }
       });
 
@@ -557,8 +547,6 @@ export class UnifiedApp {
     surpriseLink.addEventListener("click", () => {
       answers.dishFormat = null;
       answers.dishFormatLabel = null;
-      answers.dishFormat2 = null;
-      answers.dishFormatLabel2 = null;
       submitBtn.disabled = false;
       submitBtn.click();
     });
@@ -610,12 +598,10 @@ export class UnifiedApp {
     step.innerHTML = `
       <label class="q-label">What kind of direction?</label>
       <div class="q-dish-grid">${tilesHtml}</div>
-      <p class="q-dish-side-hint">＋ Tap a second tile to add a side</p>
     `;
     this._scrollToStep(body);
 
     const grid = step.querySelector(".q-dish-grid");
-    const hint = step.querySelector(".q-dish-side-hint");
 
     grid.addEventListener("click", e => {
       const tile = e.target.closest(".q-dish-tile");
@@ -623,44 +609,15 @@ export class UnifiedApp {
         return;
       }
 
-      const selectedCount = grid.querySelectorAll(
-        ".q-dish-tile.selected"
-      ).length;
-      if (selectedCount >= 2) {
-        return;
-      }
+      // Deselect previous tile
+      grid
+        .querySelectorAll(".q-dish-tile.selected")
+        .forEach(t => t.classList.remove("selected"));
+      tile.classList.add("selected");
 
-      const isSurprise = tile.dataset.label === "Surprise me";
-
-      if (selectedCount === 0) {
-        tile.classList.add("selected", "q-dish-main");
-        const badge = document.createElement("span");
-        badge.className = "q-dish-badge";
-        badge.textContent = "Main";
-        tile.appendChild(badge);
-
-        answers.dishFormat = tile.dataset.prompt || null;
-        answers.dishFormatLabel = tile.dataset.label;
-        submitBtn.disabled = false;
-
-        if (!isSurprise) {
-          hint.classList.add("visible");
-        }
-      } else {
-        if (tile.classList.contains("selected")) {
-          return;
-        }
-        hint.classList.remove("visible");
-
-        tile.classList.add("selected", "q-dish-side");
-        const badge = document.createElement("span");
-        badge.className = "q-dish-badge";
-        badge.textContent = "Side";
-        tile.appendChild(badge);
-
-        answers.dishFormat2 = tile.dataset.prompt || null;
-        answers.dishFormatLabel2 = tile.dataset.label;
-      }
+      answers.dishFormat = tile.dataset.prompt || null;
+      answers.dishFormatLabel = tile.dataset.label;
+      submitBtn.disabled = false;
     });
   }
 

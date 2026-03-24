@@ -500,7 +500,7 @@
 
 .suggestion-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   margin-bottom: 20px;
 }
@@ -547,7 +547,6 @@
   color: var(--color-primary);
   margin: 0;
   line-height: 1.3;
-  flex: 1;
   font-weight: 600;
   transition: color 0.3s ease;
 }
@@ -556,51 +555,32 @@
   color: var(--color-accent);
 }
 
-/* ─── Harmonized meal set card ────────────────────────────────────────────── */
-.recipe-suggestion-card--harmonized .suggestion-header {
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.suggestion-meal-set {
+/* ─── Multi-component suggestion cards ────────────────────────────────────── */
+.suggestion-title-group {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
-.suggestion-meal-component {
+.suggestion-component-line {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-light);
 }
 
-.suggestion-meal-tag {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.suggestion-meal-main .suggestion-meal-tag {
+.suggestion-component-plus {
   color: var(--color-accent);
-}
-
-.suggestion-meal-side .suggestion-meal-tag {
-  color: var(--color-primary);
-}
-
-.suggestion-meal-component .suggestion-title {
-  font-size: 17px;
-}
-
-.suggestion-meal-divider {
-  font-size: 14px;
-  color: var(--color-text-muted);
-  font-weight: 600;
-  padding-left: 2px;
+  font-weight: 700;
+  font-size: 15px;
   line-height: 1;
+  flex-shrink: 0;
+}
+
+.suggestion-component-name {
+  font-style: italic;
 }
 
 .suggestion-description {

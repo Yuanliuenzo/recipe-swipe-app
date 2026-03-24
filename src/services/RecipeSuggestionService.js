@@ -84,28 +84,20 @@ export class RecipeSuggestionService {
           ];
         }
 
-        // Map suggestions to internal format — handles both single and harmonized shapes
+        // Map suggestions to internal format
         const suggestions = (
           parsedSuggestions || this.fallbackSuggestions()
         ).map((s, idx) => {
-          if (s.mainTitle) {
-            // Harmonized meal set
-            return {
-              id: this.generateId(),
-              index: idx + 1,
-              isHarmonized: true,
-              mainTitle: s.mainTitle,
-              sideTitle: s.sideTitle || "",
-              title: `${s.mainTitle} + ${s.sideTitle || ""}`,
-              description: s.description || "A harmonized meal pairing",
-              fullRecipe: null
-            };
-          }
+          // Normalize to components array — LLM may return components[] or a legacy title string
+          const components =
+            Array.isArray(s.components) && s.components.length > 0
+              ? s.components
+              : [s.title || `Recipe ${idx + 1}`];
           return {
             id: this.generateId(),
             index: idx + 1,
-            isHarmonized: false,
-            title: s.title || `Recipe ${idx + 1}`,
+            title: components[0], // main dish name for display
+            components, // full array drives card rendering + recipe generation
             description:
               s.description || "Personalized recipe based on your preferences",
             fullRecipe: null
@@ -207,11 +199,7 @@ export class RecipeSuggestionService {
 
   async _fetchAndCacheRecipe(suggestion, onToken = null) {
     try {
-      // Pass structured title object for harmonized suggestions
-      const titleArg = suggestion.isHarmonized
-        ? { mainTitle: suggestion.mainTitle, sideTitle: suggestion.sideTitle }
-        : suggestion.title;
-      const prompt = this.buildFullRecipePrompt(titleArg);
+      const prompt = this.buildFullRecipePrompt(suggestion);
 
       // Use streaming — tokens appear in real time, full text assembled as they arrive
       const recipeText = await apiService.streamRecipe(prompt, onToken);
@@ -346,10 +334,6 @@ Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions
     const sessionContext = this.stateManager.get("sessionContext") || {};
     const ingredients = this.stateManager.get("ingredientsAtHome") || "";
     const season = this._getSeason();
-    const isHarmonized = Boolean(
-      sessionContext.dishFormat && sessionContext.dishFormat2
-    );
-
     const mealLabels = {
       breakfast: "Breakfast",
       brunch: "Brunch",
@@ -415,58 +399,38 @@ Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions
       ? `\nIngredients available at home: ${ingredients}\nUse whichever of these make a natural fit for the dish — do not force all of them in\n`
       : "";
 
-    let prompt;
+    let prompt =
+      "Suggest exactly 5 recipe ideas that match the following user context:\n\n";
+    prompt += contextBlock;
+    if (sessionContext.dishFormat) {
+      prompt += `Culinary direction: ${sessionContext.dishFormat} — all 5 suggestions should feel like they belong to this culinary tradition or mood. Vary the dish format freely.\n`;
+    }
+    prompt += vibeBlock;
+    prompt += seasonLine;
+    prompt += ingredientsBlock;
+    prompt += `
+For each recipe, think about what makes a complete, satisfying meal:
+- Some dishes are naturally standalone (a hearty soup, a grain bowl, shakshuka) — list only one component.
+- Some genuinely benefit from a side (pasta + salad, grilled fish + roasted veg) — list two.
+- Some are a full composed meal (tagine + couscous + yogurt dip) — list all natural components, max 3.
+Only add components when they genuinely make the meal better.
 
-    if (isHarmonized) {
-      prompt = `Suggest exactly 3 harmonized meal combinations, each pairing a ${sessionContext.dishFormat} with a ${sessionContext.dishFormat2} that complement each other.\n\n`;
-      prompt += contextBlock;
-      prompt += vibeBlock;
-      prompt += seasonLine;
-      prompt += ingredientsBlock;
-      prompt += `
-Each combination should feel like a cohesive meal — the two dishes should share a flavour thread, contrast textures, or balance richness and freshness.
-
-Please respond with exactly 3 suggestions in this JSON format:
-{
-  "suggestions": [
-    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" },
-    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" },
-    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" }
-  ]
-}
-
-Keep dish names specific and appetising. The description explains the harmony, not just what each dish is.
-`;
-    } else {
-      prompt =
-        "Suggest exactly 5 recipe titles that match the following user context:\n\n";
-      prompt += contextBlock;
-      if (sessionContext.dishFormat) {
-        prompt += `Culinary direction: ${sessionContext.dishFormat} — all 5 suggestions should feel like they belong to this culinary tradition or mood. Vary the dish format freely — different techniques, styles, and approaches are encouraged.\n`;
-      }
-      prompt += vibeBlock;
-      prompt += seasonLine;
-      prompt += ingredientsBlock;
-      prompt += `
 Please respond with exactly 5 suggestions in this JSON format:
 {
   "suggestions": [
-    { "title": "Recipe Title 1", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 2", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 3", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 4", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 5", "description": "Brief explanation (max 40 words)" }
+    { "components": ["Shakshuka"], "description": "Brief explanation (max 40 words)" },
+    { "components": ["Tagliatelle al Ragù", "Rocket & parmesan salad"], "description": "Brief explanation (max 40 words)" },
+    { "components": ["Moroccan Chicken Tagine", "Saffron Couscous", "Harissa Yogurt"], "description": "Brief explanation (max 40 words)" }
   ]
 }
 
-Keep titles appealing and accurate. Descriptions should hint at why each matches the mood.
+components[0] is always the main dish. Additional entries are natural accompaniments (max 3 total). Keep all names specific and appetising. Descriptions hint at why each matches the mood.
 `;
-    }
 
     return prompt;
   }
 
-  buildFullRecipePrompt(selectedTitle) {
+  buildFullRecipePrompt(suggestion) {
     const vibes = this.stateManager.get("vibeProfile") || [];
     const negativeVibes = this.stateManager.get("negativeVibes") || [];
     const preferences = this.stateManager.get("preferences") || {};
@@ -485,28 +449,36 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       leisurely: "an hour or more"
     };
 
-    const isHarmonized = Boolean(
-      sessionContext.dishFormat && sessionContext.dishFormat2
-    );
+    // Normalize to components array (suggestion object or legacy string)
+    const components =
+      suggestion &&
+      Array.isArray(suggestion.components) &&
+      suggestion.components.length > 0
+        ? suggestion.components
+        : [
+            typeof suggestion === "string"
+              ? suggestion
+              : suggestion?.title || "Recipe"
+          ];
 
-    // For harmonized mode, selectedTitle is "mainTitle || sideTitle" combined string;
-    // we extract both from the suggestion's stored titles (passed in as array or string).
-    // selectedTitle is either a plain string (single) or "[main] + [side]" (harmonized).
+    const isMultiComponent = components.length > 1;
+    const componentLabels = ["Main dish", "Side dish", "Accompaniment"];
+
+    // Opening line
     let prompt;
-
-    if (
-      isHarmonized &&
-      typeof selectedTitle === "object" &&
-      selectedTitle.mainTitle
-    ) {
-      // Harmonized: generate both recipes in one response
-      prompt = `Generate two complete complementary recipes that form a harmonized meal:\n`;
-      prompt += `Main: "${selectedTitle.mainTitle}"\n`;
-      prompt += `Side: "${selectedTitle.sideTitle}"\n\n`;
+    if (isMultiComponent) {
+      const list = components
+        .map(
+          (name, i) =>
+            `${componentLabels[i] || `Component ${i + 1}`}: "${name}"`
+        )
+        .join("\n");
+      prompt = `Generate complete recipes for the following meal:\n${list}\n\n`;
     } else {
-      prompt = `Generate a complete recipe for "${selectedTitle}"\n\n`;
+      prompt = `Generate a complete recipe for "${components[0]}"\n\n`;
     }
 
+    // Context
     if (sessionContext.servingSize) {
       prompt += `Servings: ${servingLabels[sessionContext.servingSize]}\n`;
     }
@@ -518,9 +490,6 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
     }
     if (preferences.budget === "Yes") {
       prompt += `Budget: affordable ingredients\n`;
-    }
-    if (!isHarmonized && sessionContext.dishFormat) {
-      prompt += `Dish format: ${sessionContext.dishFormat} — the recipe MUST be this style of dish\n`;
     }
 
     if (vibes.length) {
@@ -549,37 +518,26 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       prompt += `(Use whichever make a natural fit — no need to force all of them in)\n`;
     }
 
-    if (
-      isHarmonized &&
-      typeof selectedTitle === "object" &&
-      selectedTitle.mainTitle
-    ) {
+    // Output structure
+    if (isMultiComponent) {
+      const sectionTemplate = (name, brief) => `
+${name}
+===
+
+Ingredients:
+• [ingredient 1]
+• [ingredient 2]
+
+Instructions:
+1. [step 1]
+2. [step 2]
+${brief ? "\n(Keep this section brief — simple preparation)" : ""}`;
+      const sections = components
+        .map((name, i) => sectionTemplate(name, i > 0))
+        .join("\n\n---\n");
       prompt += `
-Structure exactly like this (two separate recipes, separated by ---):
-
-[Main Recipe Name]
-===
-
-Ingredients:
-• [ingredient 1]
-• [ingredient 2]
-
-Instructions:
-1. [step 1]
-2. [step 2]
-
----
-
-[Side Recipe Name]
-===
-
-Ingredients:
-• [ingredient 1]
-• [ingredient 2]
-
-Instructions:
-1. [step 1]
-2. [step 2]
+Structure exactly like this (one section per component, separated by ---):
+${sections}
 
 Do not omit headers. Keep each recipe concise but complete.
 `;
@@ -587,7 +545,7 @@ Do not omit headers. Keep each recipe concise but complete.
       prompt += `
 Structure exactly like this:
 
-Recipe Name
+${components[0]}
 ===
 
 Ingredients:
@@ -630,11 +588,11 @@ Do not omit headers. Keep concise but complete.
   fallbackSuggestions() {
     return [
       {
-        title: "Fresh Garden Salad",
+        components: ["Fresh Garden Salad"],
         description: "Light, healthy salad with seasonal vegetables"
       },
       {
-        title: "Comforting Vegetable Soup",
+        components: ["Comforting Vegetable Soup"],
         description: "Warm, hearty soup for cozy nights"
       }
     ];
@@ -647,46 +605,34 @@ Do not omit headers. Keep concise but complete.
   }
 
   createSuggestionCard(suggestion) {
-    if (suggestion.isHarmonized) {
-      return `
-        <div class="recipe-suggestion-card recipe-suggestion-card--harmonized" data-suggestion-id="${suggestion.id}">
-          <div class="suggestion-header">
-            <div class="suggestion-number">${suggestion.index}</div>
-            <div class="suggestion-meal-set">
-              <div class="suggestion-meal-component suggestion-meal-main">
-                <span class="suggestion-meal-tag">Main</span>
-                <h3 class="suggestion-title">${suggestion.mainTitle}</h3>
-              </div>
-              <div class="suggestion-meal-divider">＋</div>
-              <div class="suggestion-meal-component suggestion-meal-side">
-                <span class="suggestion-meal-tag">Side</span>
-                <h3 class="suggestion-title">${suggestion.sideTitle}</h3>
-              </div>
-            </div>
-          </div>
-          <div class="suggestion-description">
-            <p>${suggestion.description}</p>
-          </div>
-          <div class="suggestion-actions">
-            <button class="japandi-btn japandi-btn-primary select-recipe-btn" data-suggestion-id="${suggestion.id}">
-              Cook This Meal
-            </button>
-          </div>
-        </div>
-      `;
-    }
+    const components = suggestion.components || [suggestion.title];
+    const accompaniments = components.slice(1);
+    const accompHtml = accompaniments
+      .map(
+        name => `<div class="suggestion-component-line">
+          <span class="suggestion-component-plus">+</span>
+          <span class="suggestion-component-name">${name}</span>
+        </div>`
+      )
+      .join("");
+    const btnLabel =
+      accompaniments.length > 0 ? "Cook This Meal" : "Choose This Recipe";
+
     return `
       <div class="recipe-suggestion-card" data-suggestion-id="${suggestion.id}">
         <div class="suggestion-header">
           <div class="suggestion-number">${suggestion.index}</div>
-          <h3 class="suggestion-title">${suggestion.title}</h3>
+          <div class="suggestion-title-group">
+            <h3 class="suggestion-title">${components[0]}</h3>
+            ${accompHtml}
+          </div>
         </div>
         <div class="suggestion-description">
           <p>${suggestion.description}</p>
         </div>
         <div class="suggestion-actions">
           <button class="japandi-btn japandi-btn-primary select-recipe-btn" data-suggestion-id="${suggestion.id}">
-            Choose This Recipe
+            ${btnLabel}
           </button>
         </div>
       </div>
@@ -694,15 +640,11 @@ Do not omit headers. Keep concise but complete.
   }
 
   createSuggestionsGrid(suggestions) {
-    const isHarmonized = suggestions.some(s => s.isHarmonized);
-    const headerText = isHarmonized
-      ? "Here are some harmonized meal ideas for you. Pick one to get both recipes!"
-      : "Based on your preferences, here are 5 recipe suggestions. Click one to see the full recipe!";
     return `
       <div class="recipe-suggestions-container">
         <div class="suggestions-header">
-          <h2>🍳 ${isHarmonized ? "Meal Ideas For You" : "Recipe Ideas For You"}</h2>
-          <p>${headerText}</p>
+          <h2>🍳 Recipe Ideas For You</h2>
+          <p>Based on your preferences, here are 5 suggestions. Click one to see the full recipe!</p>
         </div>
         <div class="suggestions-grid">
           ${suggestions.map(s => this.createSuggestionCard(s)).join("")}

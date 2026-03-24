@@ -310,60 +310,6 @@
   }
 }
 
-/* Main / Side badges on selected tiles */
-.q-dish-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: var(--color-accent);
-  color: #fff;
-  border-radius: var(--radius-full);
-  padding: 2px 6px;
-  line-height: 1.4;
-  pointer-events: none;
-}
-
-.q-dish-tile {
-  position: relative; /* needed for badge positioning */
-}
-
-.q-dish-tile.q-dish-main {
-  border-color: var(--color-accent);
-  background: rgba(184, 115, 51, 0.08);
-}
-
-.q-dish-tile.q-dish-side {
-  border-color: var(--color-primary);
-  background: rgba(106, 78, 66, 0.08);
-}
-
-.q-dish-tile.q-dish-side .q-dish-badge {
-  background: var(--color-primary);
-}
-
-/* Hint that fades in after first tile selection */
-.q-dish-side-hint {
-  font-size: 12px;
-  color: var(--color-text-light);
-  margin: 4px 0 0;
-  font-style: italic;
-  opacity: 0;
-  transform: translateY(4px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-  pointer-events: none;
-}
-
-.q-dish-side-hint.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* Tablet & desktop: slightly more padding */
 @media (min-width: 768px) {
   .questionnaire-card {
