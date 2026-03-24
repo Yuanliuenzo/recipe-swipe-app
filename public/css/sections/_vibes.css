@@ -62,7 +62,7 @@
   font-weight: 500;
 }
 
-/* Vibe Cards — full-bleed image with caption overlay */
+/* Vibe Cards — full-bleed image with question + swipe direction labels */
 .vibe-card {
   background-color: #111;
   border: none;
@@ -71,32 +71,83 @@
   overflow: hidden;
 }
 
-/* Gradient scrim for caption legibility */
+/* Dual-gradient scrim: dark at top for question, dark at bottom for labels */
 .vibe-card-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.05) 40%,
-    rgba(0, 0, 0, 0.65) 100%
-  );
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, transparent 38%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 45%);
   pointer-events: none;
 }
 
-/* Evocative caption — bottom-left, clean */
-.vibe-card-caption {
+/* Question — top of card, prominent */
+.vibe-card-question {
   position: absolute;
-  bottom: 28px;
-  left: 24px;
-  right: 24px;
+  top: 26px;
+  left: 22px;
+  right: 22px;
   color: #fff;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 19px;
+  font-weight: 700;
   font-family: var(--font-heading);
   line-height: 1.3;
-  letter-spacing: 0.2px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   pointer-events: none;
+  z-index: 2;
+}
+
+/* Option labels row — bottom of card */
+.vibe-card-options {
+  position: absolute;
+  bottom: 26px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 22px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vibe-card-option {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+  max-width: 44%;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.vibe-card-option--left {
+  text-align: left;
+}
+.vibe-card-option--right {
+  text-align: right;
+}
+
+/* Skip-to-recipes nudge shown below the card stack */
+.vibe-skip-btn {
+  display: block;
+  margin: 18px auto 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s;
+  padding: 8px 16px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vibe-skip-btn:hover {
+  opacity: 1;
 }
 
 /* Mobile Vibe Cards */

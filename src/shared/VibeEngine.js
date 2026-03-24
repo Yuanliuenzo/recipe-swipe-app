@@ -11,32 +11,28 @@ export class VibeEngine {
     this.currentRound = 0;
   }
 
-  // Remove cards that don't fit the session context (mealType, time, etc.)
+  // Skip axis cards that the questionnaire already answered.
   filterCardsByContext(cards, context) {
     if (!context) {
       return cards;
     }
-    const { mealType, timeAvailable } = context;
-
     return cards.filter(card => {
-      // Skip cards whose mealTypes list is restrictive and doesn't include this meal
+      // Dish format chosen → vessel axis is redundant
       if (
-        mealType &&
-        !card.mealTypes.includes(mealType) &&
-        !card.mealTypes.includes("all")
+        card.id === "axis-vessel" &&
+        context.dishFormat !== null &&
+        context.dishFormat !== undefined
       ) {
         return false;
       }
-
-      // Exclude feast/feast-style cards for solo quick meals
-      if (
-        timeAvailable === "quick" &&
-        (card.tags.style.includes("feast") ||
-          card.tags.style.includes("slow-cooked"))
-      ) {
+      // Serving size answered → social axis is redundant
+      if (card.id === "axis-social" && context.servingSize) {
         return false;
       }
-
+      // Time available answered → effort axis is redundant
+      if (card.id === "axis-effort" && context.timeAvailable) {
+        return false;
+      }
       return true;
     });
   }

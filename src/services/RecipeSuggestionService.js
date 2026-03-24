@@ -83,17 +83,33 @@ export class RecipeSuggestionService {
           ];
         }
 
-        // Map suggestions to internal format
+        // Map suggestions to internal format — handles both single and harmonized shapes
         const suggestions = (
           parsedSuggestions || this.fallbackSuggestions()
-        ).map((s, idx) => ({
-          id: this.generateId(),
-          index: idx + 1,
-          title: s.title || `Recipe ${idx + 1}`,
-          description:
-            s.description || "Personalized recipe based on your preferences",
-          fullRecipe: s.fullRecipe || null
-        }));
+        ).map((s, idx) => {
+          if (s.mainTitle) {
+            // Harmonized meal set
+            return {
+              id: this.generateId(),
+              index: idx + 1,
+              isHarmonized: true,
+              mainTitle: s.mainTitle,
+              sideTitle: s.sideTitle || "",
+              title: `${s.mainTitle} + ${s.sideTitle || ""}`,
+              description: s.description || "A harmonized meal pairing",
+              fullRecipe: null
+            };
+          }
+          return {
+            id: this.generateId(),
+            index: idx + 1,
+            isHarmonized: false,
+            title: s.title || `Recipe ${idx + 1}`,
+            description:
+              s.description || "Personalized recipe based on your preferences",
+            fullRecipe: null
+          };
+        });
 
         // Store in state manager
         this.stateManager.setState({ currentSuggestions: suggestions });
@@ -190,7 +206,11 @@ export class RecipeSuggestionService {
 
   async _fetchAndCacheRecipe(suggestion, onToken = null) {
     try {
-      const prompt = this.buildFullRecipePrompt(suggestion.title);
+      // Pass structured title object for harmonized suggestions
+      const titleArg = suggestion.isHarmonized
+        ? { mainTitle: suggestion.mainTitle, sideTitle: suggestion.sideTitle }
+        : suggestion.title;
+      const prompt = this.buildFullRecipePrompt(titleArg);
 
       // Use streaming — tokens appear in real time, full text assembled as they arrive
       const recipeText = await apiService.streamRecipe(prompt, onToken);
@@ -236,6 +256,9 @@ export class RecipeSuggestionService {
     const sessionContext = this.stateManager.get("sessionContext") || {};
     const ingredients = this.stateManager.get("ingredientsAtHome") || "";
     const season = this._getSeason();
+    const isHarmonized = Boolean(
+      sessionContext.dishFormat && sessionContext.dishFormat2
+    );
 
     const mealLabels = {
       breakfast: "Breakfast",
@@ -255,60 +278,86 @@ export class RecipeSuggestionService {
       leisurely: "an hour or more"
     };
 
-    let prompt =
-      "Suggest exactly 5 recipe titles that match the following user context:\n\n";
-
-    // --- Factual constraints (hard requirements) ---
+    // Shared context block
+    let contextBlock = "";
     if (sessionContext.mealType) {
-      prompt += `Meal type: ${mealLabels[sessionContext.mealType]} — all 5 suggestions MUST be appropriate for this meal\n`;
+      contextBlock += `Meal type: ${mealLabels[sessionContext.mealType]}\n`;
     }
     if (sessionContext.servingSize) {
-      prompt += `Serving size: ${servingLabels[sessionContext.servingSize]}\n`;
+      contextBlock += `Serving size: ${servingLabels[sessionContext.servingSize]}\n`;
     }
     if (sessionContext.timeAvailable) {
-      prompt += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
+      contextBlock += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
     }
     if (preferences.diet && preferences.diet !== "None") {
-      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+      contextBlock += `Dietary restriction: ${preferences.diet} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
-      prompt += `Budget: affordable, everyday ingredients preferred\n`;
+      contextBlock += `Budget: affordable, everyday ingredients preferred\n`;
     }
 
-    // --- Emotional vibes (inferred from image card tags) ---
+    // Shared vibe block
+    let vibeBlock = "";
     if (vibes.length) {
       const moodTags = [...new Set(vibes.flatMap(c => c.tags?.mood || []))];
       const flavorTags = [...new Set(vibes.flatMap(c => c.tags?.flavor || []))];
       const styleTags = [...new Set(vibes.flatMap(c => c.tags?.style || []))];
-
-      prompt += `\nMood inferred from the user's image selections:\n`;
+      vibeBlock += `\nMood inferred from the user's image selections:\n`;
       if (moodTags.length) {
-        prompt += `  • Feeling: ${moodTags.join(", ")}\n`;
+        vibeBlock += `  • Feeling: ${moodTags.join(", ")}\n`;
       }
       if (flavorTags.length) {
-        prompt += `  • Craving: ${flavorTags.join(", ")}\n`;
+        vibeBlock += `  • Craving: ${flavorTags.join(", ")}\n`;
       }
       if (styleTags.length) {
-        prompt += `  • Style: ${styleTags.join(", ")}\n`;
+        vibeBlock += `  • Style: ${styleTags.join(", ")}\n`;
       }
     }
     if (negativeVibes.length) {
       const avoidTags = [
         ...new Set(negativeVibes.flatMap(c => c.tags?.mood || []))
       ];
-      prompt += `\nNOT in the mood for: ${avoidTags.join(", ")} — avoid suggestions that feel like these\n`;
+      vibeBlock += `\nNOT in the mood for: ${avoidTags.join(", ")} — avoid suggestions that feel like these\n`;
     }
 
-    // --- Seasonal context (automatic, soft guidance) ---
-    prompt += `\nCurrent season: ${season} in the northern hemisphere — lean toward seasonal ingredients where it genuinely improves the dish\n`;
+    const seasonLine = `\nCurrent season: ${season} in the northern hemisphere — lean toward seasonal ingredients where it genuinely improves the dish\n`;
+    const ingredientsBlock = ingredients.trim()
+      ? `\nIngredients available at home: ${ingredients}\nUse whichever of these make a natural fit for the dish — do not force all of them in\n`
+      : "";
 
-    // --- Ingredients (soft preference) ---
-    if (ingredients.trim()) {
-      prompt += `\nIngredients available at home: ${ingredients}\n`;
-      prompt += `Use whichever of these make a natural fit for the dish — do not force all of them in\n`;
-    }
+    let prompt;
 
-    prompt += `
+    if (isHarmonized) {
+      prompt = `Suggest exactly 3 harmonized meal combinations, each pairing a ${sessionContext.dishFormat} with a ${sessionContext.dishFormat2} that complement each other.\n\n`;
+      prompt += contextBlock;
+      prompt += vibeBlock;
+      prompt += seasonLine;
+      prompt += ingredientsBlock;
+      prompt += `
+Each combination should feel like a cohesive meal — the two dishes should share a flavour thread, contrast textures, or balance richness and freshness.
+
+Please respond with exactly 3 suggestions in this JSON format:
+{
+  "suggestions": [
+    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" },
+    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" },
+    { "mainTitle": "Main dish name", "sideTitle": "Side dish name", "description": "One sentence on why they work together (max 35 words)" }
+  ]
+}
+
+Keep dish names specific and appetising. The description explains the harmony, not just what each dish is.
+`;
+    } else {
+      prompt =
+        "Suggest exactly 5 recipe titles that match the following user context:\n\n";
+      prompt += contextBlock;
+      if (sessionContext.dishFormat) {
+        prompt += `Dish format: ${sessionContext.dishFormat} — all 5 suggestions MUST be this specific style of dish\n`;
+      }
+      prompt += vibeBlock;
+      prompt += seasonLine;
+      prompt += ingredientsBlock;
+      prompt += `
 Please respond with exactly 5 suggestions in this JSON format:
 {
   "suggestions": [
@@ -322,6 +371,7 @@ Please respond with exactly 5 suggestions in this JSON format:
 
 Keep titles appealing and accurate. Descriptions should hint at why each matches the mood.
 `;
+    }
 
     return prompt;
   }
@@ -345,7 +395,27 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       leisurely: "an hour or more"
     };
 
-    let prompt = `Generate a complete recipe for "${selectedTitle}"\n\n`;
+    const isHarmonized = Boolean(
+      sessionContext.dishFormat && sessionContext.dishFormat2
+    );
+
+    // For harmonized mode, selectedTitle is "mainTitle || sideTitle" combined string;
+    // we extract both from the suggestion's stored titles (passed in as array or string).
+    // selectedTitle is either a plain string (single) or "[main] + [side]" (harmonized).
+    let prompt;
+
+    if (
+      isHarmonized &&
+      typeof selectedTitle === "object" &&
+      selectedTitle.mainTitle
+    ) {
+      // Harmonized: generate both recipes in one response
+      prompt = `Generate two complete complementary recipes that form a harmonized meal:\n`;
+      prompt += `Main: "${selectedTitle.mainTitle}"\n`;
+      prompt += `Side: "${selectedTitle.sideTitle}"\n\n`;
+    } else {
+      prompt = `Generate a complete recipe for "${selectedTitle}"\n\n`;
+    }
 
     if (sessionContext.servingSize) {
       prompt += `Servings: ${servingLabels[sessionContext.servingSize]}\n`;
@@ -358,6 +428,9 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
     }
     if (preferences.budget === "Yes") {
       prompt += `Budget: affordable ingredients\n`;
+    }
+    if (!isHarmonized && sessionContext.dishFormat) {
+      prompt += `Dish format: ${sessionContext.dishFormat} — the recipe MUST be this style of dish\n`;
     }
 
     if (vibes.length) {
@@ -386,7 +459,42 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       prompt += `(Use whichever make a natural fit — no need to force all of them in)\n`;
     }
 
-    prompt += `
+    if (
+      isHarmonized &&
+      typeof selectedTitle === "object" &&
+      selectedTitle.mainTitle
+    ) {
+      prompt += `
+Structure exactly like this (two separate recipes, separated by ---):
+
+[Main Recipe Name]
+===
+
+Ingredients:
+• [ingredient 1]
+• [ingredient 2]
+
+Instructions:
+1. [step 1]
+2. [step 2]
+
+---
+
+[Side Recipe Name]
+===
+
+Ingredients:
+• [ingredient 1]
+• [ingredient 2]
+
+Instructions:
+1. [step 1]
+2. [step 2]
+
+Do not omit headers. Keep each recipe concise but complete.
+`;
+    } else {
+      prompt += `
 Structure exactly like this:
 
 Recipe Name
@@ -402,6 +510,7 @@ Instructions:
 
 Do not omit headers. Keep concise but complete.
 `;
+    }
 
     return prompt;
   }
@@ -448,6 +557,34 @@ Do not omit headers. Keep concise but complete.
   }
 
   createSuggestionCard(suggestion) {
+    if (suggestion.isHarmonized) {
+      return `
+        <div class="recipe-suggestion-card recipe-suggestion-card--harmonized" data-suggestion-id="${suggestion.id}">
+          <div class="suggestion-header">
+            <div class="suggestion-number">${suggestion.index}</div>
+            <div class="suggestion-meal-set">
+              <div class="suggestion-meal-component suggestion-meal-main">
+                <span class="suggestion-meal-tag">Main</span>
+                <h3 class="suggestion-title">${suggestion.mainTitle}</h3>
+              </div>
+              <div class="suggestion-meal-divider">＋</div>
+              <div class="suggestion-meal-component suggestion-meal-side">
+                <span class="suggestion-meal-tag">Side</span>
+                <h3 class="suggestion-title">${suggestion.sideTitle}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="suggestion-description">
+            <p>${suggestion.description}</p>
+          </div>
+          <div class="suggestion-actions">
+            <button class="japandi-btn japandi-btn-primary select-recipe-btn" data-suggestion-id="${suggestion.id}">
+              Cook This Meal
+            </button>
+          </div>
+        </div>
+      `;
+    }
     return `
       <div class="recipe-suggestion-card" data-suggestion-id="${suggestion.id}">
         <div class="suggestion-header">
@@ -467,11 +604,15 @@ Do not omit headers. Keep concise but complete.
   }
 
   createSuggestionsGrid(suggestions) {
+    const isHarmonized = suggestions.some(s => s.isHarmonized);
+    const headerText = isHarmonized
+      ? "Here are some harmonized meal ideas for you. Pick one to get both recipes!"
+      : "Based on your preferences, here are 5 recipe suggestions. Click one to see the full recipe!";
     return `
       <div class="recipe-suggestions-container">
         <div class="suggestions-header">
-          <h2>🍳 Recipe Ideas For You</h2>
-          <p>Based on your preferences, here are 5 recipe suggestions. Click one to see the full recipe!</p>
+          <h2>🍳 ${isHarmonized ? "Meal Ideas For You" : "Recipe Ideas For You"}</h2>
+          <p>${headerText}</p>
         </div>
         <div class="suggestions-grid">
           ${suggestions.map(s => this.createSuggestionCard(s)).join("")}

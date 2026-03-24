@@ -17,7 +17,12 @@ import { RecipeFormatter } from "../../shared/RecipeFormatter.js";
 import { PromptBuilder } from "../../shared/PromptBuilder.js";
 import { RecipeDetailView } from "../../components/views/RecipeDetailView.js";
 import { RecipeSuggestionsView } from "../../components/views/RecipeSuggestionsView.js";
-import { CONFIG, MEAL_TYPES, QUESTIONNAIRE_FLOWS } from "../Config.js";
+import {
+  CONFIG,
+  MEAL_TYPES,
+  QUESTIONNAIRE_FLOWS,
+  DISH_FORMATS
+} from "../Config.js";
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -157,7 +162,7 @@ export class UnifiedApp {
       return;
     }
 
-    console.log("🎯 Creating first vibe card:", firstVibe.name);
+    console.log("🎯 Creating first vibe card:", firstVibe.id);
 
     // Store current vibe
     globalStateManager.setState({ currentVibe: firstVibe });
@@ -174,6 +179,7 @@ export class UnifiedApp {
 
       // Initialize round progress display (card 1 of MAX_VIBE_ROUNDS)
       this.updateRoundProgress(this.vibeEngine.getCurrentRound());
+      this._updateSkipButton();
 
       console.log("✅ First card created successfully");
     } else {
@@ -225,31 +231,52 @@ export class UnifiedApp {
       return;
     }
 
-    console.log(`👆 Swipe ${direction}: ${currentVibe.name}`);
+    console.log(`👆 Swipe ${direction}: ${currentVibe.id}`);
 
-    if (direction === "right") {
-      const currentProfile = globalStateManager.get("vibeProfile");
-      globalStateManager.setState({
-        vibeProfile: [...currentProfile, currentVibe]
-      });
-      console.log(`❤️ Added ${currentVibe.name} to vibe profile`);
-    } else {
-      // Track negative vibes — used in prompts to steer away from unwanted moods
+    if (currentVibe.swipeRight) {
+      // Axis card — both directions are positive choices; the unchosen half becomes avoidance signal
+      const chosen =
+        direction === "right" ? currentVibe.swipeRight : currentVibe.swipeLeft;
+      const rejected =
+        direction === "right" ? currentVibe.swipeLeft : currentVibe.swipeRight;
+
+      const currentProfile = globalStateManager.get("vibeProfile") || [];
       const negativeVibes = globalStateManager.get("negativeVibes") || [];
+
       globalStateManager.setState({
-        negativeVibes: [...negativeVibes, currentVibe]
+        vibeProfile: [
+          ...currentProfile,
+          { axis: currentVibe.axis, label: chosen.label, tags: chosen.tags }
+        ],
+        negativeVibes: [
+          ...negativeVibes,
+          { axis: currentVibe.axis, label: rejected.label, tags: rejected.tags }
+        ]
       });
-      console.log(`👎 Added ${currentVibe.name} to negative vibes`);
+
+      console.log(`✅ [${currentVibe.axis}] Chose: "${chosen.label}"`);
+    } else {
+      // Legacy image card — right = like, left = dislike
+      if (direction === "right") {
+        const currentProfile = globalStateManager.get("vibeProfile") || [];
+        globalStateManager.setState({
+          vibeProfile: [...currentProfile, currentVibe]
+        });
+      } else {
+        const negativeVibes = globalStateManager.get("negativeVibes") || [];
+        globalStateManager.setState({
+          negativeVibes: [...negativeVibes, currentVibe]
+        });
+      }
     }
 
-    // Show next card
     this.showNextCard();
   }
 
   showNextCard() {
     const nextVibe = this.vibeEngine.getNextVibe();
     if (nextVibe) {
-      console.log(`🔄 Loading next vibe: ${nextVibe.name}`);
+      console.log(`🔄 Loading next vibe: ${nextVibe.id}`);
 
       globalStateManager.setState({ currentVibe: nextVibe });
 
@@ -261,12 +288,42 @@ export class UnifiedApp {
 
       this.setupSwipeHandling();
       this.updateRoundProgress(this.vibeEngine.getCurrentRound());
+      this._updateSkipButton();
     } else {
       this.showResult();
     }
   }
 
+  _updateSkipButton() {
+    const round = this.vibeEngine.getCurrentRound();
+    const hasIngredients = Boolean(
+      (globalStateManager.get("ingredientsAtHome") || "").trim()
+    );
+
+    // Show skip after round 1 when ingredients are known; after round 3 otherwise
+    const shouldShow = hasIngredients ? round >= 1 : round >= 3;
+    if (!shouldShow) {
+      return;
+    }
+
+    // Reuse or create the skip button below the card container
+    let skipBtn = document.querySelector(".vibe-skip-btn");
+    if (!skipBtn) {
+      skipBtn = document.createElement("button");
+      skipBtn.className = "vibe-skip-btn";
+      skipBtn.addEventListener("click", () => this.showResult());
+      this.containers.cardContainer.insertAdjacentElement("afterend", skipBtn);
+    }
+
+    skipBtn.textContent = hasIngredients
+      ? `Skip swiping — use my ingredients →`
+      : `I know what I want — show me recipes →`;
+  }
+
   showResult() {
+    // Remove skip button if present
+    document.querySelector(".vibe-skip-btn")?.remove();
+
     const profile = globalStateManager.get("vibeProfile");
     console.log("🎉 Showing result with profile:", profile);
 
@@ -318,7 +375,15 @@ export class UnifiedApp {
   }
 
   setupAdaptiveQuestionnaire(container) {
-    const answers = { mealType: null, servingSize: null, timeAvailable: null };
+    const answers = {
+      mealType: null,
+      servingSize: null,
+      timeAvailable: null,
+      dishFormat: null,
+      dishFormatLabel: null,
+      dishFormat2: null,
+      dishFormatLabel2: null
+    };
     const body = container.querySelector("#questionnaire-body");
     const submitBtn = container.querySelector(".q-submit-btn");
 
@@ -339,28 +404,38 @@ export class UnifiedApp {
       answers[field] = value;
 
       if (field === "mealType") {
-        // Clear any previously revealed steps when meal type changes
         body
           .querySelectorAll(
-            "[data-step='2'],[data-step='3'],[data-step='ingredients']"
+            "[data-step='2'],[data-step='3'],[data-step='dish']"
           )
           .forEach(el => el.remove());
         answers.servingSize = null;
         answers.timeAvailable = null;
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
+        answers.dishFormat2 = null;
+        answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
         this._revealQ2(body, answers, submitBtn, value);
       } else if (field === "servingSize") {
         body
-          .querySelectorAll("[data-step='3'],[data-step='ingredients']")
+          .querySelectorAll("[data-step='3'],[data-step='dish']")
           .forEach(el => el.remove());
         answers.timeAvailable = null;
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
+        answers.dishFormat2 = null;
+        answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
         this._revealQ3orIngredients(body, answers, submitBtn);
       } else if (field === "timeAvailable") {
-        body
-          .querySelectorAll("[data-step='ingredients']")
-          .forEach(el => el.remove());
-        this._revealIngredients(body, submitBtn);
+        body.querySelectorAll("[data-step='dish']").forEach(el => el.remove());
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
+        answers.dishFormat2 = null;
+        answers.dishFormatLabel2 = null;
+        submitBtn.disabled = true;
+        this._revealDishAndIngredients(body, answers, submitBtn);
       }
     });
 
@@ -369,7 +444,11 @@ export class UnifiedApp {
         sessionContext: {
           mealType: answers.mealType,
           servingSize: answers.servingSize,
-          timeAvailable: answers.timeAvailable
+          timeAvailable: answers.timeAvailable,
+          dishFormat: answers.dishFormat,
+          dishFormatLabel: answers.dishFormatLabel,
+          dishFormat2: answers.dishFormat2 || null,
+          dishFormatLabel2: answers.dishFormatLabel2 || null
         }
       });
 
@@ -414,9 +493,8 @@ export class UnifiedApp {
     }
 
     if (flow.q3.skip) {
-      // Set the default time and go straight to ingredients
       answers.timeAvailable = flow.q3.default;
-      this._revealIngredients(body, submitBtn);
+      this._revealDishAndIngredients(body, answers, submitBtn);
     } else {
       this._revealQ3(body, answers, submitBtn, flow.q3);
     }
@@ -441,23 +519,189 @@ export class UnifiedApp {
     this._scrollToStep(body);
   }
 
-  _revealIngredients(body, submitBtn) {
+  _revealDishAndIngredients(body, answers, submitBtn) {
+    const formats = DISH_FORMATS[answers.mealType] || DISH_FORMATS.dinner;
+    const tilesHtml = formats
+      .map(
+        f =>
+          `<button class="q-dish-tile" data-value="${f.value}" data-label="${f.label}" data-prompt="${f.prompt ?? ""}">
+            <span class="q-dish-emoji">${f.emoji}</span>
+            <span class="q-dish-label">${f.label}</span>
+          </button>`
+      )
+      .join("");
+
     const step = document.createElement("div");
     step.className = "q-step q-step-reveal";
-    step.dataset.step = "ingredients";
+    step.dataset.step = "dish";
     step.innerHTML = `
-      <label class="q-label">
-        What's in your fridge?
-        <span class="q-optional">optional</span>
-      </label>
-      <p class="q-hint">We'll use what fits naturally — no need to force everything in</p>
-      <input type="text" class="q-ingredients-input" placeholder="chicken, garlic, lemon..." />
+      <label class="q-label">What are you in the mood for?</label>
+      <div class="q-dish-grid">${tilesHtml}</div>
+      <p class="q-dish-side-hint">＋ Tap a second tile to add a side dish</p>
+      <div class="q-ingredients-section">
+        <label class="q-label q-label--sub">
+          Anything in the fridge to work in?
+          <span class="q-optional">optional</span>
+        </label>
+        <input type="text" class="q-ingredients-input" placeholder="e.g. tomatoes, pasta, chicken…" />
+        <p class="q-hint">We'll use what fits — tiles above glow when they match</p>
+      </div>
     `;
     body.appendChild(step);
     this._scrollToStep(body);
 
-    // All required answers collected — unlock the submit button
-    submitBtn.disabled = false;
+    const grid = step.querySelector(".q-dish-grid");
+    const hint = step.querySelector(".q-dish-side-hint");
+    const input = step.querySelector(".q-ingredients-input");
+
+    // Keyword signals: ingredient text → dish tile value
+    const DISH_SIGNALS = {
+      pasta: [
+        "pasta",
+        "spaghetti",
+        "penne",
+        "tagliatelle",
+        "fettuccine",
+        "linguine",
+        "rigatoni",
+        "noodle",
+        "ramen",
+        "udon",
+        "lasagna"
+      ],
+      salad: [
+        "lettuce",
+        "greens",
+        "spinach",
+        "arugula",
+        "rocket",
+        "kale",
+        "radicchio",
+        "tomato",
+        "cucumber",
+        "radish",
+        "beetroot"
+      ],
+      soup: [
+        "broth",
+        "stock",
+        "lentil",
+        "bean",
+        "chickpea",
+        "pea",
+        "leek",
+        "bouillon"
+      ],
+      bowl: [
+        "rice",
+        "quinoa",
+        "couscous",
+        "bulgur",
+        "farro",
+        "millet",
+        "grain"
+      ],
+      sandwich: [
+        "bread",
+        "tortilla",
+        "wrap",
+        "baguette",
+        "sourdough",
+        "ciabatta",
+        "pita",
+        "roll"
+      ],
+      main: [
+        "chicken",
+        "beef",
+        "pork",
+        "fish",
+        "salmon",
+        "cod",
+        "tuna",
+        "steak",
+        "lamb",
+        "duck",
+        "turkey",
+        "sausage",
+        "chorizo",
+        "tofu"
+      ],
+      flatbread: ["mozzarella", "flatbread", "pizza dough", "yeast"],
+      eggs: ["egg", "eggs"],
+      pancakes: ["flour", "pancake", "syrup", "maple", "buttermilk"],
+      oats: ["oats", "granola", "porridge", "oatmeal"],
+      baked: ["scone", "muffin", "pastry", "croissant", "biscuit"],
+      fruit: [
+        "berry",
+        "banana",
+        "mango",
+        "yogurt",
+        "apple",
+        "peach",
+        "strawberr"
+      ],
+      dip: ["hummus", "tahini", "carrot", "celery", "pepper", "crackers"],
+      bites: ["popcorn", "nuts", "chips", "cracker"],
+      sweet: ["chocolate", "sugar", "honey", "caramel", "vanilla"]
+    };
+
+    input.addEventListener("input", () => {
+      const text = input.value.toLowerCase();
+      grid.querySelectorAll(".q-dish-tile:not(.selected)").forEach(tile => {
+        const signals = DISH_SIGNALS[tile.dataset.value] || [];
+        const matches = text.trim() && signals.some(kw => text.includes(kw));
+        tile.classList.toggle("q-dish-suggested", matches);
+      });
+    });
+
+    grid.addEventListener("click", e => {
+      const tile = e.target.closest(".q-dish-tile");
+      if (!tile) {
+        return;
+      }
+
+      const selectedCount = grid.querySelectorAll(
+        ".q-dish-tile.selected"
+      ).length;
+      if (selectedCount >= 2) {
+        return;
+      }
+
+      const isSurprise = tile.dataset.value === "any";
+
+      if (selectedCount === 0) {
+        tile.classList.add("selected", "q-dish-main");
+        tile.classList.remove("q-dish-suggested");
+        const badge = document.createElement("span");
+        badge.className = "q-dish-badge";
+        badge.textContent = "Main";
+        tile.appendChild(badge);
+
+        answers.dishFormat = tile.dataset.prompt || null;
+        answers.dishFormatLabel = tile.dataset.label;
+        submitBtn.disabled = false;
+
+        if (!isSurprise) {
+          hint.classList.add("visible");
+        }
+      } else {
+        if (tile.classList.contains("selected")) {
+          return;
+        }
+        hint.classList.remove("visible");
+
+        tile.classList.add("selected", "q-dish-side");
+        tile.classList.remove("q-dish-suggested");
+        const badge = document.createElement("span");
+        badge.className = "q-dish-badge";
+        badge.textContent = "Side";
+        tile.appendChild(badge);
+
+        answers.dishFormat2 = tile.dataset.prompt || null;
+        answers.dishFormatLabel2 = tile.dataset.label;
+      }
+    });
   }
 
   _scrollToStep(body) {
