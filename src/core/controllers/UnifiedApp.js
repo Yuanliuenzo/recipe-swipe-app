@@ -406,7 +406,7 @@ export class UnifiedApp {
       if (field === "mealType") {
         body
           .querySelectorAll(
-            "[data-step='2'],[data-step='3'],[data-step='dish']"
+            "[data-step='2'],[data-step='3'],[data-step='ingredients'],[data-step='dish']"
           )
           .forEach(el => el.remove());
         answers.servingSize = null;
@@ -419,7 +419,9 @@ export class UnifiedApp {
         this._revealQ2(body, answers, submitBtn, value);
       } else if (field === "servingSize") {
         body
-          .querySelectorAll("[data-step='3'],[data-step='dish']")
+          .querySelectorAll(
+            "[data-step='3'],[data-step='ingredients'],[data-step='dish']"
+          )
           .forEach(el => el.remove());
         answers.timeAvailable = null;
         answers.dishFormat = null;
@@ -429,13 +431,15 @@ export class UnifiedApp {
         submitBtn.disabled = true;
         this._revealQ3orIngredients(body, answers, submitBtn);
       } else if (field === "timeAvailable") {
-        body.querySelectorAll("[data-step='dish']").forEach(el => el.remove());
+        body
+          .querySelectorAll("[data-step='ingredients'],[data-step='dish']")
+          .forEach(el => el.remove());
         answers.dishFormat = null;
         answers.dishFormatLabel = null;
         answers.dishFormat2 = null;
         answers.dishFormatLabel2 = null;
         submitBtn.disabled = true;
-        this._revealDishAndIngredients(body, answers, submitBtn);
+        this._revealIngredients(body, answers, submitBtn);
       }
     });
 
@@ -494,7 +498,7 @@ export class UnifiedApp {
 
     if (flow.q3.skip) {
       answers.timeAvailable = flow.q3.default;
-      this._revealDishAndIngredients(body, answers, submitBtn);
+      this._revealIngredients(body, answers, submitBtn);
     } else {
       this._revealQ3(body, answers, submitBtn, flow.q3);
     }
@@ -519,141 +523,99 @@ export class UnifiedApp {
     this._scrollToStep(body);
   }
 
-  _revealDishAndIngredients(body, answers, submitBtn) {
-    const formats = DISH_FORMATS[answers.mealType] || DISH_FORMATS.dinner;
-    const tilesHtml = formats
-      .map(
-        f =>
-          `<button class="q-dish-tile" data-value="${f.value}" data-label="${f.label}" data-prompt="${f.prompt ?? ""}">
-            <span class="q-dish-emoji">${f.emoji}</span>
-            <span class="q-dish-label">${f.label}</span>
-          </button>`
-      )
-      .join("");
-
+  _revealIngredients(body, answers, submitBtn) {
     const step = document.createElement("div");
     step.className = "q-step q-step-reveal";
-    step.dataset.step = "dish";
+    step.dataset.step = "ingredients";
     step.innerHTML = `
-      <label class="q-label">What are you in the mood for?</label>
-      <div class="q-dish-grid">${tilesHtml}</div>
-      <p class="q-dish-side-hint">＋ Tap a second tile to add a side dish</p>
-      <div class="q-ingredients-section">
-        <label class="q-label q-label--sub">
-          Anything in the fridge to work in?
-          <span class="q-optional">optional</span>
-        </label>
-        <input type="text" class="q-ingredients-input" placeholder="e.g. tomatoes, pasta, chicken…" />
-        <p class="q-hint">We'll use what fits — tiles above glow when they match</p>
+      <label class="q-label">
+        What do you have at home?
+        <span class="q-optional">optional</span>
+      </label>
+      <p class="q-hint">Leave blank if you have nothing specific in mind</p>
+      <input type="text" class="q-ingredients-input" placeholder="e.g. tomatoes, pasta, chicken…" />
+      <div class="q-direction-action-row">
+        <button class="japandi-btn japandi-btn-primary q-direction-btn">
+          Help me pick a direction →
+        </button>
+        <button class="q-surprise-link">Surprise me</button>
       </div>
     `;
     body.appendChild(step);
     this._scrollToStep(body);
 
+    const input = step.querySelector(".q-ingredients-input");
+    const directionBtn = step.querySelector(".q-direction-btn");
+    const surpriseLink = step.querySelector(".q-surprise-link");
+
+    directionBtn.addEventListener("click", () => {
+      directionBtn.disabled = true;
+      directionBtn.textContent = "Finding directions…";
+      this._loadDirections(body, answers, submitBtn, input.value);
+    });
+
+    surpriseLink.addEventListener("click", () => {
+      answers.dishFormat = null;
+      answers.dishFormatLabel = null;
+      answers.dishFormat2 = null;
+      answers.dishFormatLabel2 = null;
+      submitBtn.disabled = false;
+      submitBtn.click();
+    });
+  }
+
+  async _loadDirections(body, answers, submitBtn, ingredients) {
+    const step = document.createElement("div");
+    step.className = "q-step q-step-reveal";
+    step.dataset.step = "dish";
+    step.innerHTML = `
+      <label class="q-label">What kind of direction?</label>
+      <div class="q-dish-loading">
+        <div class="q-dish-loading-spinner"></div>
+        <span>Finding the best directions…</span>
+      </div>
+    `;
+    body.appendChild(step);
+    this._scrollToStep(body);
+
+    let tiles;
+    try {
+      tiles = await this.recipeSuggestionService.suggestFoodDirections(
+        answers,
+        ingredients
+      );
+    } catch (err) {
+      console.warn("⚠️ _loadDirections fallback:", err.message);
+      tiles = (DISH_FORMATS[answers.mealType] || DISH_FORMATS.dinner)
+        .filter(f => f.value !== "any")
+        .slice(0, 4)
+        .map(f => ({ label: f.label, emoji: f.emoji, prompt: f.prompt }));
+    }
+
+    tiles.push({ label: "Surprise me", emoji: "🎲", prompt: null });
+    this._renderDirectionTiles(step, body, answers, submitBtn, tiles);
+  }
+
+  _renderDirectionTiles(step, body, answers, submitBtn, tiles) {
+    const tilesHtml = tiles
+      .map(
+        t =>
+          `<button class="q-dish-tile" data-label="${t.label}" data-prompt="${t.prompt ?? ""}">
+            <span class="q-dish-emoji">${t.emoji}</span>
+            <span class="q-dish-label">${t.label}</span>
+          </button>`
+      )
+      .join("");
+
+    step.innerHTML = `
+      <label class="q-label">What kind of direction?</label>
+      <div class="q-dish-grid">${tilesHtml}</div>
+      <p class="q-dish-side-hint">＋ Tap a second tile to add a side</p>
+    `;
+    this._scrollToStep(body);
+
     const grid = step.querySelector(".q-dish-grid");
     const hint = step.querySelector(".q-dish-side-hint");
-    const input = step.querySelector(".q-ingredients-input");
-
-    // Keyword signals: ingredient text → dish tile value
-    const DISH_SIGNALS = {
-      pasta: [
-        "pasta",
-        "spaghetti",
-        "penne",
-        "tagliatelle",
-        "fettuccine",
-        "linguine",
-        "rigatoni",
-        "noodle",
-        "ramen",
-        "udon",
-        "lasagna"
-      ],
-      salad: [
-        "lettuce",
-        "greens",
-        "spinach",
-        "arugula",
-        "rocket",
-        "kale",
-        "radicchio",
-        "tomato",
-        "cucumber",
-        "radish",
-        "beetroot"
-      ],
-      soup: [
-        "broth",
-        "stock",
-        "lentil",
-        "bean",
-        "chickpea",
-        "pea",
-        "leek",
-        "bouillon"
-      ],
-      bowl: [
-        "rice",
-        "quinoa",
-        "couscous",
-        "bulgur",
-        "farro",
-        "millet",
-        "grain"
-      ],
-      sandwich: [
-        "bread",
-        "tortilla",
-        "wrap",
-        "baguette",
-        "sourdough",
-        "ciabatta",
-        "pita",
-        "roll"
-      ],
-      main: [
-        "chicken",
-        "beef",
-        "pork",
-        "fish",
-        "salmon",
-        "cod",
-        "tuna",
-        "steak",
-        "lamb",
-        "duck",
-        "turkey",
-        "sausage",
-        "chorizo",
-        "tofu"
-      ],
-      flatbread: ["mozzarella", "flatbread", "pizza dough", "yeast"],
-      eggs: ["egg", "eggs"],
-      pancakes: ["flour", "pancake", "syrup", "maple", "buttermilk"],
-      oats: ["oats", "granola", "porridge", "oatmeal"],
-      baked: ["scone", "muffin", "pastry", "croissant", "biscuit"],
-      fruit: [
-        "berry",
-        "banana",
-        "mango",
-        "yogurt",
-        "apple",
-        "peach",
-        "strawberr"
-      ],
-      dip: ["hummus", "tahini", "carrot", "celery", "pepper", "crackers"],
-      bites: ["popcorn", "nuts", "chips", "cracker"],
-      sweet: ["chocolate", "sugar", "honey", "caramel", "vanilla"]
-    };
-
-    input.addEventListener("input", () => {
-      const text = input.value.toLowerCase();
-      grid.querySelectorAll(".q-dish-tile:not(.selected)").forEach(tile => {
-        const signals = DISH_SIGNALS[tile.dataset.value] || [];
-        const matches = text.trim() && signals.some(kw => text.includes(kw));
-        tile.classList.toggle("q-dish-suggested", matches);
-      });
-    });
 
     grid.addEventListener("click", e => {
       const tile = e.target.closest(".q-dish-tile");
@@ -668,11 +630,10 @@ export class UnifiedApp {
         return;
       }
 
-      const isSurprise = tile.dataset.value === "any";
+      const isSurprise = tile.dataset.label === "Surprise me";
 
       if (selectedCount === 0) {
         tile.classList.add("selected", "q-dish-main");
-        tile.classList.remove("q-dish-suggested");
         const badge = document.createElement("span");
         badge.className = "q-dish-badge";
         badge.textContent = "Main";
@@ -692,7 +653,6 @@ export class UnifiedApp {
         hint.classList.remove("visible");
 
         tile.classList.add("selected", "q-dish-side");
-        tile.classList.remove("q-dish-suggested");
         const badge = document.createElement("span");
         badge.className = "q-dish-badge";
         badge.textContent = "Side";

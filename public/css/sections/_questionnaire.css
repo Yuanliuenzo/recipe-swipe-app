@@ -258,28 +258,56 @@
   color: var(--color-accent);
 }
 
-/* Sub-label (smaller, used inside combined steps) */
-.q-label--sub {
-  font-size: 11px;
-  opacity: 0.75;
+/* Action row: "Help me pick a direction" + "Surprise me" */
+.q-direction-action-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
   margin-top: var(--space-md);
+  flex-wrap: wrap;
 }
 
-/* Ingredients section inside the combined dish step */
-.q-ingredients-section {
+.q-surprise-link {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: var(--font-primary);
+  transition: color var(--transition-fast);
+}
+
+.q-surprise-link:hover {
+  color: var(--color-text);
+}
+
+/* Loading state while LLM generates food directions */
+.q-dish-loading {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-border);
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-2xl) 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-style: italic;
 }
 
-/* Ingredient-matched tile glow */
-.q-dish-tile.q-dish-suggested:not(.selected) {
-  border-color: var(--color-accent);
-  background: rgba(184, 115, 51, 0.07);
-  box-shadow: 0 0 0 2px rgba(184, 115, 51, 0.18);
+.q-dish-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: q-spin 0.8s linear infinite;
+}
+
+@keyframes q-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Main / Side badges on selected tiles */

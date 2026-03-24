@@ -4,6 +4,7 @@
 import { apiService } from "../core/ApiService.js";
 import { RecipeFormatter } from "../shared/RecipeFormatter.js";
 import { getCurrentSeason } from "../utils/LLMUtils.js";
+import { CONFIG, DISH_FORMATS } from "../core/Config.js";
 
 export class RecipeSuggestionService {
   constructor(stateManager) {
@@ -242,6 +243,95 @@ export class RecipeSuggestionService {
   }
 
   // --------------------------
+  // Quick dish-direction suggester (called from questionnaire before swiping)
+  // --------------------------
+
+  async suggestFoodDirections(context, ingredients) {
+    const { mealType, servingSize, timeAvailable } = context;
+
+    const mealLabels = {
+      breakfast: "breakfast",
+      brunch: "brunch",
+      lunch: "lunch",
+      dinner: "dinner",
+      snack: "snack"
+    };
+    const servingLabels = {
+      solo: "1 person",
+      couple: "2–3 people",
+      group: "4 or more people"
+    };
+    const timeLabels = {
+      quick: "under 20 minutes",
+      normal: "30–45 minutes",
+      leisurely: "an hour or more"
+    };
+
+    const prompt = `You are a creative food editor helping someone choose a culinary direction for their meal.
+The direction they pick will be used to generate 5 different recipe ideas — so it must be
+broad enough that 5 distinctly different dishes could all fit comfortably within it.
+
+Context:
+- Meal: ${mealLabels[mealType] || mealType}
+- People: ${servingLabels[servingSize] || "unspecified"}
+- Time available: ${timeLabels[timeAvailable] || "flexible"}
+- Ingredients on hand: ${ingredients?.trim() || "nothing specific"}
+
+Suggest 3–4 culinary directions (cuisine, mood, or cooking style).
+Each direction must be broad enough to inspire 5 completely different recipes.
+
+BAD (too narrow — only one dish fits):
+  "Golden eggs & greens", "Shakshuka", "Stir-fried spinach", "Pan-fried egg", "Egg dish", "Salad" — these are recipes, not directions.
+
+GOOD (broad enough for 5 diverse recipes):
+  "Mediterranean" → shakshuka, frittata, baked feta, tabbouleh, egg drop soup with herbs
+  "Italian comfort" → pasta, frittata, bruschetta, ribollita, uova in purgatorio
+  "Middle Eastern warmth" → shakshuka, fatteh, spinach with tahini, pilafs, flatbreads
+  "Light & Japanese-inspired" → miso soup, onsen tamago, salads, rice bowls, dashi broth dishes
+
+If ingredients were provided, lean toward directions where they fit naturally — but the direction itself stays broad.
+
+Respond ONLY with JSON (no extra text):
+{
+  "directions": [
+    {"label": "Mediterranean", "emoji": "🫒", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
+    {"label": "Italian comfort", "emoji": "🍅", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
+    {"label": "Light & Asian-inspired", "emoji": "🥢", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
+  ]
+}
+
+Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
+
+    try {
+      const response = await apiService.post(
+        CONFIG.ENDPOINTS.GENERATE_RECIPE,
+        { prompt, suggestions: false },
+        30000
+      );
+      const rawText =
+        response?.recipe ?? (typeof response === "string" ? response : "");
+      const match = rawText.match(/\{[\s\S]*\}/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (Array.isArray(parsed.directions) && parsed.directions.length > 0) {
+          return parsed.directions;
+        }
+      }
+    } catch (err) {
+      console.warn(
+        "⚠️ suggestFoodDirections failed, using fallback:",
+        err.message
+      );
+    }
+
+    // Fallback: static DISH_FORMATS for this meal type (exclude "any")
+    return (DISH_FORMATS[mealType] || DISH_FORMATS.dinner)
+      .filter(f => f.value !== "any")
+      .slice(0, 4)
+      .map(f => ({ label: f.label, emoji: f.emoji, prompt: f.prompt }));
+  }
+
+  // --------------------------
   // Prompt builders
   // --------------------------
 
@@ -352,7 +442,7 @@ Keep dish names specific and appetising. The description explains the harmony, n
         "Suggest exactly 5 recipe titles that match the following user context:\n\n";
       prompt += contextBlock;
       if (sessionContext.dishFormat) {
-        prompt += `Dish format: ${sessionContext.dishFormat} — all 5 suggestions MUST be this specific style of dish\n`;
+        prompt += `Culinary direction: ${sessionContext.dishFormat} — all 5 suggestions should feel like they belong to this culinary tradition or mood. Vary the dish format freely — different techniques, styles, and approaches are encouraged.\n`;
       }
       prompt += vibeBlock;
       prompt += seasonLine;
