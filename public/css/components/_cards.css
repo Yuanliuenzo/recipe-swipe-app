@@ -85,10 +85,11 @@
 
 .mobile-recipe-content {
   flex: 1;
+  min-height: 0; /* critical: allows flex child to scroll without overflowing card */
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-sm);
-  margin: calc(-1 * var(--space-sm));
+  padding: var(--space-sm) var(--space-sm) 0;
+  text-align: left;
 
   /* Custom scrollbar for recipe content */
   scrollbar-width: thin;

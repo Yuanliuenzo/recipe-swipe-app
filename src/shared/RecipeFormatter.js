@@ -1,6 +1,6 @@
 // Recipe text formatting and processing
 export class RecipeFormatter {
-  // Main formatting function
+  // Main formatting function — entry point
   static format(rawText = "") {
     // Handle legacy { recipe: "..." } object format stored before the refactor
     if (rawText && typeof rawText === "object") {
@@ -12,10 +12,34 @@ export class RecipeFormatter {
         html: "<p>No recipe available</p>",
         title: "Untitled Recipe",
         hasIngredients: false,
-        hasInstructions: false
+        hasInstructions: false,
+        isMultiComponent: false,
+        hasTimeline: false
       };
     }
 
+    // Split by component separator (--- on its own line)
+    const rawSections = rawText
+      .split(/\n\s*---\s*\n/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    if (rawSections.length > 1) {
+      return this._formatMultiComponent(rawSections);
+    }
+
+    // Single component — original behaviour
+    const parsed = this._parseSingle(rawText);
+    return {
+      ...parsed,
+      html: this._buildSingleHTML(parsed),
+      isMultiComponent: false,
+      hasTimeline: false
+    };
+  }
+
+  // Parse a single recipe section into structured data (no HTML)
+  static _parseSingle(rawText) {
     const lines = rawText.split("\n").map(l => l.trim());
 
     let title = "Untitled Recipe";
@@ -28,39 +52,39 @@ export class RecipeFormatter {
         return;
       }
 
+      // Skip === separator lines
+      if (/^={2,}$/.test(line)) {
+        return;
+      }
+
       const lower = line.toLowerCase();
 
-      // Check for section headers FIRST
+      // Section headers
       if (lower.includes("ingredients")) {
         currentSection = "ingredients";
         return;
       }
-
       if (lower.includes("instructions") || lower.includes("directions")) {
         currentSection = "instructions";
         return;
       }
 
-      // Set title if not set yet
-      if (!title || title === "Untitled Recipe") {
-        // Clean up the title - remove asterisks, bold markers, and extra formatting
+      // First non-section, non-empty line is the title
+      if (title === "Untitled Recipe") {
         title = line
-          .replace(/\*\*/g, "") // Remove asterisks
-          .replace(/\*\*/g, "") // Remove double asterisks (bold)
-          .replace(/__+/g, "") // Remove underscores (underline)
-          .replace(/^#+\s*/, "") // Remove markdown headers
-          .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove bold markdown but keep text
-          .replace(/_([^_]+)_/g, "$1") // Remove italic markdown but keep text
-          .replace(/^Recipe\s+Name:\s*/i, "") // Remove "Recipe Name:" prefix
-          .replace(/^Recipe:\s*/i, "") // Remove "Recipe:" prefix
-          .replace(/^Name:\s*/i, "") // Remove "Name:" prefix
+          .replace(/\*\*/g, "")
+          .replace(/__+/g, "")
+          .replace(/^#+\s*/, "")
+          .replace(/\*\*([^*]+)\*\*/g, "$1")
+          .replace(/_([^_]+)_/g, "$1")
+          .replace(/^Recipe\s+Name:\s*/i, "")
+          .replace(/^Recipe:\s*/i, "")
+          .replace(/^Name:\s*/i, "")
           .trim();
         return;
       }
 
-      // Only add to sections if we're in a valid section
       if (currentSection === "ingredients") {
-        // Don't add numbered items to ingredients (they're likely instructions)
         if (!/^\d+[\.\)]/.test(line)) {
           ingredients.push(line.replace(/^[-•\d.]+\s*/, ""));
         }
@@ -71,79 +95,125 @@ export class RecipeFormatter {
       }
     });
 
-    const hasIngredients = ingredients.length > 0;
-    const hasInstructions = instructions.length > 0;
+    return {
+      title,
+      ingredients,
+      instructions,
+      hasIngredients: ingredients.length > 0,
+      hasInstructions: instructions.length > 0
+    };
+  }
 
-    const html = `
+  // Build HTML for a single-component recipe
+  static _buildSingleHTML(parsed) {
+    const { ingredients, instructions, hasIngredients, hasInstructions } =
+      parsed;
+    return `
     <div class="recipe-wrapper">
       ${
         hasIngredients
           ? `
         <div class="recipe-section" data-recipe-section="ingredients">
-          <h3>🥘 Ingredients</h3>
           <ul class="ingredients-list">
             ${ingredients.map(i => `<li>${i}</li>`).join("")}
           </ul>
-        </div>
-      `
+        </div>`
           : ""
       }
-
       ${
         hasInstructions
           ? `
         <div class="recipe-section" data-recipe-section="instructions">
-          <h3>👨‍🍳 Instructions</h3>
           <ol class="instructions-list">
             ${instructions.map(i => `<li>${i}</li>`).join("")}
           </ol>
-        </div>
-      `
+        </div>`
           : ""
       }
-    </div>
-  `;
+    </div>`;
+  }
 
+  // Parse multiple sections into components + optional timeline
+  static _formatMultiComponent(rawSections) {
+    const components = [];
+    let timeline = null;
+
+    for (const section of rawSections) {
+      const parsed = this._parseSingle(section);
+      if (/timeline/i.test(parsed.title)) {
+        // Timeline steps land in instructions array; fallback to raw lines if needed
+        const steps =
+          parsed.instructions.length > 0
+            ? parsed.instructions
+            : section
+                .split("\n")
+                .map(l => l.trim())
+                .filter(
+                  l =>
+                    l &&
+                    !/^(Cooking\s+)?Timeline/i.test(l) &&
+                    !/^={2,}$/.test(l)
+                )
+                .map(l => l.replace(/^[-•*]\s*/, ""));
+        timeline = { steps };
+      } else {
+        components.push(parsed);
+      }
+    }
+
+    const html = this._buildMultiComponentHTML(components, timeline);
     return {
+      isMultiComponent: true,
+      components,
+      timeline,
       html,
-      title,
-      hasIngredients,
-      hasInstructions
+      title: components[0]?.title || "Recipe",
+      hasIngredients: components.some(c => c.hasIngredients),
+      hasInstructions: components.some(c => c.hasInstructions),
+      hasTimeline: Boolean(timeline?.steps?.length)
     };
   }
 
-  // Format ingredients section
-  static _formatIngredients(ingredientLines, applyInlineFormatting) {
-    const cleanedIngredients = ingredientLines
-      .map(item => item.replace(/^[-•]\s*/, ""))
-      .map(item => `<li>${applyInlineFormatting(item)}</li>`)
-      .join("");
-
-    return `
-      <div class="recipe-section recipe-section-ingredients" data-recipe-section="ingredients">
-        <h3>🥘 Ingredients</h3>
+  // Build HTML for a multi-component recipe
+  static _buildMultiComponentHTML(components, timeline) {
+    const ingredientsHtml = components
+      .filter(c => c.hasIngredients)
+      .map(
+        c => `
+        <div class="recipe-component-label">${c.title}</div>
         <ul class="ingredients-list">
-          ${cleanedIngredients}
-        </ul>
-      </div>
-    `;
-  }
-
-  // Format instructions section
-  static _formatInstructions(instructionLines, applyInlineFormatting) {
-    const cleanedInstructions = instructionLines
-      .map(item => item.replace(/^\d+\.|^\d+\)|^[-•]\s*/g, "").trim())
-      .map(item => `<li>${applyInlineFormatting(item)}</li>`)
+          ${c.ingredients.map(i => `<li>${i}</li>`).join("")}
+        </ul>`
+      )
       .join("");
 
+    const instructionsHtml = components
+      .filter(c => c.hasInstructions)
+      .map(
+        c => `
+        <div class="recipe-component-label">${c.title}</div>
+        <ol class="instructions-list instructions-list--reset">
+          ${c.instructions.map(i => `<li>${i}</li>`).join("")}
+        </ol>`
+      )
+      .join("");
+
+    const timelineHtml = timeline?.steps?.length
+      ? `<div class="recipe-timeline">
+          ${timeline.steps.map(s => `<div class="timeline-step">${s}</div>`).join("")}
+        </div>`
+      : "";
+
     return `
-      <div class="recipe-section recipe-section-instructions" data-recipe-section="instructions">
-        <h3>👨‍🍳 Instructions</h3>
-        <ol class="instructions-list">
-          ${cleanedInstructions}
-        </ol>
+    <div class="recipe-wrapper">
+      <div class="recipe-section" data-recipe-section="ingredients">
+        ${ingredientsHtml}
       </div>
-    `;
+      <div class="recipe-section" data-recipe-section="instructions">
+        ${instructionsHtml}
+      </div>
+      ${timeline ? `<div class="recipe-section" data-recipe-section="timeline">${timelineHtml}</div>` : ""}
+    </div>`;
   }
 
   // Extract just the title

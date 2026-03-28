@@ -540,6 +540,14 @@ Structure exactly like this (one section per component, separated by ---):
 ${sections}
 
 Do not omit headers. Keep each recipe concise but complete.
+
+After all recipe sections, add one final section:
+
+Cooking Timeline
+===
+A practical schedule so everything finishes at the same time.
+List 4–7 steps, each on its own line in this format: "X min before serving: [what to do]"
+Work backwards from serving time. Be specific and actionable.
 `;
     } else {
       prompt += `
