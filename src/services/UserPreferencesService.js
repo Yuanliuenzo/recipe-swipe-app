@@ -188,14 +188,14 @@ export class UserPreferencesService {
         )}
 
         ${this.renderRadioGroup(
-          "Budget",
+          "Budget-Conscious?",
           "budget",
           ["No", "Yes"],
           preferences.budget
         )}
 
         ${this.renderRadioGroup(
-          "Seasonal King",
+          "Prefer Seasonal Ingredients?",
           "seasonalKing",
           ["No", "Yes"],
           preferences.seasonalKing

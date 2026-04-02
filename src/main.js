@@ -141,10 +141,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Expose minimal global API for HTML onclick handlers
     window.nav = {
-      go: view => globalEventBus.emit("navigation:go", { view })
+      go: view => {
+        // Close FAB menu before navigating
+        fabMenu?.classList.remove("show");
+        fabOverlay?.classList.remove("show");
+        globalEventBus.emit("navigation:go", { view });
+      }
     };
 
     window.logout = () => {
+      fabMenu?.classList.remove("show");
+      fabOverlay?.classList.remove("show");
       globalEventBus.emit("auth:logout");
     };
 

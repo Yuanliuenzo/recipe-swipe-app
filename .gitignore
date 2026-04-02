@@ -89,3 +89,10 @@ Thumbs.db
 # Debug utilities (development only)
 src/utils/PhoneDebugUtil.js
 debug-phone.js
+
+# Playwright MCP
+.playwright-mcp/
+.mcp.json
+
+# Playwright screenshots
+*.png

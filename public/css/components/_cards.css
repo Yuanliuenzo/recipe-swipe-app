@@ -69,18 +69,17 @@
   width: 90vw;
   max-width: 400px;
   margin: 0 auto;
-  max-height: 85vh;
+  height: 85vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
-/* Special state for suggestions - make container scrollable */
+/* Special state for suggestions - let outer container handle scrolling */
 .mobile-recipe-card.suggestions-mode {
-  max-height: 70vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  height: auto;
+  overflow: visible;
 }
 
 .mobile-recipe-content {
@@ -88,7 +87,7 @@
   min-height: 0; /* critical: allows flex child to scroll without overflowing card */
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-sm) var(--space-sm) 0;
+  padding: var(--space-sm) var(--space-sm) 80px;
   text-align: left;
 
   /* Custom scrollbar for recipe content */

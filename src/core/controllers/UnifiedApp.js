@@ -537,6 +537,9 @@ export class UnifiedApp {
     body.appendChild(step);
     this._scrollToStep(body);
 
+    // All 3 required answers are in — enable Start Swiping with Surprise Me as default
+    submitBtn.disabled = false;
+
     const input = step.querySelector(".q-ingredients-input");
     const directionBtn = step.querySelector(".q-direction-btn");
     const surpriseLink = step.querySelector(".q-surprise-link");

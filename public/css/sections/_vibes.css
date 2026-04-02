@@ -173,7 +173,7 @@
 .mobile-vibe-card {
   width: 100%;
   max-width: 420px;
-  height: min(80vh, 640px);
+  height: min(90vh, 750px);
   border-radius: var(--radius-5xl);
   overflow: hidden;
   box-sizing: border-box;
@@ -356,7 +356,7 @@
 
   .mobile-vibe-card {
     max-width: 100%;
-    height: min(70vh, 500px);
+    height: min(88vh, 700px);
   }
 
   .vibe-card-caption {
