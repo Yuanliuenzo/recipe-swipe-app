@@ -17,7 +17,12 @@ import { RecipeFormatter } from "../../shared/RecipeFormatter.js";
 import { PromptBuilder } from "../../shared/PromptBuilder.js";
 import { RecipeDetailView } from "../../components/views/RecipeDetailView.js";
 import { RecipeSuggestionsView } from "../../components/views/RecipeSuggestionsView.js";
-import { CONFIG, MEAL_TYPES, QUESTIONNAIRE_FLOWS } from "../Config.js";
+import {
+  CONFIG,
+  MEAL_TYPES,
+  QUESTIONNAIRE_FLOWS,
+  DISH_FORMATS
+} from "../Config.js";
 
 export class UnifiedApp {
   constructor(serviceRegistry, componentRegistry) {
@@ -157,7 +162,7 @@ export class UnifiedApp {
       return;
     }
 
-    console.log("🎯 Creating first vibe card:", firstVibe.name);
+    console.log("🎯 Creating first vibe card:", firstVibe.id);
 
     // Store current vibe
     globalStateManager.setState({ currentVibe: firstVibe });
@@ -174,6 +179,7 @@ export class UnifiedApp {
 
       // Initialize round progress display (card 1 of MAX_VIBE_ROUNDS)
       this.updateRoundProgress(this.vibeEngine.getCurrentRound());
+      this._updateSkipButton();
 
       console.log("✅ First card created successfully");
     } else {
@@ -225,31 +231,52 @@ export class UnifiedApp {
       return;
     }
 
-    console.log(`👆 Swipe ${direction}: ${currentVibe.name}`);
+    console.log(`👆 Swipe ${direction}: ${currentVibe.id}`);
 
-    if (direction === "right") {
-      const currentProfile = globalStateManager.get("vibeProfile");
-      globalStateManager.setState({
-        vibeProfile: [...currentProfile, currentVibe]
-      });
-      console.log(`❤️ Added ${currentVibe.name} to vibe profile`);
-    } else {
-      // Track negative vibes — used in prompts to steer away from unwanted moods
+    if (currentVibe.swipeRight) {
+      // Axis card — both directions are positive choices; the unchosen half becomes avoidance signal
+      const chosen =
+        direction === "right" ? currentVibe.swipeRight : currentVibe.swipeLeft;
+      const rejected =
+        direction === "right" ? currentVibe.swipeLeft : currentVibe.swipeRight;
+
+      const currentProfile = globalStateManager.get("vibeProfile") || [];
       const negativeVibes = globalStateManager.get("negativeVibes") || [];
+
       globalStateManager.setState({
-        negativeVibes: [...negativeVibes, currentVibe]
+        vibeProfile: [
+          ...currentProfile,
+          { axis: currentVibe.axis, label: chosen.label, tags: chosen.tags }
+        ],
+        negativeVibes: [
+          ...negativeVibes,
+          { axis: currentVibe.axis, label: rejected.label, tags: rejected.tags }
+        ]
       });
-      console.log(`👎 Added ${currentVibe.name} to negative vibes`);
+
+      console.log(`✅ [${currentVibe.axis}] Chose: "${chosen.label}"`);
+    } else {
+      // Legacy image card — right = like, left = dislike
+      if (direction === "right") {
+        const currentProfile = globalStateManager.get("vibeProfile") || [];
+        globalStateManager.setState({
+          vibeProfile: [...currentProfile, currentVibe]
+        });
+      } else {
+        const negativeVibes = globalStateManager.get("negativeVibes") || [];
+        globalStateManager.setState({
+          negativeVibes: [...negativeVibes, currentVibe]
+        });
+      }
     }
 
-    // Show next card
     this.showNextCard();
   }
 
   showNextCard() {
     const nextVibe = this.vibeEngine.getNextVibe();
     if (nextVibe) {
-      console.log(`🔄 Loading next vibe: ${nextVibe.name}`);
+      console.log(`🔄 Loading next vibe: ${nextVibe.id}`);
 
       globalStateManager.setState({ currentVibe: nextVibe });
 
@@ -261,20 +288,53 @@ export class UnifiedApp {
 
       this.setupSwipeHandling();
       this.updateRoundProgress(this.vibeEngine.getCurrentRound());
+      this._updateSkipButton();
     } else {
       this.showResult();
     }
   }
 
-  showResult() {
-    const profile = globalStateManager.get("vibeProfile");
-    console.log("🎉 Showing result with profile:", profile);
+  _updateSkipButton() {
+    const round = this.vibeEngine.getCurrentRound();
+    const hasIngredients = Boolean(
+      (globalStateManager.get("ingredientsAtHome") || "").trim()
+    );
 
-    if (profile.length > 0) {
-      this.showRecipeGeneration(profile);
-    } else {
-      this.showSimpleResult();
+    // Show skip after round 1 when ingredients are known; after round 3 otherwise
+    const shouldShow = hasIngredients ? round >= 1 : round >= 3;
+    if (!shouldShow) {
+      return;
     }
+
+    // Reuse or create the skip button fixed to bottom of screen (above card container)
+    let skipBtn = document.querySelector(".vibe-skip-btn");
+    if (!skipBtn) {
+      skipBtn = document.createElement("button");
+      skipBtn.className = "vibe-skip-btn";
+      skipBtn.addEventListener("click", () => {
+        if (skipBtn.classList.contains("is-exiting")) {
+          return;
+        } // prevent double-fire
+        skipBtn.classList.add("is-exiting");
+        // Start recipe generation immediately — loading screen appears behind the exiting pill
+        this.showRecipeGeneration();
+        // Remove pill from DOM after exit animation completes
+        setTimeout(() => skipBtn.remove(), 420);
+      });
+      this.containers.cardContainer.appendChild(skipBtn);
+    }
+
+    skipBtn.textContent = hasIngredients
+      ? `Skip swiping — use my ingredients →`
+      : `I know what I want — show me recipes →`;
+  }
+
+  showResult() {
+    // Remove skip button if present
+    document.querySelector(".vibe-skip-btn")?.remove();
+    // Always generate — showRecipeGeneration reads full context (vibes + ingredients + questionnaire)
+    // and works correctly even with an empty vibe profile
+    this.showRecipeGeneration();
   }
 
   showQuestionnaire() {
@@ -318,7 +378,13 @@ export class UnifiedApp {
   }
 
   setupAdaptiveQuestionnaire(container) {
-    const answers = { mealType: null, servingSize: null, timeAvailable: null };
+    const answers = {
+      mealType: null,
+      servingSize: null,
+      timeAvailable: null,
+      dishFormat: null,
+      dishFormatLabel: null
+    };
     const body = container.querySelector("#questionnaire-body");
     const submitBtn = container.querySelector(".q-submit-btn");
 
@@ -339,28 +405,36 @@ export class UnifiedApp {
       answers[field] = value;
 
       if (field === "mealType") {
-        // Clear any previously revealed steps when meal type changes
         body
           .querySelectorAll(
-            "[data-step='2'],[data-step='3'],[data-step='ingredients']"
+            "[data-step='2'],[data-step='3'],[data-step='ingredients'],[data-step='dish']"
           )
           .forEach(el => el.remove());
         answers.servingSize = null;
         answers.timeAvailable = null;
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
         submitBtn.disabled = true;
         this._revealQ2(body, answers, submitBtn, value);
       } else if (field === "servingSize") {
         body
-          .querySelectorAll("[data-step='3'],[data-step='ingredients']")
+          .querySelectorAll(
+            "[data-step='3'],[data-step='ingredients'],[data-step='dish']"
+          )
           .forEach(el => el.remove());
         answers.timeAvailable = null;
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
         submitBtn.disabled = true;
         this._revealQ3orIngredients(body, answers, submitBtn);
       } else if (field === "timeAvailable") {
         body
-          .querySelectorAll("[data-step='ingredients']")
+          .querySelectorAll("[data-step='ingredients'],[data-step='dish']")
           .forEach(el => el.remove());
-        this._revealIngredients(body, submitBtn);
+        answers.dishFormat = null;
+        answers.dishFormatLabel = null;
+        submitBtn.disabled = true;
+        this._revealIngredients(body, answers, submitBtn);
       }
     });
 
@@ -369,7 +443,9 @@ export class UnifiedApp {
         sessionContext: {
           mealType: answers.mealType,
           servingSize: answers.servingSize,
-          timeAvailable: answers.timeAvailable
+          timeAvailable: answers.timeAvailable,
+          dishFormat: answers.dishFormat,
+          dishFormatLabel: answers.dishFormatLabel
         }
       });
 
@@ -414,9 +490,8 @@ export class UnifiedApp {
     }
 
     if (flow.q3.skip) {
-      // Set the default time and go straight to ingredients
       answers.timeAvailable = flow.q3.default;
-      this._revealIngredients(body, submitBtn);
+      this._revealIngredients(body, answers, submitBtn);
     } else {
       this._revealQ3(body, answers, submitBtn, flow.q3);
     }
@@ -441,23 +516,112 @@ export class UnifiedApp {
     this._scrollToStep(body);
   }
 
-  _revealIngredients(body, submitBtn) {
+  _revealIngredients(body, answers, submitBtn) {
     const step = document.createElement("div");
     step.className = "q-step q-step-reveal";
     step.dataset.step = "ingredients";
     step.innerHTML = `
       <label class="q-label">
-        What's in your fridge?
+        What do you have at home?
         <span class="q-optional">optional</span>
       </label>
-      <p class="q-hint">We'll use what fits naturally — no need to force everything in</p>
-      <input type="text" class="q-ingredients-input" placeholder="chicken, garlic, lemon..." />
+      <p class="q-hint">Leave blank if you have nothing specific in mind</p>
+      <input type="text" class="q-ingredients-input" placeholder="e.g. tomatoes, pasta, chicken…" />
+      <div class="q-direction-action-row">
+        <button class="japandi-btn japandi-btn-primary q-direction-btn">
+          Help me pick a direction →
+        </button>
+        <button class="q-surprise-link">Surprise me</button>
+      </div>
     `;
     body.appendChild(step);
     this._scrollToStep(body);
 
-    // All required answers collected — unlock the submit button
-    submitBtn.disabled = false;
+    const input = step.querySelector(".q-ingredients-input");
+    const directionBtn = step.querySelector(".q-direction-btn");
+    const surpriseLink = step.querySelector(".q-surprise-link");
+
+    directionBtn.addEventListener("click", () => {
+      directionBtn.disabled = true;
+      directionBtn.textContent = "Finding directions…";
+      this._loadDirections(body, answers, submitBtn, input.value);
+    });
+
+    surpriseLink.addEventListener("click", () => {
+      answers.dishFormat = null;
+      answers.dishFormatLabel = null;
+      submitBtn.disabled = false;
+      submitBtn.click();
+    });
+  }
+
+  async _loadDirections(body, answers, submitBtn, ingredients) {
+    const step = document.createElement("div");
+    step.className = "q-step q-step-reveal";
+    step.dataset.step = "dish";
+    step.innerHTML = `
+      <label class="q-label">What kind of direction?</label>
+      <div class="q-dish-loading">
+        <div class="q-dish-loading-spinner"></div>
+        <span>Finding the best directions…</span>
+      </div>
+    `;
+    body.appendChild(step);
+    this._scrollToStep(body);
+
+    let tiles;
+    try {
+      tiles = await this.recipeSuggestionService.suggestFoodDirections(
+        answers,
+        ingredients
+      );
+    } catch (err) {
+      console.warn("⚠️ _loadDirections fallback:", err.message);
+      tiles = (DISH_FORMATS[answers.mealType] || DISH_FORMATS.dinner)
+        .filter(f => f.value !== "any")
+        .slice(0, 4)
+        .map(f => ({ label: f.label, emoji: f.emoji, prompt: f.prompt }));
+    }
+
+    tiles.push({ label: "Surprise me", emoji: "🎲", prompt: null });
+    this._renderDirectionTiles(step, body, answers, submitBtn, tiles);
+  }
+
+  _renderDirectionTiles(step, body, answers, submitBtn, tiles) {
+    const tilesHtml = tiles
+      .map(
+        t =>
+          `<button class="q-dish-tile" data-label="${t.label}" data-prompt="${t.prompt ?? ""}">
+            <span class="q-dish-emoji">${t.emoji}</span>
+            <span class="q-dish-label">${t.label}</span>
+          </button>`
+      )
+      .join("");
+
+    step.innerHTML = `
+      <label class="q-label">What kind of direction?</label>
+      <div class="q-dish-grid">${tilesHtml}</div>
+    `;
+    this._scrollToStep(body);
+
+    const grid = step.querySelector(".q-dish-grid");
+
+    grid.addEventListener("click", e => {
+      const tile = e.target.closest(".q-dish-tile");
+      if (!tile) {
+        return;
+      }
+
+      // Deselect previous tile
+      grid
+        .querySelectorAll(".q-dish-tile.selected")
+        .forEach(t => t.classList.remove("selected"));
+      tile.classList.add("selected");
+
+      answers.dishFormat = tile.dataset.prompt || null;
+      answers.dishFormatLabel = tile.dataset.label;
+      submitBtn.disabled = false;
+    });
   }
 
   _scrollToStep(body) {
@@ -477,6 +641,9 @@ export class UnifiedApp {
     // Reset vibe engine with session context for contextual filtering
     const sessionContext = globalStateManager.get("sessionContext");
     this.vibeEngine.reset(sessionContext);
+
+    // Preload first few card images immediately so they're ready
+    this.vibeEngine.preloadFirst(4);
 
     this.createFirstCard();
   }
@@ -512,10 +679,51 @@ export class UnifiedApp {
       this.recipeSuggestionsView.on("recipeSelected", e => {
         this.handleRecipeSelected(e.detail.suggestion);
       });
+
+      this.recipeSuggestionsView.on("startFresh", () => {
+        this.resetAndRestart();
+      });
     }
 
     this.currentView = this.recipeSuggestionsView;
     this.recipeSuggestionsView.render();
+  }
+
+  resetAndRestart() {
+    // Reset session state — keep preferences, favorites, and username
+    globalStateManager.setState({
+      sessionContext: {
+        mealType: null,
+        servingSize: null,
+        timeAvailable: null,
+        dishFormat: null,
+        dishFormatLabel: null
+      },
+      vibeProfile: [],
+      negativeVibes: [],
+      currentSuggestions: [],
+      ingredientsAtHome: "",
+      currentVibeRound: 0,
+      shuffledVibes: []
+    });
+
+    // Hide result view, restore main container
+    const resultContainer = this.containers.resultContainer;
+    const mobileContainer = document.querySelector(".mobile-container");
+
+    if (resultContainer) {
+      resultContainer.style.display = "none";
+      resultContainer.classList.remove("show");
+    }
+    if (mobileContainer) {
+      mobileContainer.style.display = "";
+    }
+
+    // Clear view references so they're re-created fresh next session
+    this.recipeSuggestionsView = null;
+    this.recipeDetailView = null;
+
+    this.showQuestionnaire();
   }
 
   handleRecipeSelected(suggestion) {

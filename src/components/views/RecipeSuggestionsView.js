@@ -95,6 +95,14 @@ export class RecipeSuggestionsView {
       });
     });
 
+    // Setup start-fresh button
+    const startFreshBtn = this.container.querySelector(".start-fresh-btn");
+    if (startFreshBtn) {
+      startFreshBtn.addEventListener("click", () => {
+        this.container.dispatchEvent(new CustomEvent("startFresh"));
+      });
+    }
+
     // Setup regenerate button
     const regenerateBtn = this.container.querySelector(".regenerate-btn");
     if (regenerateBtn) {

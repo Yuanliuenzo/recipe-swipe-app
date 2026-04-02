@@ -17,7 +17,9 @@ class StateManager {
       sessionContext: {
         mealType: null, // "breakfast" | "brunch" | "lunch" | "dinner" | "snack"
         servingSize: null, // "solo" | "couple" | "group"
-        timeAvailable: null // "quick" | "normal" | "leisurely"
+        timeAvailable: null, // "quick" | "normal" | "leisurely"
+        dishFormat: null, // culinary direction prompt, or null
+        dishFormatLabel: null // display label e.g. "Mediterranean"
       },
 
       // Game state

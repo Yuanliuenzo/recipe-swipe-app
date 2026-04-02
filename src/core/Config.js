@@ -1,7 +1,7 @@
 // Centralized configuration and constants
 export const CONFIG = {
   // App settings
-  MAX_VIBE_ROUNDS: 5,
+  MAX_VIBE_ROUNDS: 7,
   API_TIMEOUT: 5000, // 5 seconds for regular API calls
 
   // Swipe thresholds
@@ -226,6 +226,182 @@ export const QUESTIONNAIRE_FLOWS = {
     // Snacks are always quick — no need to ask
     q3: { skip: true, default: "quick" }
   }
+};
+
+// Dish format options shown as the final questionnaire step.
+// prompt: string injected into LLM as hard constraint, or null for no constraint.
+export const DISH_FORMATS = {
+  breakfast: [
+    {
+      value: "eggs",
+      emoji: "🍳",
+      label: "Eggs",
+      prompt: "egg-based dish (scrambled, poached, omelette, frittata, etc.)"
+    },
+    {
+      value: "pancakes",
+      emoji: "🥞",
+      label: "Pancakes",
+      prompt: "pancakes, French toast, or crêpes"
+    },
+    {
+      value: "oats",
+      emoji: "🥣",
+      label: "Oats & granola",
+      prompt: "oats, granola, or porridge"
+    },
+    {
+      value: "baked",
+      emoji: "🥐",
+      label: "Something baked",
+      prompt: "baked breakfast item (muffin, scone, pastry, or toast)"
+    },
+    {
+      value: "fruit",
+      emoji: "🍓",
+      label: "Fruit & yogurt",
+      prompt: "fruit-based dish or yogurt bowl"
+    },
+    { value: "any", emoji: "🎲", label: "Surprise me", prompt: null }
+  ],
+  brunch: [
+    {
+      value: "eggs",
+      emoji: "🍳",
+      label: "Eggs",
+      prompt: "egg-based brunch dish"
+    },
+    {
+      value: "pancakes",
+      emoji: "🥞",
+      label: "Pancakes",
+      prompt: "pancakes, French toast, or crêpes"
+    },
+    {
+      value: "baked",
+      emoji: "🥐",
+      label: "Something baked",
+      prompt: "baked brunch item (croissant, scone, pastry)"
+    },
+    {
+      value: "bowl",
+      emoji: "🥣",
+      label: "Bowl",
+      prompt: "brunch bowl (grain, açaí, yogurt, or poké style)"
+    },
+    {
+      value: "sandwich",
+      emoji: "🥪",
+      label: "Sandwich",
+      prompt: "brunch sandwich, bagel, or toast"
+    },
+    { value: "any", emoji: "🎲", label: "Surprise me", prompt: null }
+  ],
+  lunch: [
+    {
+      value: "salad",
+      emoji: "🥗",
+      label: "Salad",
+      prompt: "salad — the recipe must be a salad as the main dish"
+    },
+    {
+      value: "soup",
+      emoji: "🥣",
+      label: "Soup or stew",
+      prompt: "soup or stew served in a bowl"
+    },
+    {
+      value: "sandwich",
+      emoji: "🥪",
+      label: "Sandwich or wrap",
+      prompt: "sandwich, wrap, or burger"
+    },
+    {
+      value: "pasta",
+      emoji: "🍝",
+      label: "Pasta or noodles",
+      prompt: "pasta or noodle dish"
+    },
+    {
+      value: "bowl",
+      emoji: "🍚",
+      label: "Rice or grain bowl",
+      prompt: "rice bowl, grain bowl, or similar"
+    },
+    {
+      value: "main",
+      emoji: "🍽️",
+      label: "Main dish",
+      prompt: "main dish with a protein and sides"
+    },
+    { value: "any", emoji: "🎲", label: "Surprise me", prompt: null }
+  ],
+  dinner: [
+    {
+      value: "soup",
+      emoji: "🥣",
+      label: "Soup or stew",
+      prompt: "soup, stew, or braise"
+    },
+    {
+      value: "pasta",
+      emoji: "🍝",
+      label: "Pasta or noodles",
+      prompt: "pasta or noodle dish"
+    },
+    {
+      value: "main",
+      emoji: "🍽️",
+      label: "Main + sides",
+      prompt: "main course with protein and one or two sides"
+    },
+    {
+      value: "bowl",
+      emoji: "🍚",
+      label: "Rice or grain bowl",
+      prompt: "rice bowl, grain bowl, or similar one-bowl meal"
+    },
+    {
+      value: "flatbread",
+      emoji: "🍕",
+      label: "Pizza or flatbread",
+      prompt: "pizza, flatbread, or tart"
+    },
+    {
+      value: "salad",
+      emoji: "🥗",
+      label: "Salad",
+      prompt: "substantial salad as main course"
+    },
+    { value: "any", emoji: "🎲", label: "Surprise me", prompt: null }
+  ],
+  snack: [
+    {
+      value: "bites",
+      emoji: "🍿",
+      label: "Quick bites",
+      prompt: "quick finger food or snack"
+    },
+    {
+      value: "dip",
+      emoji: "🧀",
+      label: "Dip & veg",
+      prompt: "dip served with vegetables or crackers"
+    },
+    {
+      value: "wrap",
+      emoji: "🥙",
+      label: "Wrap or roll",
+      prompt: "wrap, roll, or small flatbread"
+    },
+    {
+      value: "sweet",
+      emoji: "🍫",
+      label: "Something sweet",
+      prompt: "sweet snack or no-bake treat"
+    },
+    { value: "any", emoji: "🎲", label: "Surprise me", prompt: null }
+  ]
 };
 
 // Default preferences

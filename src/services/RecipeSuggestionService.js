@@ -4,6 +4,7 @@
 import { apiService } from "../core/ApiService.js";
 import { RecipeFormatter } from "../shared/RecipeFormatter.js";
 import { getCurrentSeason } from "../utils/LLMUtils.js";
+import { CONFIG, DISH_FORMATS } from "../core/Config.js";
 
 export class RecipeSuggestionService {
   constructor(stateManager) {
@@ -86,14 +87,22 @@ export class RecipeSuggestionService {
         // Map suggestions to internal format
         const suggestions = (
           parsedSuggestions || this.fallbackSuggestions()
-        ).map((s, idx) => ({
-          id: this.generateId(),
-          index: idx + 1,
-          title: s.title || `Recipe ${idx + 1}`,
-          description:
-            s.description || "Personalized recipe based on your preferences",
-          fullRecipe: s.fullRecipe || null
-        }));
+        ).map((s, idx) => {
+          // Normalize to components array — LLM may return components[] or a legacy title string
+          const components =
+            Array.isArray(s.components) && s.components.length > 0
+              ? s.components
+              : [s.title || `Recipe ${idx + 1}`];
+          return {
+            id: this.generateId(),
+            index: idx + 1,
+            title: components[0], // main dish name for display
+            components, // full array drives card rendering + recipe generation
+            description:
+              s.description || "Personalized recipe based on your preferences",
+            fullRecipe: null
+          };
+        });
 
         // Store in state manager
         this.stateManager.setState({ currentSuggestions: suggestions });
@@ -190,7 +199,7 @@ export class RecipeSuggestionService {
 
   async _fetchAndCacheRecipe(suggestion, onToken = null) {
     try {
-      const prompt = this.buildFullRecipePrompt(suggestion.title);
+      const prompt = this.buildFullRecipePrompt(suggestion);
 
       // Use streaming — tokens appear in real time, full text assembled as they arrive
       const recipeText = await apiService.streamRecipe(prompt, onToken);
@@ -222,6 +231,95 @@ export class RecipeSuggestionService {
   }
 
   // --------------------------
+  // Quick dish-direction suggester (called from questionnaire before swiping)
+  // --------------------------
+
+  async suggestFoodDirections(context, ingredients) {
+    const { mealType, servingSize, timeAvailable } = context;
+
+    const mealLabels = {
+      breakfast: "breakfast",
+      brunch: "brunch",
+      lunch: "lunch",
+      dinner: "dinner",
+      snack: "snack"
+    };
+    const servingLabels = {
+      solo: "1 person",
+      couple: "2–3 people",
+      group: "4 or more people"
+    };
+    const timeLabels = {
+      quick: "under 20 minutes",
+      normal: "30–45 minutes",
+      leisurely: "an hour or more"
+    };
+
+    const prompt = `You are a creative food editor helping someone choose a culinary direction for their meal.
+The direction they pick will be used to generate 5 different recipe ideas — so it must be
+broad enough that 5 distinctly different dishes could all fit comfortably within it.
+
+Context:
+- Meal: ${mealLabels[mealType] || mealType}
+- People: ${servingLabels[servingSize] || "unspecified"}
+- Time available: ${timeLabels[timeAvailable] || "flexible"}
+- Ingredients on hand: ${ingredients?.trim() || "nothing specific"}
+
+Suggest 3–4 culinary directions (cuisine, mood, or cooking style).
+Each direction must be broad enough to inspire 5 completely different recipes.
+
+BAD (too narrow — only one dish fits):
+  "Golden eggs & greens", "Shakshuka", "Stir-fried spinach", "Pan-fried egg", "Egg dish", "Salad" — these are recipes, not directions.
+
+GOOD (broad enough for 5 diverse recipes):
+  "Mediterranean" → shakshuka, frittata, baked feta, tabbouleh, egg drop soup with herbs
+  "Italian comfort" → pasta, frittata, bruschetta, ribollita, uova in purgatorio
+  "Middle Eastern warmth" → shakshuka, fatteh, spinach with tahini, pilafs, flatbreads
+  "Light & Japanese-inspired" → miso soup, onsen tamago, salads, rice bowls, dashi broth dishes
+
+If ingredients were provided, lean toward directions where they fit naturally — but the direction itself stays broad.
+
+Respond ONLY with JSON (no extra text):
+{
+  "directions": [
+    {"label": "Mediterranean", "emoji": "🫒", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
+    {"label": "Italian comfort", "emoji": "🍅", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
+    {"label": "Light & Asian-inspired", "emoji": "🥢", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
+  ]
+}
+
+Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
+
+    try {
+      const response = await apiService.post(
+        CONFIG.ENDPOINTS.GENERATE_RECIPE,
+        { prompt, suggestions: false },
+        30000
+      );
+      const rawText =
+        response?.recipe ?? (typeof response === "string" ? response : "");
+      const match = rawText.match(/\{[\s\S]*\}/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (Array.isArray(parsed.directions) && parsed.directions.length > 0) {
+          return parsed.directions;
+        }
+      }
+    } catch (err) {
+      console.warn(
+        "⚠️ suggestFoodDirections failed, using fallback:",
+        err.message
+      );
+    }
+
+    // Fallback: static DISH_FORMATS for this meal type (exclude "any")
+    return (DISH_FORMATS[mealType] || DISH_FORMATS.dinner)
+      .filter(f => f.value !== "any")
+      .slice(0, 4)
+      .map(f => ({ label: f.label, emoji: f.emoji, prompt: f.prompt }));
+  }
+
+  // --------------------------
   // Prompt builders
   // --------------------------
 
@@ -236,7 +334,6 @@ export class RecipeSuggestionService {
     const sessionContext = this.stateManager.get("sessionContext") || {};
     const ingredients = this.stateManager.get("ingredientsAtHome") || "";
     const season = this._getSeason();
-
     const mealLabels = {
       breakfast: "Breakfast",
       brunch: "Brunch",
@@ -255,63 +352,85 @@ export class RecipeSuggestionService {
       leisurely: "an hour or more"
     };
 
-    let prompt =
-      "Suggest exactly 5 recipe titles that match the following user context:\n\n";
-
-    // --- Factual constraints (hard requirements) ---
+    // Shared context block
+    let contextBlock = "";
     if (sessionContext.mealType) {
-      prompt += `Meal type: ${mealLabels[sessionContext.mealType]} — all 5 suggestions MUST be appropriate for this meal\n`;
+      contextBlock += `Meal type: ${mealLabels[sessionContext.mealType]}\n`;
     }
     if (sessionContext.servingSize) {
-      prompt += `Serving size: ${servingLabels[sessionContext.servingSize]}\n`;
+      contextBlock += `Serving size: ${servingLabels[sessionContext.servingSize]}\n`;
     }
     if (sessionContext.timeAvailable) {
-      prompt += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
+      contextBlock += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
     }
     if (preferences.diet && preferences.diet !== "None") {
-      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+      contextBlock += `Dietary restriction: ${preferences.diet} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
-      prompt += `Budget: affordable, everyday ingredients preferred\n`;
+      contextBlock += `Budget: affordable, everyday ingredients preferred\n`;
     }
 
-    // --- Emotional vibes (stylistic guidance) ---
+    // Shared vibe block
+    let vibeBlock = "";
     if (vibes.length) {
-      prompt += `\nMood/Vibes the user is feeling:\n`;
-      vibes.forEach(v => (prompt += `  • ${v.emoji} ${v.name}: ${v.prompt}\n`));
+      const moodTags = [...new Set(vibes.flatMap(c => c.tags?.mood || []))];
+      const flavorTags = [...new Set(vibes.flatMap(c => c.tags?.flavor || []))];
+      const styleTags = [...new Set(vibes.flatMap(c => c.tags?.style || []))];
+      vibeBlock += `\nMood inferred from the user's image selections:\n`;
+      if (moodTags.length) {
+        vibeBlock += `  • Feeling: ${moodTags.join(", ")}\n`;
+      }
+      if (flavorTags.length) {
+        vibeBlock += `  • Craving: ${flavorTags.join(", ")}\n`;
+      }
+      if (styleTags.length) {
+        vibeBlock += `  • Style: ${styleTags.join(", ")}\n`;
+      }
     }
     if (negativeVibes.length) {
-      prompt += `\nNOT in the mood for: ${negativeVibes.map(v => `${v.emoji} ${v.name}`).join(", ")} — avoid suggestions that feel like these\n`;
+      const avoidTags = [
+        ...new Set(negativeVibes.flatMap(c => c.tags?.mood || []))
+      ];
+      vibeBlock += `\nNOT in the mood for: ${avoidTags.join(", ")} — avoid suggestions that feel like these\n`;
     }
 
-    // --- Seasonal context (automatic, soft guidance) ---
-    prompt += `\nCurrent season: ${season} in the northern hemisphere — lean toward seasonal ingredients where it genuinely improves the dish\n`;
+    const seasonLine = `\nCurrent season: ${season} in the northern hemisphere — lean toward seasonal ingredients where it genuinely improves the dish\n`;
+    const ingredientsBlock = ingredients.trim()
+      ? `\nIngredients available at home: ${ingredients}\nUse whichever of these make a natural fit for the dish — do not force all of them in\n`
+      : "";
 
-    // --- Ingredients (soft preference) ---
-    if (ingredients.trim()) {
-      prompt += `\nIngredients available at home: ${ingredients}\n`;
-      prompt += `Use whichever of these make a natural fit for the dish — do not force all of them in\n`;
+    let prompt =
+      "Suggest exactly 5 recipe ideas that match the following user context:\n\n";
+    prompt += contextBlock;
+    if (sessionContext.dishFormat) {
+      prompt += `Culinary direction: ${sessionContext.dishFormat} — all 5 suggestions should feel like they belong to this culinary tradition or mood. Vary the dish format freely.\n`;
     }
-
+    prompt += vibeBlock;
+    prompt += seasonLine;
+    prompt += ingredientsBlock;
     prompt += `
+For each recipe, think about what makes a complete, satisfying meal:
+- Some dishes are naturally standalone (a hearty soup, a grain bowl, shakshuka) — list only one component.
+- Some genuinely benefit from a side (pasta + salad, grilled fish + roasted veg) — list two.
+- Some are a full composed meal (tagine + couscous + yogurt dip) — list all natural components, max 3.
+Only add components when they genuinely make the meal better.
+
 Please respond with exactly 5 suggestions in this JSON format:
 {
   "suggestions": [
-    { "title": "Recipe Title 1", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 2", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 3", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 4", "description": "Brief explanation (max 40 words)" },
-    { "title": "Recipe Title 5", "description": "Brief explanation (max 40 words)" }
+    { "components": ["Shakshuka"], "description": "Brief explanation (max 40 words)" },
+    { "components": ["Tagliatelle al Ragù", "Rocket & parmesan salad"], "description": "Brief explanation (max 40 words)" },
+    { "components": ["Moroccan Chicken Tagine", "Saffron Couscous", "Harissa Yogurt"], "description": "Brief explanation (max 40 words)" }
   ]
 }
 
-Keep titles appealing and accurate. Descriptions should hint at why each matches the mood.
+components[0] is always the main dish. Additional entries are natural accompaniments (max 3 total). Keep all names specific and appetising. Descriptions hint at why each matches the mood.
 `;
 
     return prompt;
   }
 
-  buildFullRecipePrompt(selectedTitle) {
+  buildFullRecipePrompt(suggestion) {
     const vibes = this.stateManager.get("vibeProfile") || [];
     const negativeVibes = this.stateManager.get("negativeVibes") || [];
     const preferences = this.stateManager.get("preferences") || {};
@@ -330,8 +449,36 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       leisurely: "an hour or more"
     };
 
-    let prompt = `Generate a complete recipe for "${selectedTitle}"\n\n`;
+    // Normalize to components array (suggestion object or legacy string)
+    const components =
+      suggestion &&
+      Array.isArray(suggestion.components) &&
+      suggestion.components.length > 0
+        ? suggestion.components
+        : [
+            typeof suggestion === "string"
+              ? suggestion
+              : suggestion?.title || "Recipe"
+          ];
 
+    const isMultiComponent = components.length > 1;
+    const componentLabels = ["Main dish", "Side dish", "Accompaniment"];
+
+    // Opening line
+    let prompt;
+    if (isMultiComponent) {
+      const list = components
+        .map(
+          (name, i) =>
+            `${componentLabels[i] || `Component ${i + 1}`}: "${name}"`
+        )
+        .join("\n");
+      prompt = `Generate complete recipes for the following meal:\n${list}\n\n`;
+    } else {
+      prompt = `Generate a complete recipe for "${components[0]}"\n\n`;
+    }
+
+    // Context
     if (sessionContext.servingSize) {
       prompt += `Servings: ${servingLabels[sessionContext.servingSize]}\n`;
     }
@@ -346,10 +493,22 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
     }
 
     if (vibes.length) {
-      prompt += `\nMood: ${vibes.map(v => `${v.emoji} ${v.name}`).join(", ")}\n`;
+      const moodTags = [...new Set(vibes.flatMap(c => c.tags?.mood || []))];
+      const flavorTags = [...new Set(vibes.flatMap(c => c.tags?.flavor || []))];
+      const styleTags = [...new Set(vibes.flatMap(c => c.tags?.style || []))];
+      prompt += `\nMood: ${moodTags.join(", ")}\n`;
+      if (flavorTags.length) {
+        prompt += `Flavor cues: ${flavorTags.join(", ")}\n`;
+      }
+      if (styleTags.length) {
+        prompt += `Style: ${styleTags.join(", ")}\n`;
+      }
     }
     if (negativeVibes.length) {
-      prompt += `Avoid: ${negativeVibes.map(v => v.name).join(", ")}\n`;
+      const avoidTags = [
+        ...new Set(negativeVibes.flatMap(c => c.tags?.mood || []))
+      ];
+      prompt += `Avoid: ${avoidTags.join(", ")}\n`;
     }
 
     prompt += `Season: ${season} — use seasonal ingredients where appropriate\n`;
@@ -359,10 +518,42 @@ Keep titles appealing and accurate. Descriptions should hint at why each matches
       prompt += `(Use whichever make a natural fit — no need to force all of them in)\n`;
     }
 
-    prompt += `
+    // Output structure
+    if (isMultiComponent) {
+      const sectionTemplate = (name, brief) => `
+${name}
+===
+
+Ingredients:
+• [ingredient 1]
+• [ingredient 2]
+
+Instructions:
+1. [step 1]
+2. [step 2]
+${brief ? "\n(Keep this section brief — simple preparation)" : ""}`;
+      const sections = components
+        .map((name, i) => sectionTemplate(name, i > 0))
+        .join("\n\n---\n");
+      prompt += `
+Structure exactly like this (one section per component, separated by ---):
+${sections}
+
+Do not omit headers. Keep each recipe concise but complete.
+
+After all recipe sections, add one final section:
+
+Cooking Timeline
+===
+A practical schedule so everything finishes at the same time.
+List 4–7 steps, each on its own line in this format: "X min before serving: [what to do]"
+Work backwards from serving time. Be specific and actionable.
+`;
+    } else {
+      prompt += `
 Structure exactly like this:
 
-Recipe Name
+${components[0]}
 ===
 
 Ingredients:
@@ -375,6 +566,7 @@ Instructions:
 
 Do not omit headers. Keep concise but complete.
 `;
+    }
 
     return prompt;
   }
@@ -404,11 +596,11 @@ Do not omit headers. Keep concise but complete.
   fallbackSuggestions() {
     return [
       {
-        title: "Fresh Garden Salad",
+        components: ["Fresh Garden Salad"],
         description: "Light, healthy salad with seasonal vegetables"
       },
       {
-        title: "Comforting Vegetable Soup",
+        components: ["Comforting Vegetable Soup"],
         description: "Warm, hearty soup for cozy nights"
       }
     ];
@@ -421,18 +613,34 @@ Do not omit headers. Keep concise but complete.
   }
 
   createSuggestionCard(suggestion) {
+    const components = suggestion.components || [suggestion.title];
+    const accompaniments = components.slice(1);
+    const accompHtml = accompaniments
+      .map(
+        name => `<div class="suggestion-component-line">
+          <span class="suggestion-component-plus">+</span>
+          <span class="suggestion-component-name">${name}</span>
+        </div>`
+      )
+      .join("");
+    const btnLabel =
+      accompaniments.length > 0 ? "Cook This Meal" : "Choose This Recipe";
+
     return `
       <div class="recipe-suggestion-card" data-suggestion-id="${suggestion.id}">
         <div class="suggestion-header">
           <div class="suggestion-number">${suggestion.index}</div>
-          <h3 class="suggestion-title">${suggestion.title}</h3>
+          <div class="suggestion-title-group">
+            <h3 class="suggestion-title">${components[0]}</h3>
+            ${accompHtml}
+          </div>
         </div>
         <div class="suggestion-description">
           <p>${suggestion.description}</p>
         </div>
         <div class="suggestion-actions">
           <button class="japandi-btn japandi-btn-primary select-recipe-btn" data-suggestion-id="${suggestion.id}">
-            Choose This Recipe
+            ${btnLabel}
           </button>
         </div>
       </div>
@@ -444,7 +652,7 @@ Do not omit headers. Keep concise but complete.
       <div class="recipe-suggestions-container">
         <div class="suggestions-header">
           <h2>🍳 Recipe Ideas For You</h2>
-          <p>Based on your preferences, here are 5 recipe suggestions. Click one to see the full recipe!</p>
+          <p>Based on your preferences, here are 5 suggestions. Click one to see the full recipe!</p>
         </div>
         <div class="suggestions-grid">
           ${suggestions.map(s => this.createSuggestionCard(s)).join("")}
@@ -453,6 +661,7 @@ Do not omit headers. Keep concise but complete.
           <button class="japandi-btn japandi-btn-subtle regenerate-btn">
             🔄 Get New Ideas
           </button>
+          <button class="start-fresh-btn">Cook something different →</button>
         </div>
       </div>
     `;

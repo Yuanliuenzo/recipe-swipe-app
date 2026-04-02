@@ -1,130 +1,92 @@
 import { Card } from "./Card.js";
 import { CONFIG } from "../../core/Config.js";
 
-// Platform detection
-const isMobile = () => {
-  return (
-    window.location.pathname.includes("mobile.html") ||
-    document.querySelector(".mobile-container") !== null
-  );
-};
+const isMobile = () =>
+  window.location.pathname.includes("mobile.html") ||
+  document.querySelector(".mobile-container") !== null;
 
-// Vibe-specific card component
+// Axis card: shows a question, full-bleed image, and two labeled swipe directions.
+// Swipe RIGHT = swipeRight.label, swipe LEFT = swipeLeft.label.
 export class VibeCard extends Card {
   constructor(container, props = {}) {
     super(container, {
       className: isMobile() ? "mobile-vibe-card" : "vibe-card",
       ...props
     });
-
     this.vibe = props.vibe;
     this.round = props.round || 1;
   }
 
   render() {
     if (!this.vibe) {
-      console.warn("VibeCard: No vibe data provided");
-      return `<div class="${isMobile() ? "mobile-vibe-card" : "vibe-card"} error">No vibe data</div>`;
+      console.warn("VibeCard: No card data provided");
+      return `<div class="vibe-card error">No card data</div>`;
     }
 
-    const { name, emoji, description, image, color } = this.vibe;
+    const { id, image, question, swipeRight, swipeLeft } = this.vibe;
+    const cls = isMobile() ? "mobile-vibe-card" : "vibe-card";
 
-    if (isMobile()) {
-      // Mobile rendering with beautiful styling
-      return `
-        <div class="${isMobile() ? "mobile-vibe-card" : "vibe-card"}" 
-             data-component-id="${this.id}"
-             data-vibe-name="${name}"
-             style="background-image: url('${image}'); 
-                    background-size: cover; 
-                    background-position: center;
-                    border: 3px solid ${color}80;
-                    top: ${(this.round - 1) * 5}px;">
-          <div class="mobile-vibe-card-overlay">
-            <div class="mobile-vibe-emoji">${emoji}</div>
-            <div class="mobile-vibe-name">${name}</div>
-            <div class="mobile-vibe-description">${description}</div>
-          </div>
+    const leftLabel = swipeLeft?.label ?? "";
+    const rightLabel = swipeRight?.label ?? "";
+
+    return `
+      <div class="${cls}"
+           data-component-id="${this.id}"
+           data-vibe-name="${id}"
+           style="background-image: url('${image}');
+                  background-size: cover;
+                  background-position: center;
+                  top: ${(this.round - 1) * 5}px;">
+        <div class="vibe-card-gradient"></div>
+        ${question ? `<div class="vibe-card-question">${question}</div>` : ""}
+        <div class="vibe-card-options">
+          <div class="vibe-card-option vibe-card-option--left">← ${leftLabel}</div>
+          <div class="vibe-card-option vibe-card-option--right">${rightLabel} →</div>
         </div>
-      `;
-    } else {
-      // Web rendering (original)
-      return `
-        <div class="card vibe-card" 
-             data-component-id="${this.id}"
-             data-vibe-name="${name}"
-             style="background-image: url('${image}'); 
-                    background-size: cover; 
-                    background-position: center;
-                    border: 3px solid ${color}80;
-                    top: ${(this.round - 1) * 5}px;">
-          <div class="overlay vibe-overlay" 
-               style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));">
-            <div class="vibe-emoji">${emoji}</div>
-            <div class="vibe-name">${name}</div>
-            <div class="vibe-description">${description}</div>
-          </div>
-        </div>
-      `;
-    }
+      </div>
+    `;
   }
 
   onMount() {
     super.onMount();
-
-    // Add entrance animation with stagger based on round
-    const cardElement = this.find(`[data-component-id="${this.id}"]`);
-    if (cardElement) {
-      const delay = (this.round - 1) * 100;
-
-      setTimeout(() => {
-        cardElement.style.opacity = "1";
-        cardElement.style.transform = "translateY(0) scale(1)";
-      }, delay);
+    const el = this.find(`[data-component-id="${this.id}"]`);
+    if (el) {
+      setTimeout(
+        () => {
+          el.style.opacity = "1";
+          el.style.transform = "translateY(0) scale(1)";
+        },
+        (this.round - 1) * 100
+      );
     }
   }
 
-  // Get vibe data
+  // Public API (kept for backward compat)
   getVibe() {
     return this.vibe;
   }
-
-  // Get vibe name
   getVibeName() {
-    return this.vibe?.name || "";
+    return this.vibe?.id ?? "";
   }
-
-  // Get vibe color
   getVibeColor() {
-    return this.vibe?.color || "#000";
+    return "#000";
   }
 
-  // Add swipe-specific animations
   showLikeIndicator() {
     this.addSwipeEffect(150, 0, 7.5, 1.05);
   }
-
   showNopeIndicator() {
     this.addSwipeEffect(-150, 0, -7.5, 1.05);
   }
-
-  // Animate swipe out with direction-specific effects
   swipeOut(direction = "right", callback = null) {
-    const distance = direction === "right" ? 500 : -500;
-    this.animateOut(direction, distance);
-
-    // Call callback after animation
+    this.animateOut(direction, direction === "right" ? 500 : -500);
     if (callback) {
       setTimeout(callback, CONFIG.ANIMATION_DURATION);
     }
   }
-
-  // Reset to neutral position
   resetToCenter() {
     this.resetPosition();
   }
-
-  // Update vibe data
   updateVibe(newVibe) {
     this.vibe = newVibe;
     this.forceUpdate();

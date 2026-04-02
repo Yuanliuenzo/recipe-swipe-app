@@ -204,6 +204,112 @@
   }
 }
 
+/* ---- Dish format tile grid ---- */
+.q-dish-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.q-dish-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 14px 6px 12px;
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.q-dish-emoji {
+  font-size: 28px;
+  line-height: 1;
+  display: block;
+}
+
+.q-dish-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+}
+
+.q-dish-tile:active {
+  transform: scale(0.93);
+}
+
+.q-dish-tile.selected {
+  border-color: var(--color-accent);
+  background: rgba(184, 115, 51, 0.08);
+}
+
+.q-dish-tile.selected .q-dish-label {
+  color: var(--color-accent);
+}
+
+/* Action row: "Help me pick a direction" + "Surprise me" */
+.q-direction-action-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.q-surprise-link {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: var(--font-primary);
+  transition: color var(--transition-fast);
+}
+
+.q-surprise-link:hover {
+  color: var(--color-text);
+}
+
+/* Loading state while LLM generates food directions */
+.q-dish-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-2xl) 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.q-dish-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: q-spin 0.8s linear infinite;
+}
+
+@keyframes q-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Tablet & desktop: slightly more padding */
 @media (min-width: 768px) {
   .questionnaire-card {
