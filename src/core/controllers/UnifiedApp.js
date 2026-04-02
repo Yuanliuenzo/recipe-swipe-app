@@ -306,13 +306,22 @@ export class UnifiedApp {
       return;
     }
 
-    // Reuse or create the skip button below the card container
+    // Reuse or create the skip button fixed to bottom of screen (above card container)
     let skipBtn = document.querySelector(".vibe-skip-btn");
     if (!skipBtn) {
       skipBtn = document.createElement("button");
       skipBtn.className = "vibe-skip-btn";
-      skipBtn.addEventListener("click", () => this.showResult());
-      this.containers.cardContainer.insertAdjacentElement("afterend", skipBtn);
+      skipBtn.addEventListener("click", () => {
+        if (skipBtn.classList.contains("is-exiting")) {
+          return;
+        } // prevent double-fire
+        skipBtn.classList.add("is-exiting");
+        // Start recipe generation immediately — loading screen appears behind the exiting pill
+        this.showRecipeGeneration();
+        // Remove pill from DOM after exit animation completes
+        setTimeout(() => skipBtn.remove(), 420);
+      });
+      this.containers.cardContainer.appendChild(skipBtn);
     }
 
     skipBtn.textContent = hasIngredients
@@ -323,15 +332,9 @@ export class UnifiedApp {
   showResult() {
     // Remove skip button if present
     document.querySelector(".vibe-skip-btn")?.remove();
-
-    const profile = globalStateManager.get("vibeProfile");
-    console.log("🎉 Showing result with profile:", profile);
-
-    if (profile.length > 0) {
-      this.showRecipeGeneration(profile);
-    } else {
-      this.showSimpleResult();
-    }
+    // Always generate — showRecipeGeneration reads full context (vibes + ingredients + questionnaire)
+    // and works correctly even with an empty vibe profile
+    this.showRecipeGeneration();
   }
 
   showQuestionnaire() {
@@ -676,10 +679,51 @@ export class UnifiedApp {
       this.recipeSuggestionsView.on("recipeSelected", e => {
         this.handleRecipeSelected(e.detail.suggestion);
       });
+
+      this.recipeSuggestionsView.on("startFresh", () => {
+        this.resetAndRestart();
+      });
     }
 
     this.currentView = this.recipeSuggestionsView;
     this.recipeSuggestionsView.render();
+  }
+
+  resetAndRestart() {
+    // Reset session state — keep preferences, favorites, and username
+    globalStateManager.setState({
+      sessionContext: {
+        mealType: null,
+        servingSize: null,
+        timeAvailable: null,
+        dishFormat: null,
+        dishFormatLabel: null
+      },
+      vibeProfile: [],
+      negativeVibes: [],
+      currentSuggestions: [],
+      ingredientsAtHome: "",
+      currentVibeRound: 0,
+      shuffledVibes: []
+    });
+
+    // Hide result view, restore main container
+    const resultContainer = this.containers.resultContainer;
+    const mobileContainer = document.querySelector(".mobile-container");
+
+    if (resultContainer) {
+      resultContainer.style.display = "none";
+      resultContainer.classList.remove("show");
+    }
+    if (mobileContainer) {
+      mobileContainer.style.display = "";
+    }
+
+    // Clear view references so they're re-created fresh next session
+    this.recipeSuggestionsView = null;
+    this.recipeDetailView = null;
+
+    this.showQuestionnaire();
   }
 
   handleRecipeSelected(suggestion) {

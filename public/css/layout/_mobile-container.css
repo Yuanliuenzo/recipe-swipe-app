@@ -63,6 +63,18 @@
   justify-content: flex-start;
   align-items: center;
   padding: var(--space-lg);
+  animation: resultFadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes resultFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .mobile-result-content {

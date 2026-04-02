@@ -661,6 +661,7 @@ Do not omit headers. Keep concise but complete.
           <button class="japandi-btn japandi-btn-subtle regenerate-btn">
             🔄 Get New Ideas
           </button>
+          <button class="start-fresh-btn">Cook something different →</button>
         </div>
       </div>
     `;
