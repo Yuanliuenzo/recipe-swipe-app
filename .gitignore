@@ -94,5 +94,10 @@ debug-phone.js
 .playwright-mcp/
 .mcp.json
 
+# Playwright CLI
+.playwright-cli/
+playwright-cli.json
+.claude/skills/
+
 # Playwright screenshots
 *.png

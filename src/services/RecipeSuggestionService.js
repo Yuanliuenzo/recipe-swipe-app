@@ -624,7 +624,7 @@ Do not omit headers. Keep concise but complete.
       )
       .join("");
     const btnLabel =
-      accompaniments.length > 0 ? "Cook This Meal" : "Choose This Recipe";
+      accompaniments.length > 0 ? "Cook this meal" : "Let's make this";
 
     return `
       <div class="recipe-suggestion-card" data-suggestion-id="${suggestion.id}">
@@ -651,8 +651,8 @@ Do not omit headers. Keep concise but complete.
     return `
       <div class="recipe-suggestions-container">
         <div class="suggestions-header">
-          <h2>🍳 Recipe Ideas For You</h2>
-          <p>Based on your preferences, here are 5 suggestions. Click one to see the full recipe!</p>
+          <h2>Your recipe picks</h2>
+          <p>Tailored to your vibe tonight — tap one to get cooking.</p>
         </div>
         <div class="suggestions-grid">
           ${suggestions.map(s => this.createSuggestionCard(s)).join("")}
