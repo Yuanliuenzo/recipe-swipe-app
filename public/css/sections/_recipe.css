@@ -340,42 +340,98 @@
 
 /* ─── Cooking Timeline ────────────────────────────────────────────────────── */
 .recipe-timeline {
-  padding: var(--space-xs) 0;
+  padding: 4px 0;
 }
 
+/* Each countdown step: [time badge] [dot+line track] [action text] */
 .timeline-step {
-  position: relative;
-  padding: var(--space-sm) var(--space-md) var(--space-sm) 28px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-text);
-  margin-bottom: 2px;
+  display: flex;
+  gap: 10px;
+  /* stretch (default) so the track column fills full step height — this makes the
+     connecting line run continuously from one dot to the next */
 }
 
-.timeline-step::before {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 11px;
-  width: 8px;
-  height: 8px;
-  background: var(--color-accent);
+.timeline-step-time {
+  width: 32px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(
+    --color-primary
+  ); /* darker than accent for readable contrast on iOS */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  padding-top: 1px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.timeline-step-track {
+  width: 14px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-step-dot {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
+  background: var(--gradient-primary);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(196, 146, 74, 0.18);
+}
+
+.timeline-step-line {
+  width: 2px;
+  flex: 1;
+  min-height: 16px;
+  background: rgba(196, 146, 74, 0.28);
+  margin-top: 3px;
+}
+
+.timeline-step-action {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-text);
+  padding-bottom: 16px;
+}
+
+/* Serve endpoint node */
+.timeline-serve {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.timeline-serve-spacer {
+  width: 32px;
   flex-shrink: 0;
 }
 
-.timeline-step::after {
-  content: "";
-  position: absolute;
-  left: 9px;
-  top: 19px;
-  width: 2px;
-  bottom: -4px;
-  background: rgba(184, 115, 51, 0.2);
+.timeline-serve-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(196, 146, 74, 0.18);
 }
 
-.timeline-step:last-child::after {
-  display: none;
+.timeline-serve-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Recipe Loading States */
