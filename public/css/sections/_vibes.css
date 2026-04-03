@@ -129,42 +129,38 @@
   text-align: right;
 }
 
-/* Skip-to-recipes pill — fixed above the card container */
+/* Skip link — in .mobile-header, right of center but clear of the FAB (56px wide, right: 20px) */
 .vibe-skip-btn {
   position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background: transparent;
-  border: 1.5px solid var(--color-border);
-  color: var(--color-text-light);
-  font-size: 13px;
+  right: 84px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
   font-family: var(--font-primary);
   font-weight: 500;
-  letter-spacing: 0.02em;
   cursor: pointer;
-  padding: 10px 22px;
-  border-radius: var(--radius-full);
+  padding: 8px 4px;
   white-space: nowrap;
-  /* hover transitions run fast; exit transition runs slower */
+  -webkit-tap-highlight-color: transparent;
+  /* Opacity-only transition — no transform animation, safe on iOS */
+  opacity: 0;
   transition:
-    border-color var(--transition-fast),
-    color var(--transition-fast),
-    background var(--transition-fast),
-    transform 0.38s cubic-bezier(0.4, 0, 1, 1),
-    opacity 0.38s ease;
+    opacity 0.3s ease,
+    color 0.15s ease;
 }
 
-.vibe-skip-btn:hover {
-  border-color: var(--color-accent);
+.vibe-skip-btn.is-visible {
+  opacity: 1;
+}
+
+.vibe-skip-btn:active {
   color: var(--color-accent);
-  background: rgba(196, 146, 74, 0.06);
 }
 
-/* Exit: pill swipes off to the right, matching the swipe metaphor */
 .vibe-skip-btn.is-exiting {
-  transform: translateX(calc(-50% + 110vw));
   opacity: 0;
   pointer-events: none;
 }

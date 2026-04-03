@@ -282,13 +282,13 @@ If ingredients were provided, lean toward directions where they fit naturally �
 Respond ONLY with JSON (no extra text):
 {
   "directions": [
-    {"label": "Mediterranean", "emoji": "🫒", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
-    {"label": "Italian comfort", "emoji": "🍅", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
-    {"label": "Light & Asian-inspired", "emoji": "🥢", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
+    {"label": "Mediterranean", "emoji": "🫒", "description": "Bright, herb-forward dishes — olive oil, citrus, and sun-ripened vegetables.", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
+    {"label": "Italian comfort", "emoji": "🍅", "description": "Hearty and warming — pasta, slow-cooked sauces, and rustic baked dishes.", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
+    {"label": "Light & Asian-inspired", "emoji": "🥢", "description": "Clean, umami-rich flavours — fresh herbs, sesame, ginger, and miso.", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
   ]
 }
 
-Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
+Rules: labels 1–3 words (cuisine name or short mood), punchy; description 1 short evocative sentence (~12 words, sensory/mood-driven); 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
 
     try {
       const response = await apiService.post(

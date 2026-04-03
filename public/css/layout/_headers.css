@@ -2,6 +2,7 @@
 
 /* Mobile Header */
 .mobile-header {
+  position: relative;
   text-align: center;
   padding: var(--space-xl) var(--space-xl) var(--space-sm);
   background: rgba(245, 242, 237, 0.85);

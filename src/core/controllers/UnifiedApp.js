@@ -318,15 +318,19 @@ export class UnifiedApp {
         skipBtn.classList.add("is-exiting");
         // Start recipe generation immediately — loading screen appears behind the exiting pill
         this.showRecipeGeneration();
-        // Remove pill from DOM after exit animation completes
-        setTimeout(() => skipBtn.remove(), 420);
+        // Remove from DOM after exit animation completes
+        setTimeout(() => skipBtn.remove(), 350);
       });
-      this.containers.cardContainer.appendChild(skipBtn);
+      document.querySelector(".mobile-header").appendChild(skipBtn);
+      // Double rAF: first frame lets the browser compute layout with opacity:0,
+      // second frame triggers the transition. No CSS animation used — avoids
+      // the iOS Safari bug where animation+transform on fixed elements = invisible.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => skipBtn.classList.add("is-visible"));
+      });
     }
 
-    skipBtn.textContent = hasIngredients
-      ? `Skip swiping — use my ingredients →`
-      : `I know what I want — show me recipes →`;
+    skipBtn.textContent = "Skip →";
   }
 
   showResult() {
@@ -531,30 +535,21 @@ export class UnifiedApp {
         <button class="japandi-btn japandi-btn-primary q-direction-btn">
           Help me pick a direction →
         </button>
-        <button class="q-surprise-link">Surprise me</button>
       </div>
     `;
     body.appendChild(step);
     this._scrollToStep(body);
 
-    // All 3 required answers are in — enable Start Swiping with Surprise Me as default
+    // All 3 required answers are in — enable Start Swiping (no direction = surprise me)
     submitBtn.disabled = false;
 
     const input = step.querySelector(".q-ingredients-input");
     const directionBtn = step.querySelector(".q-direction-btn");
-    const surpriseLink = step.querySelector(".q-surprise-link");
 
     directionBtn.addEventListener("click", () => {
       directionBtn.disabled = true;
       directionBtn.textContent = "Finding directions…";
       this._loadDirections(body, answers, submitBtn, input.value);
-    });
-
-    surpriseLink.addEventListener("click", () => {
-      answers.dishFormat = null;
-      answers.dishFormatLabel = null;
-      submitBtn.disabled = false;
-      submitBtn.click();
     });
   }
 
@@ -583,46 +578,59 @@ export class UnifiedApp {
       tiles = (DISH_FORMATS[answers.mealType] || DISH_FORMATS.dinner)
         .filter(f => f.value !== "any")
         .slice(0, 4)
-        .map(f => ({ label: f.label, emoji: f.emoji, prompt: f.prompt }));
+        .map(f => ({
+          label: f.label,
+          emoji: f.emoji,
+          prompt: f.prompt,
+          description: f.description || ""
+        }));
     }
 
-    tiles.push({ label: "Surprise me", emoji: "🎲", prompt: null });
+    tiles.push({
+      label: "Surprise me",
+      emoji: "🎲",
+      prompt: null,
+      description: "Let the app pick for you — anything goes."
+    });
     this._renderDirectionTiles(step, body, answers, submitBtn, tiles);
   }
 
   _renderDirectionTiles(step, body, answers, submitBtn, tiles) {
-    const tilesHtml = tiles
+    const cardsHtml = tiles
       .map(
         t =>
-          `<button class="q-dish-tile" data-label="${t.label}" data-prompt="${t.prompt ?? ""}">
-            <span class="q-dish-emoji">${t.emoji}</span>
-            <span class="q-dish-label">${t.label}</span>
+          `<button class="q-direction-card" data-label="${t.label}" data-prompt="${t.prompt ?? ""}">
+            <span class="q-direction-card-emoji">${t.emoji}</span>
+            <div class="q-direction-card-text">
+              <span class="q-direction-card-label">${t.label}</span>
+              ${t.description ? `<span class="q-direction-card-desc">${t.description}</span>` : ""}
+            </div>
           </button>`
       )
       .join("");
 
     step.innerHTML = `
       <label class="q-label">What kind of direction?</label>
-      <div class="q-dish-grid">${tilesHtml}</div>
+      <div class="q-direction-list">${cardsHtml}</div>
     `;
     this._scrollToStep(body);
 
-    const grid = step.querySelector(".q-dish-grid");
+    const list = step.querySelector(".q-direction-list");
 
-    grid.addEventListener("click", e => {
-      const tile = e.target.closest(".q-dish-tile");
-      if (!tile) {
+    list.addEventListener("click", e => {
+      const card = e.target.closest(".q-direction-card");
+      if (!card) {
         return;
       }
 
-      // Deselect previous tile
-      grid
-        .querySelectorAll(".q-dish-tile.selected")
-        .forEach(t => t.classList.remove("selected"));
-      tile.classList.add("selected");
+      // Deselect previous card
+      list
+        .querySelectorAll(".q-direction-card.selected")
+        .forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
 
-      answers.dishFormat = tile.dataset.prompt || null;
-      answers.dishFormatLabel = tile.dataset.label;
+      answers.dishFormat = card.dataset.prompt || null;
+      answers.dishFormatLabel = card.dataset.label;
       submitBtn.disabled = false;
     });
   }
