@@ -36,12 +36,14 @@ export class RecipeDisplayComponent {
           ? `
         <div class="mobile-recipe-toggle">
           <button class="mobile-recipe-toggle-btn active" data-target="ingredients">
-            ${formatted.isMultiComponent ? "🥘 What You Need" : "Ingredients"}
+            <span class="toggle-btn-icon">🥘</span>
+            <span class="toggle-btn-label">Ingredients</span>
           </button>
           <button class="mobile-recipe-toggle-btn" data-target="instructions">
-            ${formatted.isMultiComponent ? "👨‍🍳 How To Cook" : "Instructions"}
+            <span class="toggle-btn-icon">👨‍🍳</span>
+            <span class="toggle-btn-label">Method</span>
           </button>
-          ${formatted.hasTimeline ? `<button class="mobile-recipe-toggle-btn" data-target="timeline">⏱ Timeline</button>` : ""}
+          ${formatted.hasTimeline ? `<button class="mobile-recipe-toggle-btn" data-target="timeline"><span class="toggle-btn-icon">⏱</span><span class="toggle-btn-label">Timeline</span></button>` : ""}
         </div>
       `
           : ""

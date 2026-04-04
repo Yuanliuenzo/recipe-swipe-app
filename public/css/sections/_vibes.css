@@ -12,7 +12,7 @@
 
 .vibe-summary h2 {
   margin-bottom: var(--space-xl);
-  color: #333;
+  color: var(--color-text);
   font-size: 28px;
 }
 
@@ -25,13 +25,13 @@
 }
 
 .vibe-tag {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--gradient-vibe);
   color: white;
   padding: var(--space-sm) var(--space-lg);
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 10px rgba(192, 88, 58, 0.2);
 }
 
 /* Mobile Vibe Summary */
@@ -41,7 +41,7 @@
 
 .mobile-vibe-summary h2 {
   font-size: 24px;
-  color: #333;
+  color: var(--color-text);
   margin-bottom: var(--space-lg);
 }
 
@@ -204,12 +204,12 @@
 
 .mobile-swipe-indicator.like {
   right: 20px;
-  color: #2e7d32;
+  color: var(--color-accent);
 }
 
 .mobile-swipe-indicator.nope {
   left: 20px;
-  color: #c0392b;
+  color: var(--color-primary);
 }
 
 .mobile-swipe-indicator.show {

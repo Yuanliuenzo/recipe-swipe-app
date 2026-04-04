@@ -1,11 +1,11 @@
 /* Typography — Amsterdam/Berlin Minimal */
 
 /* Font Imports */
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap");
 
 /* Base Typography */
 body {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   color: var(--color-text);
   font-family: var(--font-primary);
@@ -21,7 +21,7 @@ h5,
 h6 {
   font-family: var(--font-heading);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
   margin-bottom: var(--space-lg);
   color: var(--color-text);
   letter-spacing: -0.03em;
@@ -108,6 +108,7 @@ a:hover {
 
 .vibe-description {
   font-size: 13px;
+  font-weight: 300;
   color: rgba(255, 255, 255, 0.78);
   line-height: 1.55;
   max-width: 260px;
@@ -116,6 +117,7 @@ a:hover {
 
 .mobile-vibe-description {
   font-size: 14px;
+  font-weight: 300;
   color: rgba(255, 255, 255, 0.78);
   line-height: 1.55;
   font-family: var(--font-primary);
@@ -208,6 +210,7 @@ a:hover {
   text-align: center;
   color: var(--color-text-light);
   font-size: 12px;
+  font-weight: 300;
   margin-bottom: var(--space-lg);
   font-style: italic;
   letter-spacing: 0.02em;
