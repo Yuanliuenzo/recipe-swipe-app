@@ -213,7 +213,9 @@ app.get("/api/me", (req, res) => {
     preferences: {
       diet: req.prefs.diet,
       budget: req.prefs.budget,
-      seasonalKing: req.prefs.seasonal_king
+      seasonalKing: req.prefs.seasonal_king,
+      healthGoal: req.prefs.health_goal,
+      cookingSkill: req.prefs.cooking_skill
     },
     createdAt: req.user.created_at,
     lastLogin: req.user.last_login
@@ -338,7 +340,9 @@ app.get("/api/preferences", (req, res) => {
     preferences: {
       diet: req.prefs.diet,
       budget: req.prefs.budget,
-      seasonalKing: req.prefs.seasonal_king
+      seasonalKing: req.prefs.seasonal_king,
+      healthGoal: req.prefs.health_goal,
+      cookingSkill: req.prefs.cooking_skill
     }
   });
 });
@@ -348,23 +352,35 @@ app.patch("/api/preferences", (req, res) => {
     return res.status(401).json({ error: "Not logged in" });
   }
 
-  const { diet, budget, seasonalKing } = req.body;
+  const { diet, budget, seasonalKing, healthGoal, cookingSkill } = req.body;
   const p = req.prefs;
 
+  const newDiet = diet !== undefined ? diet : p.diet;
+  const newBudget = budget !== undefined ? budget : p.budget;
+  const newSeasonalKing =
+    seasonalKing !== undefined ? seasonalKing : p.seasonal_king;
+  const newHealthGoal = healthGoal !== undefined ? healthGoal : p.health_goal;
+  const newCookingSkill =
+    cookingSkill !== undefined ? cookingSkill : p.cooking_skill;
+
   db.prepare(
-    "UPDATE preferences SET diet = ?, budget = ?, seasonal_king = ? WHERE username = ?"
+    "UPDATE preferences SET diet = ?, budget = ?, seasonal_king = ?, health_goal = ?, cooking_skill = ? WHERE username = ?"
   ).run(
-    diet || p.diet,
-    budget || p.budget,
-    seasonalKing || p.seasonal_king,
+    newDiet,
+    newBudget,
+    newSeasonalKing,
+    newHealthGoal,
+    newCookingSkill,
     req.username
   );
 
   res.json({
     preferences: {
-      diet: diet || p.diet,
-      budget: budget || p.budget,
-      seasonalKing: seasonalKing || p.seasonal_king
+      diet: newDiet,
+      budget: newBudget,
+      seasonalKing: newSeasonalKing,
+      healthGoal: newHealthGoal,
+      cookingSkill: newCookingSkill
     }
   });
 });
@@ -465,8 +481,26 @@ app.use((req, res) => {
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
+function migratePreferences() {
+  try {
+    db.exec(
+      "ALTER TABLE preferences ADD COLUMN health_goal TEXT NOT NULL DEFAULT 'balanced'"
+    );
+  } catch {
+    /* column already exists */
+  }
+  try {
+    db.exec(
+      "ALTER TABLE preferences ADD COLUMN cooking_skill TEXT NOT NULL DEFAULT 'moderate'"
+    );
+  } catch {
+    /* column already exists */
+  }
+}
+
 function startServer() {
   initializeAccounts();
+  migratePreferences();
   cleanExpiredSessions();
 
   app.listen(3000, "0.0.0.0", () => {

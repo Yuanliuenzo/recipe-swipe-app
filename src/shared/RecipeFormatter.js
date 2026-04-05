@@ -198,9 +198,41 @@ export class RecipeFormatter {
       )
       .join("");
 
-    const timelineHtml = timeline?.steps?.length
+    const parseStep = raw => {
+      const m = raw.match(/^(\d+)\s*min\s*before\s*serving[:\s\u2013-]+(.+)$/i);
+      return m
+        ? { minutesBefore: parseInt(m[1], 10), action: m[2].trim() }
+        : { minutesBefore: null, action: raw.trim() };
+    };
+
+    const parsedSteps = timeline?.steps?.length
+      ? timeline.steps
+          .map(parseStep)
+          .sort((a, b) => (b.minutesBefore ?? -1) - (a.minutesBefore ?? -1))
+      : [];
+
+    const timelineHtml = parsedSteps.length
       ? `<div class="recipe-timeline">
-          ${timeline.steps.map(s => `<div class="timeline-step">${s}</div>`).join("")}
+          ${parsedSteps
+            .map(({ minutesBefore, action }) => {
+              if (minutesBefore === 0) {
+                return `<div class="timeline-serve">
+                  <div class="timeline-serve-spacer"></div>
+                  <div class="timeline-serve-dot">🍽</div>
+                  <div class="timeline-serve-label">Serve!</div>
+                </div>`;
+              }
+              const label = minutesBefore !== null ? `${minutesBefore}m` : "";
+              return `<div class="timeline-step">
+                <div class="timeline-step-time">${label}</div>
+                <div class="timeline-step-track">
+                  <div class="timeline-step-dot"></div>
+                  <div class="timeline-step-line"></div>
+                </div>
+                <div class="timeline-step-action">${action}</div>
+              </div>`;
+            })
+            .join("")}
         </div>`
       : "";
 

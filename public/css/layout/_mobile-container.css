@@ -63,6 +63,7 @@
   justify-content: flex-start;
   align-items: center;
   padding: var(--space-lg);
+  overflow-y: auto;
   animation: resultFadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
@@ -211,4 +212,15 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   margin: 0 var(--space-xl);
+}
+
+/* Desktop: center the mobile app like a phone frame */
+@media (min-width: 768px) {
+  .mobile-container {
+    max-width: 430px;
+    margin: 0 auto;
+    border-left: 1px solid rgba(0, 0, 0, 0.06);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.08);
+  }
 }

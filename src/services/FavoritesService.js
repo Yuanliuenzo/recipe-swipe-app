@@ -156,9 +156,19 @@ export class FavoritesService {
       favorites.forEach(fav => {
         const card = document.createElement("div");
         card.className = "mobile-favorite-card";
+        const savedDate = fav.createdAt
+          ? new Date(fav.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric"
+            })
+          : "";
         card.innerHTML = `
           <div class="mobile-favorite-header">
-            <h3 class="mobile-favorite-title">${fav.title}</h3>
+            <div class="mobile-favorite-info">
+              <h3 class="mobile-favorite-title">${fav.title}</h3>
+              ${savedDate ? `<span class="mobile-favorite-date">${savedDate}</span>` : ""}
+            </div>
+            <span class="mobile-favorite-chevron">›</span>
           </div>
         `;
         card.addEventListener("click", () => this.openFavoriteModal(fav));

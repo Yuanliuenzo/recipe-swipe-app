@@ -12,7 +12,7 @@
 
 .vibe-summary h2 {
   margin-bottom: var(--space-xl);
-  color: #333;
+  color: var(--color-text);
   font-size: 28px;
 }
 
@@ -25,13 +25,13 @@
 }
 
 .vibe-tag {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--gradient-vibe);
   color: white;
   padding: var(--space-sm) var(--space-lg);
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 10px rgba(192, 88, 58, 0.2);
 }
 
 /* Mobile Vibe Summary */
@@ -41,7 +41,7 @@
 
 .mobile-vibe-summary h2 {
   font-size: 24px;
-  color: #333;
+  color: var(--color-text);
   margin-bottom: var(--space-lg);
 }
 
@@ -129,42 +129,38 @@
   text-align: right;
 }
 
-/* Skip-to-recipes pill — fixed above the card container */
+/* Skip link — in .mobile-header, right of center but clear of the FAB (56px wide, right: 20px) */
 .vibe-skip-btn {
   position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background: transparent;
-  border: 1.5px solid var(--color-border);
-  color: var(--color-text-light);
-  font-size: 13px;
+  right: 84px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
   font-family: var(--font-primary);
   font-weight: 500;
-  letter-spacing: 0.02em;
   cursor: pointer;
-  padding: 10px 22px;
-  border-radius: var(--radius-full);
+  padding: 8px 4px;
   white-space: nowrap;
-  /* hover transitions run fast; exit transition runs slower */
+  -webkit-tap-highlight-color: transparent;
+  /* Opacity-only transition — no transform animation, safe on iOS */
+  opacity: 0;
   transition:
-    border-color var(--transition-fast),
-    color var(--transition-fast),
-    background var(--transition-fast),
-    transform 0.38s cubic-bezier(0.4, 0, 1, 1),
-    opacity 0.38s ease;
+    opacity 0.3s ease,
+    color 0.15s ease;
 }
 
-.vibe-skip-btn:hover {
-  border-color: var(--color-accent);
+.vibe-skip-btn.is-visible {
+  opacity: 1;
+}
+
+.vibe-skip-btn:active {
   color: var(--color-accent);
-  background: rgba(196, 146, 74, 0.06);
 }
 
-/* Exit: pill swipes off to the right, matching the swipe metaphor */
 .vibe-skip-btn.is-exiting {
-  transform: translateX(calc(-50% + 110vw));
   opacity: 0;
   pointer-events: none;
 }
@@ -173,7 +169,7 @@
 .mobile-vibe-card {
   width: 100%;
   max-width: 420px;
-  height: min(80vh, 640px);
+  height: min(90vh, 750px);
   border-radius: var(--radius-5xl);
   overflow: hidden;
   box-sizing: border-box;
@@ -208,12 +204,12 @@
 
 .mobile-swipe-indicator.like {
   right: 20px;
-  color: #2e7d32;
+  color: var(--color-accent);
 }
 
 .mobile-swipe-indicator.nope {
   left: 20px;
-  color: #c0392b;
+  color: var(--color-primary);
 }
 
 .mobile-swipe-indicator.show {
@@ -356,7 +352,7 @@
 
   .mobile-vibe-card {
     max-width: 100%;
-    height: min(70vh, 500px);
+    height: min(88vh, 700px);
   }
 
   .vibe-card-caption {

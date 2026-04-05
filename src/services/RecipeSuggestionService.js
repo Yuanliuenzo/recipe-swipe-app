@@ -282,13 +282,13 @@ If ingredients were provided, lean toward directions where they fit naturally �
 Respond ONLY with JSON (no extra text):
 {
   "directions": [
-    {"label": "Mediterranean", "emoji": "🫒", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
-    {"label": "Italian comfort", "emoji": "🍅", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
-    {"label": "Light & Asian-inspired", "emoji": "🥢", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
+    {"label": "Mediterranean", "emoji": "🫒", "description": "Bright, herb-forward dishes — olive oil, citrus, and sun-ripened vegetables.", "prompt": "Mediterranean-inspired cooking — varied dishes in this tradition"},
+    {"label": "Italian comfort", "emoji": "🍅", "description": "Hearty and warming — pasta, slow-cooked sauces, and rustic baked dishes.", "prompt": "Italian home cooking — pasta, eggs, soups, or vegetable dishes"},
+    {"label": "Light & Asian-inspired", "emoji": "🥢", "description": "Clean, umami-rich flavours — fresh herbs, sesame, ginger, and miso.", "prompt": "Light Asian-influenced dishes — quick, fresh, umami-forward"}
   ]
 }
 
-Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
+Rules: labels 1–3 words (cuisine name or short mood), punchy; description 1 short evocative sentence (~12 words, sensory/mood-driven); 3–4 directions; the "prompt" field describes the culinary tradition or style in one phrase.`;
 
     try {
       const response = await apiService.post(
@@ -363,11 +363,30 @@ Rules: labels 1–3 words (cuisine name or short mood), punchy; 3–4 directions
     if (sessionContext.timeAvailable) {
       contextBlock += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
     }
-    if (preferences.diet && preferences.diet !== "None") {
-      contextBlock += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    const diets = (preferences.diet || "")
+      .split(",")
+      .map(d => d.trim())
+      .filter(d => d && d !== "None");
+    if (diets.length) {
+      contextBlock += `Dietary restrictions: ${diets.join(", ")} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
       contextBlock += `Budget: affordable, everyday ingredients preferred\n`;
+    }
+    if (preferences.healthGoal === "light") {
+      contextBlock += `Calorie focus: light and healthy — lean proteins, vegetables, low-fat preparations\n`;
+    }
+    if (preferences.healthGoal === "indulgent") {
+      contextBlock += `Calorie focus: indulgent — rich ingredients, satisfying portions welcome\n`;
+    }
+    if (preferences.cookingSkill === "easy") {
+      contextBlock += `Skill level: beginner-friendly — simple techniques, under 10 ingredients\n`;
+    }
+    if (preferences.cookingSkill === "involved") {
+      contextBlock += `Skill level: advanced cook — complex techniques welcome\n`;
+    }
+    if (preferences.seasonalKing === "Yes") {
+      contextBlock += `Strong preference for seasonal, locally-available ingredients\n`;
     }
 
     // Shared vibe block
@@ -485,11 +504,30 @@ components[0] is always the main dish. Additional entries are natural accompanim
     if (sessionContext.timeAvailable) {
       prompt += `Time constraint: ${timeLabels[sessionContext.timeAvailable]}\n`;
     }
-    if (preferences.diet && preferences.diet !== "None") {
-      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    const diets = (preferences.diet || "")
+      .split(",")
+      .map(d => d.trim())
+      .filter(d => d && d !== "None");
+    if (diets.length) {
+      prompt += `Dietary restrictions: ${diets.join(", ")} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
       prompt += `Budget: affordable ingredients\n`;
+    }
+    if (preferences.healthGoal === "light") {
+      prompt += `Calorie focus: light and healthy — lean proteins, vegetables, low-fat preparations\n`;
+    }
+    if (preferences.healthGoal === "indulgent") {
+      prompt += `Calorie focus: indulgent — rich ingredients, satisfying portions welcome\n`;
+    }
+    if (preferences.cookingSkill === "easy") {
+      prompt += `Skill level: beginner-friendly — simple techniques, under 10 ingredients\n`;
+    }
+    if (preferences.cookingSkill === "involved") {
+      prompt += `Skill level: advanced cook — complex techniques welcome\n`;
+    }
+    if (preferences.seasonalKing === "Yes") {
+      prompt += `Strong preference for seasonal, locally-available ingredients\n`;
     }
 
     if (vibes.length) {
@@ -624,7 +662,7 @@ Do not omit headers. Keep concise but complete.
       )
       .join("");
     const btnLabel =
-      accompaniments.length > 0 ? "Cook This Meal" : "Choose This Recipe";
+      accompaniments.length > 0 ? "Cook this meal" : "Let's make this";
 
     return `
       <div class="recipe-suggestion-card" data-suggestion-id="${suggestion.id}">
@@ -651,8 +689,8 @@ Do not omit headers. Keep concise but complete.
     return `
       <div class="recipe-suggestions-container">
         <div class="suggestions-header">
-          <h2>🍳 Recipe Ideas For You</h2>
-          <p>Based on your preferences, here are 5 suggestions. Click one to see the full recipe!</p>
+          <h2>Your recipe picks</h2>
+          <p>Tailored to your vibe tonight — tap one to get cooking.</p>
         </div>
         <div class="suggestions-grid">
           ${suggestions.map(s => this.createSuggestionCard(s)).join("")}

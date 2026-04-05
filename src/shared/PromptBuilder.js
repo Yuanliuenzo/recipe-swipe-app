@@ -6,7 +6,7 @@ export class PromptBuilder {
     preferences = {},
     ingredientsAtHome = ""
   ) {
-    let basePrompt = "";
+    let basePrompt;
 
     // Build base prompt from vibe profile
     if (vibeProfile.length === 0) {

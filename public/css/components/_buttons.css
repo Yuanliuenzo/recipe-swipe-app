@@ -180,17 +180,30 @@
   background: transparent;
   color: var(--color-text-light);
   border: none;
-  padding: var(--space-lg) var(--space-xl);
+  padding: 9px 6px;
   border-radius: var(--radius-md);
   font-family: var(--font-primary);
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-smooth);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.toggle-btn-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.toggle-btn-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
 }
 
 .mobile-recipe-toggle-btn.active {

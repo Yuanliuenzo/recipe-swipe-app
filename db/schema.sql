@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS preferences (
   username      TEXT PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE,
   diet          TEXT NOT NULL DEFAULT 'None',
   budget        TEXT NOT NULL DEFAULT 'No',
-  seasonal_king TEXT NOT NULL DEFAULT 'No'
+  seasonal_king TEXT NOT NULL DEFAULT 'No',
+  health_goal   TEXT NOT NULL DEFAULT 'balanced',
+  cooking_skill TEXT NOT NULL DEFAULT 'moderate'
 );
 
 CREATE TABLE IF NOT EXISTS favorites (
