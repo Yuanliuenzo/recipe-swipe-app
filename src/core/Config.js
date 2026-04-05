@@ -408,5 +408,7 @@ export const DISH_FORMATS = {
 export const DEFAULT_PREFERENCES = {
   diet: "None",
   budget: "No",
-  seasonalKing: "No"
+  seasonalKing: "No",
+  healthGoal: "balanced",
+  cookingSkill: "moderate"
 };

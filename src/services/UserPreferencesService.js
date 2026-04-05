@@ -110,7 +110,9 @@ export class UserPreferencesService {
     return {
       diet: prefs.diet || "None",
       budget: prefs.budget || "No",
-      seasonalKing: prefs.seasonalKing || "No"
+      seasonalKing: prefs.seasonalKing || "No",
+      healthGoal: prefs.healthGoal || "balanced",
+      cookingSkill: prefs.cookingSkill || "moderate"
     };
   }
 
@@ -141,26 +143,31 @@ export class UserPreferencesService {
     await this.ensureLoaded();
     const preferences = this.getPreferences();
 
-    // Create preferences content
     const screen = document.createElement("div");
     screen.className = "mobile-preferences-screen";
     screen.innerHTML = this.renderPreferencesHTML(preferences);
 
-    // Wire up close button
+    // Close button
     screen
-      .querySelector(".mobile-favorites-close")
+      .querySelector(".mobile-preferences-close")
       .addEventListener("click", () => {
         if (this.navigationService) {
           this.navigationService.go("main");
         }
       });
 
-    // Wire up save button (was defined in attachEvents() but never called)
-    screen
-      .querySelector(".mobile-save-btn")
-      .addEventListener("click", () => this.saveFromModal(screen));
+    // Wire chip interactions
+    screen.querySelectorAll(".pref-chip[data-pref]").forEach(chip => {
+      chip.addEventListener("click", () => this._handleChipClick(chip, screen));
+    });
 
-    // Render into the preferences view
+    // Wire toggle interactions
+    screen.querySelectorAll(".toggle-switch[data-pref]").forEach(toggle => {
+      toggle.addEventListener("click", () =>
+        this._handleToggleClick(toggle, screen)
+      );
+    });
+
     if (this.navigationService) {
       this.navigationService.renderPreferences(screen);
     } else {
@@ -171,100 +178,186 @@ export class UserPreferencesService {
     console.log("✅ Preferences screen rendered");
   }
 
-  renderPreferencesHTML(preferences) {
-    return `
-      <div class="mobile-favorites-header">
-        <button class="mobile-favorites-close">←</button>
-        <h2>Preferences</h2>
-      </div>
+  _handleChipClick(chip, screen) {
+    const prefKey = chip.dataset.pref;
+    const value = chip.dataset.value;
+    const isMulti = chip.dataset.multi === "true";
 
-      <div class="mobile-favorites-list">
+    if (isMulti) {
+      // Diet multi-select
+      if (value === "None") {
+        // Clear all, select only None
+        screen
+          .querySelectorAll(`.pref-chip[data-pref="${prefKey}"]`)
+          .forEach(c => {
+            c.classList.toggle("selected", c.dataset.value === "None");
+          });
+        this._autoSave("diet", "None", screen);
+      } else {
+        // Deselect None, toggle this chip
+        screen
+          .querySelectorAll(
+            `.pref-chip[data-pref="${prefKey}"][data-value="None"]`
+          )
+          .forEach(c => {
+            c.classList.remove("selected");
+          });
+        chip.classList.toggle("selected");
 
-        ${this.renderRadioGroup(
-          "Dietary Restrictions",
-          "diet",
-          ["None", "Vegetarian", "Vegan", "Gluten-Free"],
-          preferences.diet
-        )}
+        // Collect selected values
+        const selected = [
+          ...screen.querySelectorAll(
+            `.pref-chip[data-pref="${prefKey}"].selected`
+          )
+        ]
+          .map(c => c.dataset.value)
+          .filter(v => v !== "None");
 
-        ${this.renderRadioGroup(
-          "Budget-Conscious?",
-          "budget",
-          ["No", "Yes"],
-          preferences.budget
-        )}
-
-        ${this.renderRadioGroup(
-          "Prefer Seasonal Ingredients?",
-          "seasonalKing",
-          ["No", "Yes"],
-          preferences.seasonalKing
-        )}
-
-        <div class="mobile-preference-actions">
-          <button class="mobile-save-btn">Save Preferences</button>
-        </div>
-
-      </div>
-    `;
-  }
-
-  renderRadioGroup(title, name, options, selected) {
-    return `
-      <div class="mobile-preference-group">
-        <h3>${title}</h3>
-        <div class="mobile-preference-options">
-          ${options
-            .map(
-              opt => `
-            <label class="mobile-preference-option">
-              <input type="radio" name="${name}" value="${opt}"
-                ${selected === opt ? "checked" : ""}>
-              <span>${opt}</span>
-            </label>
-          `
+        // If nothing selected, fall back to None
+        if (selected.length === 0) {
+          screen
+            .querySelectorAll(
+              `.pref-chip[data-pref="${prefKey}"][data-value="None"]`
             )
-            .join("")}
+            .forEach(c => {
+              c.classList.add("selected");
+            });
+          this._autoSave("diet", "None", screen);
+        } else {
+          this._autoSave("diet", selected.join(","), screen);
+        }
+      }
+    } else {
+      // Single-select: deselect siblings, select this one
+      screen
+        .querySelectorAll(`.pref-chip[data-pref="${prefKey}"]`)
+        .forEach(c => {
+          c.classList.remove("selected");
+        });
+      chip.classList.add("selected");
+      this._autoSave(prefKey, value, screen);
+    }
+  }
+
+  _handleToggleClick(toggle, screen) {
+    const isActive = toggle.classList.toggle("active");
+    this._autoSave(toggle.dataset.pref, isActive ? "Yes" : "No", screen);
+  }
+
+  async _autoSave(key, value, screen) {
+    try {
+      await this.updatePreference(key, value);
+      const savedEl = screen.querySelector(".pref-saved");
+      if (savedEl) {
+        savedEl.classList.add("show");
+        clearTimeout(this._savedTimeout);
+        this._savedTimeout = setTimeout(
+          () => savedEl.classList.remove("show"),
+          1500
+        );
+      }
+    } catch {
+      // silent — user can try again
+    }
+  }
+
+  renderPreferencesHTML(preferences) {
+    // Parse diet multi-select (stored as comma-separated)
+    const selectedDiets = (preferences.diet || "None")
+      .split(",")
+      .map(d => d.trim())
+      .filter(Boolean);
+
+    const dietChips = [
+      { value: "None", label: "None" },
+      { value: "Vegetarian", label: "Vegetarian" },
+      { value: "Vegan", label: "Vegan" },
+      { value: "Gluten-Free", label: "Gluten-Free" },
+      { value: "Dairy-Free", label: "Dairy-Free" },
+      { value: "Nut-Free", label: "Nut-Free" }
+    ]
+      .map(({ value, label }) => {
+        const sel = selectedDiets.includes(value) ? " selected" : "";
+        return `<button class="pref-chip${sel}" data-pref="diet" data-value="${value}" data-multi="true">${label}</button>`;
+      })
+      .join("");
+
+    const healthChips = ["indulgent", "balanced", "light"]
+      .map(v => {
+        const labels = {
+          indulgent: "🍖 Indulgent",
+          balanced: "⚖️ Balanced",
+          light: "🥗 Light"
+        };
+        const sel = preferences.healthGoal === v ? " selected" : "";
+        return `<button class="pref-chip${sel}" data-pref="healthGoal" data-value="${v}">${labels[v]}</button>`;
+      })
+      .join("");
+
+    const skillChips = ["easy", "moderate", "involved"]
+      .map(v => {
+        const labels = {
+          easy: "🌱 Easy",
+          moderate: "👨‍🍳 Moderate",
+          involved: "🔪 Involved"
+        };
+        const sel = preferences.cookingSkill === v ? " selected" : "";
+        return `<button class="pref-chip${sel}" data-pref="cookingSkill" data-value="${v}">${labels[v]}</button>`;
+      })
+      .join("");
+
+    const budgetActive = preferences.budget === "Yes" ? " active" : "";
+    const seasonalActive = preferences.seasonalKing === "Yes" ? " active" : "";
+
+    return `
+      <div class="mobile-preferences-header">
+        <button class="mobile-preferences-close">←</button>
+        <h2>Preferences</h2>
+        <span class="pref-saved">Saved ✓</span>
+      </div>
+
+      <div class="pref-body">
+
+        <p class="pref-section-label">Eating</p>
+        <div class="pref-card">
+          <div class="pref-chip-row">
+            <span class="pref-chip-row-label">🥗 Dietary needs</span>
+            <div class="pref-chip-group">${dietChips}</div>
+          </div>
+          <div class="pref-chip-row">
+            <span class="pref-chip-row-label">🍽️ Calorie focus</span>
+            <div class="pref-chip-group">${healthChips}</div>
+          </div>
         </div>
+
+        <p class="pref-section-label">Cooking</p>
+        <div class="pref-card">
+          <div class="pref-chip-row">
+            <span class="pref-chip-row-label">👨‍🍳 Skill level</span>
+            <div class="pref-chip-group">${skillChips}</div>
+          </div>
+        </div>
+
+        <p class="pref-section-label">Priorities</p>
+        <div class="pref-card">
+          <div class="pref-toggle-row">
+            <div class="pref-toggle-info">
+              <div class="pref-toggle-title">💰 Budget-friendly</div>
+              <div class="pref-toggle-desc">Prefer everyday ingredients</div>
+            </div>
+            <div class="toggle-switch${budgetActive}" data-pref="budget"></div>
+          </div>
+          <div class="pref-toggle-row">
+            <div class="pref-toggle-info">
+              <div class="pref-toggle-title">🌿 Seasonal cooking</div>
+              <div class="pref-toggle-desc">Lean toward what's in season</div>
+            </div>
+            <div class="toggle-switch${seasonalActive}" data-pref="seasonalKing"></div>
+          </div>
+        </div>
+
       </div>
     `;
-  }
-
-  attachEvents(screen) {
-    screen
-      .querySelector(".mobile-favorites-close")
-      .addEventListener("click", () => this.closePreferences());
-
-    screen
-      .querySelector(".mobile-save-btn")
-      .addEventListener("click", () => this.saveFromModal(screen));
-  }
-
-  closePreferences() {
-    const screen = document.querySelector(".mobile-preferences-screen");
-    if (screen) {
-      screen.remove();
-    }
-
-    document.body.classList.remove("app--overlay-open");
-  }
-
-  async saveFromModal(screen) {
-    const diet = screen.querySelector('input[name="diet"]:checked')?.value;
-    const budget = screen.querySelector('input[name="budget"]:checked')?.value;
-    const seasonalKing = screen.querySelector(
-      'input[name="seasonalKing"]:checked'
-    )?.value;
-
-    const preferences = this.normalize({ diet, budget, seasonalKing });
-
-    try {
-      await this.saveUserPreferences(preferences);
-      this.closePreferences();
-      this.showToast("Preferences saved successfully!");
-    } catch {
-      this.showToast("Failed to save preferences");
-    }
   }
 
   /* ===============================

@@ -239,7 +239,7 @@
 .q-dish-label {
   font-size: 10px;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-text-light);
   text-align: center;
   line-height: 1.2;
   letter-spacing: 0.2px;

@@ -593,6 +593,7 @@
 .suggestion-description p {
   margin: 0;
   color: var(--color-text-muted);
+  font-weight: 300;
   position: relative;
   padding-left: 12px;
   border-left: 2px solid rgba(196, 146, 74, 0.35);

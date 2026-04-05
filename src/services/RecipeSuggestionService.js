@@ -363,11 +363,30 @@ Rules: labels 1–3 words (cuisine name or short mood), punchy; description 1 sh
     if (sessionContext.timeAvailable) {
       contextBlock += `Time available: ${timeLabels[sessionContext.timeAvailable]} — recipes must fit within this time\n`;
     }
-    if (preferences.diet && preferences.diet !== "None") {
-      contextBlock += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    const diets = (preferences.diet || "")
+      .split(",")
+      .map(d => d.trim())
+      .filter(d => d && d !== "None");
+    if (diets.length) {
+      contextBlock += `Dietary restrictions: ${diets.join(", ")} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
       contextBlock += `Budget: affordable, everyday ingredients preferred\n`;
+    }
+    if (preferences.healthGoal === "light") {
+      contextBlock += `Calorie focus: light and healthy — lean proteins, vegetables, low-fat preparations\n`;
+    }
+    if (preferences.healthGoal === "indulgent") {
+      contextBlock += `Calorie focus: indulgent — rich ingredients, satisfying portions welcome\n`;
+    }
+    if (preferences.cookingSkill === "easy") {
+      contextBlock += `Skill level: beginner-friendly — simple techniques, under 10 ingredients\n`;
+    }
+    if (preferences.cookingSkill === "involved") {
+      contextBlock += `Skill level: advanced cook — complex techniques welcome\n`;
+    }
+    if (preferences.seasonalKing === "Yes") {
+      contextBlock += `Strong preference for seasonal, locally-available ingredients\n`;
     }
 
     // Shared vibe block
@@ -485,11 +504,30 @@ components[0] is always the main dish. Additional entries are natural accompanim
     if (sessionContext.timeAvailable) {
       prompt += `Time constraint: ${timeLabels[sessionContext.timeAvailable]}\n`;
     }
-    if (preferences.diet && preferences.diet !== "None") {
-      prompt += `Dietary restriction: ${preferences.diet} — strictly required\n`;
+    const diets = (preferences.diet || "")
+      .split(",")
+      .map(d => d.trim())
+      .filter(d => d && d !== "None");
+    if (diets.length) {
+      prompt += `Dietary restrictions: ${diets.join(", ")} — strictly required\n`;
     }
     if (preferences.budget === "Yes") {
       prompt += `Budget: affordable ingredients\n`;
+    }
+    if (preferences.healthGoal === "light") {
+      prompt += `Calorie focus: light and healthy — lean proteins, vegetables, low-fat preparations\n`;
+    }
+    if (preferences.healthGoal === "indulgent") {
+      prompt += `Calorie focus: indulgent — rich ingredients, satisfying portions welcome\n`;
+    }
+    if (preferences.cookingSkill === "easy") {
+      prompt += `Skill level: beginner-friendly — simple techniques, under 10 ingredients\n`;
+    }
+    if (preferences.cookingSkill === "involved") {
+      prompt += `Skill level: advanced cook — complex techniques welcome\n`;
+    }
+    if (preferences.seasonalKing === "Yes") {
+      prompt += `Strong preference for seasonal, locally-available ingredients\n`;
     }
 
     if (vibes.length) {
