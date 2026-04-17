@@ -89,3 +89,10 @@ Thumbs.db
 # Debug utilities (development only)
 src/utils/PhoneDebugUtil.js
 debug-phone.js
+
+# Claude Code local settings
+.claude/
+
+# Playwright MCP / CLI artifacts
+.playwright-mcp/
+.playwright-cli/
