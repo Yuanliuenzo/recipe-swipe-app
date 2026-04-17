@@ -1,0 +1,5 @@
+{
+  "browser": { "browserName": "chromium" },
+  "timeouts": { "action": 5000 },
+  "outputDir": ".playwright-cli"
+}
