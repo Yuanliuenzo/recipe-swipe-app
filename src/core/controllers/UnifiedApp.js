@@ -17,6 +17,8 @@ import { RecipeFormatter } from "../../shared/RecipeFormatter.js";
 import { PromptBuilder } from "../../shared/PromptBuilder.js";
 import { RecipeDetailView } from "../../components/views/RecipeDetailView.js";
 import { RecipeSuggestionsView } from "../../components/views/RecipeSuggestionsView.js";
+import { RestaurantService } from "../../services/RestaurantService.js";
+import { RestaurantQuestionnaireView } from "../../components/views/RestaurantQuestionnaireView.js";
 import {
   CONFIG,
   MEAL_TYPES,
@@ -51,6 +53,9 @@ export class UnifiedApp {
     this.recipeSuggestionService = new RecipeSuggestionService(
       globalStateManager
     );
+
+    this.restaurantService = new RestaurantService(this.navigationService);
+    this.navigationService.restaurantService = this.restaurantService;
 
     // Now inject dependencies back into services
     this.favoritesService.navigationService = this.navigationService;
@@ -117,6 +122,7 @@ export class UnifiedApp {
       "recipeSuggestion",
       this.recipeSuggestionService
     );
+    this.serviceRegistry.register("restaurants", this.restaurantService);
     this.serviceRegistry.register("api", apiService);
 
     console.log("✅ All existing services initialized and registered");
@@ -316,25 +322,30 @@ export class UnifiedApp {
           return;
         } // prevent double-fire
         skipBtn.classList.add("is-exiting");
-        // Start recipe generation immediately — loading screen appears behind the exiting pill
-        this.showRecipeGeneration();
-        // Remove pill from DOM after exit animation completes
+        this.showResult();
         setTimeout(() => skipBtn.remove(), 420);
       });
       this.containers.cardContainer.appendChild(skipBtn);
     }
 
-    skipBtn.textContent = hasIngredients
-      ? `Skip swiping — use my ingredients →`
-      : `I know what I want — show me recipes →`;
+    const mode = globalStateManager.get("diningMode") || "home";
+    skipBtn.textContent =
+      mode === "out"
+        ? `I've seen enough — find me a restaurant →`
+        : hasIngredients
+          ? `Skip swiping — use my ingredients →`
+          : `I know what I want — show me recipes →`;
   }
 
   showResult() {
-    // Remove skip button if present
     document.querySelector(".vibe-skip-btn")?.remove();
-    // Always generate — showRecipeGeneration reads full context (vibes + ingredients + questionnaire)
-    // and works correctly even with an empty vibe profile
-    this.showRecipeGeneration();
+    const mode = globalStateManager.get("diningMode") || "home";
+    if (mode === "out") {
+      this.navigationService.go("restaurants");
+      this.restaurantService.showRestaurants();
+    } else {
+      this.showRecipeGeneration();
+    }
   }
 
   showQuestionnaire() {
@@ -348,12 +359,61 @@ export class UnifiedApp {
       return;
     }
 
+    container.innerHTML = `
+      <div class="mode-selector-card">
+        <div class="questionnaire-header">
+          <h2 class="questionnaire-title">What's the plan tonight?</h2>
+          <p class="questionnaire-subtitle">Pick your adventure</p>
+        </div>
+        <div class="mode-selector-body">
+          <button class="mode-btn" data-mode="home">
+            <span class="mode-btn-icon">🏠</span>
+            <span class="mode-btn-label">Home cooking</span>
+            <span class="mode-btn-desc">Get personalised recipe suggestions</span>
+          </button>
+          <button class="mode-btn" data-mode="out">
+            <span class="mode-btn-icon">🍽️</span>
+            <span class="mode-btn-label">Out for dinner</span>
+            <span class="mode-btn-desc">Find Amsterdam restaurants that match your vibe</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    container
+      .querySelector("[data-mode='home']")
+      .addEventListener("click", () => {
+        globalStateManager.setState({ diningMode: "home" });
+        this._showCookingQuestionnaire(container);
+      });
+
+    container
+      .querySelector("[data-mode='out']")
+      .addEventListener("click", () => {
+        globalStateManager.setState({ diningMode: "out" });
+        this._showRestaurantQuestionnaire(container);
+      });
+  }
+
+  _showRestaurantQuestionnaire(container) {
+    const view = new RestaurantQuestionnaireView(container, {
+      onComplete: ({ restaurantQuery, neighborhood }) => {
+        globalStateManager.setState({
+          restaurantQuery,
+          restaurantNeighborhood: neighborhood
+        });
+        this.navigationService.go("restaurants");
+      }
+    });
+    view.render();
+  }
+
+  _showCookingQuestionnaire(container) {
     const mealOptions = MEAL_TYPES.map(
       m =>
         `<button class="q-option" data-field="mealType" data-value="${m.value}">${m.emoji} ${m.label}</button>`
     ).join("");
 
-    // Only Q1 is rendered upfront — Q2, Q3, and ingredients reveal progressively
     container.innerHTML = `
       <div class="questionnaire-card">
         <div class="questionnaire-header">

@@ -76,6 +76,9 @@
 /* Questionnaire - Pre-swipe setup screen */
 @import "sections/_questionnaire.css";
 
+/* Restaurants - Vibe-matched restaurant discovery */
+@import "sections/_restaurants.css";
+
 /* ================================
    UTILITIES LAYER
    ================================ */

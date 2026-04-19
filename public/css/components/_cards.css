@@ -724,6 +724,24 @@
   color: var(--color-text-light);
 }
 
+.eat-out-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  transition: color var(--transition-fast);
+}
+
+.eat-out-btn:hover {
+  color: var(--color-primary-dark);
+}
+
 /* Premium Animations */
 @keyframes fadeInUp {
   from {

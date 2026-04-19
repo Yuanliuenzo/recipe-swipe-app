@@ -28,3 +28,17 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at TEXT DEFAULT (datetime('now')),
   expires_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS restaurants (
+  id           TEXT PRIMARY KEY,
+  name         TEXT NOT NULL,
+  cuisine      TEXT,
+  lat          REAL NOT NULL,
+  lng          REAL NOT NULL,
+  address      TEXT,
+  neighborhood TEXT,
+  description  TEXT,
+  embedding    BLOB,
+  osm_tags     TEXT,
+  created_at   TEXT DEFAULT (datetime('now'))
+);
