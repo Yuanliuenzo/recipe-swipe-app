@@ -22,6 +22,16 @@
     />
 
     <link rel="stylesheet" href="css/mobile.css" />
+    <!-- Leaflet map — free, no API key required -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+    ></script>
   </head>
   <body>
     <!-- App Root with Navigation Views -->
@@ -63,6 +73,9 @@
 
       <!-- Preferences View -->
       <div id="view-preferences" class="app-view"></div>
+
+      <!-- Restaurant Advisor View -->
+      <div id="view-restaurants" class="app-view"></div>
     </div>
 
     <!-- Mobile Navigation -->
@@ -75,6 +88,9 @@
           </button>
           <button class="fab-item" onclick="nav.go('preferences')">
             ⚙️ Preferences
+          </button>
+          <button class="fab-item" onclick="nav.go('restaurants')">
+            🗺️ Find Restaurants
           </button>
           <button class="fab-item" onclick="logout()">🚪 Logout</button>
         </div>

@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import * as gateway from "./ai/gateway.js";
+import { ollamaEmbed } from "./ai/providers/ollama.js";
 import { extractJSON } from "./src/utils/LLMUtils.js";
 import { stats as cacheStats } from "./ai/cache.js";
 import db from "./db/database.js";
@@ -435,6 +436,310 @@ app.post("/api/streamRecipe", async (req, res) => {
   } finally {
     res.end();
   }
+});
+
+// ─── Restaurants ──────────────────────────────────────────────────────────────
+
+// Module-level embedding cache — loaded once, reused on every search request
+let _restaurantCache = null;
+
+function loadRestaurantCache() {
+  if (_restaurantCache) {
+    return _restaurantCache;
+  }
+  const rows = db
+    .prepare(
+      "SELECT id, name, cuisine, lat, lng, address, neighborhood, description, embedding FROM restaurants"
+    )
+    .all();
+  _restaurantCache = rows
+    .filter(r => r.embedding)
+    .map(r => ({
+      id: r.id,
+      name: r.name,
+      cuisine: r.cuisine,
+      lat: r.lat,
+      lng: r.lng,
+      address: r.address,
+      neighborhood: r.neighborhood,
+      description: r.description,
+      embedding: new Float32Array(
+        r.embedding.buffer,
+        r.embedding.byteOffset,
+        r.embedding.byteLength / 4
+      )
+    }));
+  console.log(
+    `🗂️  Loaded ${_restaurantCache.length} restaurant embeddings into cache`
+  );
+  return _restaurantCache;
+}
+
+function cosineSimilarity(a, b) {
+  let dot = 0,
+    normA = 0,
+    normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom === 0 ? 0 : dot / denom;
+}
+
+// Amsterdam neighborhood centers — used by both /search and /refine
+const NEIGHBORHOODS = [
+  { name: "Centrum", center: [52.3728, 4.8936], radius: 1200 },
+  { name: "Jordaan", center: [52.3752, 4.8826], radius: 800 },
+  { name: "De Pijp", center: [52.354, 4.8971], radius: 900 },
+  { name: "Oud-West", center: [52.3639, 4.8737], radius: 900 },
+  { name: "Oud-Zuid", center: [52.3465, 4.872], radius: 1000 },
+  { name: "Oost", center: [52.3618, 4.9257], radius: 1200 },
+  { name: "Noord", center: [52.4007, 4.9236], radius: 1500 },
+  { name: "Westerpark", center: [52.3855, 4.8682], radius: 900 },
+  { name: "De Baarsjes", center: [52.3692, 4.858], radius: 800 },
+  { name: "Watergraafsmeer", center: [52.3497, 4.9365], radius: 1000 }
+];
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function vibeProfileToQueryText(vibeProfile) {
+  if (!vibeProfile?.length) {
+    return "cozy warm restaurant Amsterdam";
+  }
+  return vibeProfile
+    .map(v => {
+      const tags = v.tags || {};
+      const parts = [
+        v.label || "",
+        ...(tags.mood || []),
+        ...(tags.flavor || []),
+        ...(tags.style || [])
+      ];
+      return parts.join(" ");
+    })
+    .join(". ");
+}
+
+app.post("/api/restaurants/search", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  const { vibeProfile = [], neighborhood = null } = req.body;
+  const queryText = vibeProfileToQueryText(vibeProfile);
+
+  let queryEmbedding;
+  try {
+    queryEmbedding = await ollamaEmbed(queryText);
+  } catch (err) {
+    console.error("❌ Embedding failed:", err.message);
+    return res
+      .status(503)
+      .json({
+        error:
+          "Embedding service unavailable. Make sure Ollama is running with nomic-embed-text."
+      });
+  }
+
+  let pool = loadRestaurantCache();
+
+  if (pool.length === 0) {
+    return res.json({
+      restaurants: [],
+      total: 0,
+      message:
+        "No restaurants indexed yet. Run: node scripts/ingest-restaurants.js"
+    });
+  }
+
+  // Apply neighborhood geo-filter upfront if questionnaire set one
+  if (neighborhood) {
+    const n = NEIGHBORHOODS.find(x => x.name === neighborhood);
+    if (n) {
+      pool = pool.filter(
+        r =>
+          haversineKm(r.lat, r.lng, n.center[0], n.center[1]) * 1000 <= n.radius
+      );
+    }
+  }
+
+  const scored = pool.map(r => ({
+    id: r.id,
+    name: r.name,
+    cuisine: r.cuisine,
+    lat: r.lat,
+    lng: r.lng,
+    address: r.address,
+    neighborhood: r.neighborhood,
+    description: r.description,
+    score: cosineSimilarity(queryEmbedding, r.embedding)
+  }));
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored.slice(0, 15);
+
+  res.json({ restaurants: top, total: pool.length, queryText, neighborhood });
+});
+
+app.get("/api/restaurants/explain/:id", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  const restaurant = db
+    .prepare("SELECT * FROM restaurants WHERE id = ?")
+    .get(req.params.id);
+  if (!restaurant) {
+    return res.status(404).json({ error: "Restaurant not found" });
+  }
+
+  const vibeProfile = JSON.parse(req.query.vibes || "[]");
+  const vibeText = vibeProfileToQueryText(vibeProfile);
+
+  const prompt = `You are a warm restaurant advisor. In 2–3 short sentences, explain why ${restaurant.name} (${restaurant.cuisine || "restaurant"} in Amsterdam) is a great match for someone who is feeling: ${vibeText || "looking for a good meal"}.
+
+Be specific about the restaurant's character and atmosphere. Be warm and inviting. Don't use filler phrases like "This restaurant is perfect for you".`;
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  try {
+    for await (const token of gateway.streamTokens(prompt, {
+      timeout: 30000
+    })) {
+      res.write(`data: ${JSON.stringify({ token })}\n\n`);
+    }
+    res.write("data: [DONE]\n\n");
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+  } finally {
+    res.end();
+  }
+});
+
+// Browse all restaurants — paginated, no embedding required
+app.get("/api/restaurants/all", (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  const limit = Math.min(parseInt(req.query.limit) || 30, 100);
+  const offset = parseInt(req.query.offset) || 0;
+
+  const { total } = db
+    .prepare("SELECT COUNT(*) AS total FROM restaurants")
+    .get();
+  const rows = db
+    .prepare(
+      "SELECT id, name, cuisine, lat, lng, address, neighborhood FROM restaurants ORDER BY name LIMIT ? OFFSET ?"
+    )
+    .all(limit, offset);
+
+  res.json({
+    restaurants: rows,
+    total,
+    limit,
+    offset,
+    hasMore: offset + rows.length < total
+  });
+});
+
+// Hybrid retrieval: NL query → slot extraction + semantic re-ranking with optional filters
+app.post("/api/restaurants/refine", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  const {
+    vibeProfile = [],
+    nlQuery = "",
+    neighborhood = null,
+    cuisine = null
+  } = req.body;
+
+  // Build combined query: questionnaire context + NL text
+  const baseText = vibeProfileToQueryText(vibeProfile);
+  const combinedQuery = [baseText, nlQuery].filter(Boolean).join(". ");
+
+  let queryEmbedding;
+  try {
+    queryEmbedding = await ollamaEmbed(combinedQuery);
+  } catch {
+    return res.status(503).json({ error: "Embedding service unavailable." });
+  }
+
+  let pool = loadRestaurantCache();
+
+  // Apply neighborhood geo-filter
+  if (neighborhood) {
+    const n = NEIGHBORHOODS.find(x => x.name === neighborhood);
+    if (n) {
+      pool = pool.filter(
+        r =>
+          haversineKm(r.lat, r.lng, n.center[0], n.center[1]) * 1000 <= n.radius
+      );
+    }
+  }
+
+  // Apply cuisine string filter
+  if (cuisine) {
+    const lc = cuisine.toLowerCase();
+    const cuisineFiltered = pool.filter(
+      r => r.cuisine && r.cuisine.toLowerCase().includes(lc)
+    );
+    // Only apply if it yields results; otherwise keep the full pool
+    if (cuisineFiltered.length > 0) {
+      pool = cuisineFiltered;
+    }
+  }
+
+  // Score and rank
+  const scored = pool.map(r => ({
+    id: r.id,
+    name: r.name,
+    cuisine: r.cuisine,
+    lat: r.lat,
+    lng: r.lng,
+    address: r.address,
+    neighborhood: r.neighborhood,
+    description: r.description,
+    score: cosineSimilarity(queryEmbedding, r.embedding)
+  }));
+
+  scored.sort((a, b) => b.score - a.score);
+  res.json({
+    restaurants: scored.slice(0, 10),
+    total: pool.length,
+    nlQuery,
+    neighborhood,
+    cuisine
+  });
+});
+
+app.get("/api/restaurants/status", (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+  const count = db.prepare("SELECT COUNT(*) as n FROM restaurants").get().n;
+  const withEmbeddings = db
+    .prepare(
+      "SELECT COUNT(*) as n FROM restaurants WHERE embedding IS NOT NULL"
+    )
+    .get().n;
+  res.json({ total: count, withEmbeddings });
 });
 
 // ─── Health ───────────────────────────────────────────────────────────────────

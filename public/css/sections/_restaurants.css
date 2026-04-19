@@ -1,0 +1,541 @@
+/* ============================================================
+   RESTAURANT ADVISOR — Japandi-inspired restaurant discovery
+   ============================================================ */
+
+.restaurant-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+/* ─── Restaurant Questionnaire ──────────────────────────── */
+
+.restaurant-q-card {
+  background: var(--color-card);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-4xl) var(--space-xl) var(--space-xl);
+  max-width: 440px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: var(--shadow-xl);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.restaurant-q-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.restaurant-q-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 var(--space-sm);
+}
+
+.restaurant-q-subtitle {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.restaurant-q-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.rq-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.rq-step-reveal {
+  animation: rq-reveal 0.25s ease both;
+}
+
+@keyframes rq-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rq-question {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+.rq-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.rq-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-lg) var(--space-sm);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base),
+    transform var(--transition-fast);
+  text-align: center;
+}
+
+.rq-tile:active {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .rq-tile:hover {
+    border-color: var(--color-primary);
+    background: var(--color-card);
+  }
+}
+
+.rq-tile.is-selected {
+  border-color: var(--color-primary);
+  background: rgba(192, 90, 58, 0.06);
+}
+
+.rq-tile-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.rq-tile-label {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ─── Refinement Bar ─────────────────────────────────────── */
+
+.refine-bar {
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.refine-pills {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.refine-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.refine-pill {
+  flex-shrink: 0;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.refine-pill.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.refine-nl {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.refine-nl-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-lg);
+  padding-right: 36px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.refine-nl-input:focus {
+  border-color: var(--color-primary);
+}
+
+.refine-nl-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.refine-nl-clear {
+  position: absolute;
+  right: var(--space-md);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+
+.restaurant-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  padding-top: max(var(--space-lg), env(safe-area-inset-top));
+}
+
+.restaurant-back-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+
+.restaurant-back-btn:hover {
+  background: var(--color-surface);
+}
+
+.restaurant-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.restaurant-indexed-count {
+  font-size: 11px;
+  color: var(--color-text-light);
+  margin: 2px 0 0;
+  opacity: 0.7;
+}
+
+.load-more-btn {
+  display: block;
+  width: calc(100% - var(--space-2xl) * 2);
+  margin: var(--space-lg) var(--space-2xl) var(--space-xl);
+  text-align: center;
+}
+
+.restaurant-view-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.view-toggle-btn {
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-xs) var(--space-md);
+  font-size: 12px;
+  font-family: var(--font-primary);
+  color: var(--color-text-light);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.view-toggle-btn.is-active {
+  background: var(--color-card);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 2px;
+}
+
+.restaurant-subtitle {
+  font-family: var(--font-primary);
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.restaurant-subtitle em {
+  color: var(--color-primary);
+  font-style: normal;
+}
+
+/* ─── Map ────────────────────────────────────────────────── */
+
+.restaurant-map {
+  height: 42vh;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border);
+  z-index: 1;
+}
+
+/* Override Leaflet defaults for Japandi look */
+.leaflet-container {
+  font-family: var(--font-primary) !important;
+}
+
+.map-popup strong {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.map-popup small {
+  color: var(--color-text-light);
+}
+
+/* ─── Restaurant List ────────────────────────────────────── */
+
+.restaurant-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-md) var(--space-lg);
+  padding-bottom: max(var(--space-4xl), env(safe-area-inset-bottom));
+}
+
+.restaurant-list-header {
+  padding: var(--space-sm) 0 var(--space-md);
+}
+
+.restaurant-count {
+  font-family: var(--font-primary);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.restaurant-loading,
+.restaurant-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-4xl) var(--space-lg);
+  text-align: center;
+  color: var(--color-text-light);
+}
+
+/* ─── Restaurant Cards ───────────────────────────────────── */
+
+.restaurant-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.restaurant-card {
+  display: flex;
+  gap: var(--space-md);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-fast);
+}
+
+.restaurant-card:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .restaurant-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.restaurant-card.is-selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(192, 90, 58, 0.2);
+}
+
+.restaurant-card-rank {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-border);
+  min-width: 28px;
+  text-align: center;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+.restaurant-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.restaurant-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.restaurant-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.restaurant-card-name {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.restaurant-card-meta {
+  font-family: var(--font-primary);
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Match Score Badge ──────────────────────────────────── */
+
+.restaurant-card-score {
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.restaurant-card-score.match-high {
+  background: rgba(90, 122, 80, 0.12);
+  color: #5a7a50;
+}
+
+.restaurant-card-score.match-med {
+  background: rgba(196, 146, 74, 0.12);
+  color: #a07538;
+}
+
+.restaurant-card-score.match-low {
+  background: rgba(192, 90, 58, 0.08);
+  color: var(--color-primary);
+}
+
+/* ─── Explain Button & Output ────────────────────────────── */
+
+.restaurant-explain-container {
+  min-height: 0;
+}
+
+.explain-text {
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-light);
+  padding: var(--space-sm) 0;
+  font-style: italic;
+}
+
+.restaurant-explain-btn {
+  align-self: flex-start;
+  font-size: 12px;
+  padding: var(--space-xs) var(--space-md);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .restaurant-map {
+    height: 50vh;
+  }
+
+  .restaurant-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

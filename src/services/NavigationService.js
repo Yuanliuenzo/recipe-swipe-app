@@ -8,7 +8,8 @@ export class NavigationService {
     this.views = {
       main: document.getElementById("view-main"),
       favorites: document.getElementById("view-favorites"),
-      preferences: document.getElementById("view-preferences")
+      preferences: document.getElementById("view-preferences"),
+      restaurants: document.getElementById("view-restaurants")
     };
 
     this.current = "main";
@@ -17,6 +18,7 @@ export class NavigationService {
     // Injected services
     this.favoritesService = favoritesService;
     this.userPreferencesService = userPreferencesService;
+    this.restaurantService = null; // injected after construction
 
     // Initialize
     console.log("🧭 Navigation Service initialized");
@@ -39,6 +41,8 @@ export class NavigationService {
       await this.favoritesService.showFavorites();
     } else if (view === "preferences" && this.userPreferencesService) {
       await this.userPreferencesService.showPreferences();
+    } else if (view === "restaurants" && this.restaurantService) {
+      await this.restaurantService.showRestaurants();
     }
 
     // Transition

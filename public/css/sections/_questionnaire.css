@@ -2,6 +2,97 @@
    QUESTIONNAIRE — Pre-swipe setup screen
    ================================ */
 
+/* Mode selector */
+.mode-selector-card {
+  background: var(--color-card);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-2xl);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  animation: questionnaire-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mode-selector-body {
+  padding: var(--space-xl) var(--space-3xl) var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-xl) var(--space-2xl);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.15s;
+  width: 100%;
+}
+
+.mode-btn:hover,
+.mode-btn:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--gradient-surface);
+  transform: translateY(-1px);
+}
+
+.mode-btn:active {
+  transform: translateY(0);
+}
+
+.mode-btn-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.mode-btn-label {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.mode-btn-desc {
+  font-size: 13px;
+  color: var(--color-text-light);
+  line-height: 1.4;
+}
+
+/* Restaurant card actions row */
+.restaurant-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.restaurant-maps-link {
+  font-size: 13px;
+  color: var(--color-text-light);
+  text-decoration: none;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  white-space: nowrap;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.restaurant-maps-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 .questionnaire-card {
   background: var(--color-card);
   border-radius: var(--radius-3xl);

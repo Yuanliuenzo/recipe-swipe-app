@@ -662,6 +662,7 @@ Do not omit headers. Keep concise but complete.
             🔄 Get New Ideas
           </button>
           <button class="start-fresh-btn">Cook something different →</button>
+          <button class="eat-out-btn">🗺️ Not cooking? Find restaurants →</button>
         </div>
       </div>
     `;

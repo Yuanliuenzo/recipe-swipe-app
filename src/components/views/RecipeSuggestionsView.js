@@ -95,6 +95,16 @@ export class RecipeSuggestionsView {
       });
     });
 
+    // Setup "find restaurants" shortcut
+    const eatOutBtn = this.container.querySelector(".eat-out-btn");
+    if (eatOutBtn) {
+      eatOutBtn.addEventListener("click", () => {
+        if (window.nav) {
+          window.nav.go("restaurants");
+        }
+      });
+    }
+
     // Setup start-fresh button
     const startFreshBtn = this.container.querySelector(".start-fresh-btn");
     if (startFreshBtn) {
